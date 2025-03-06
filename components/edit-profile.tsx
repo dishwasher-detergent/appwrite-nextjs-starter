@@ -34,8 +34,8 @@ export function EditProfile({
 
   return (
     <DyanmicDrawer
-      title="Edit Sample"
-      description="Edit an existing Sample"
+      title="Edit Profile"
+      description="Edit your profile."
       open={open}
       setOpen={setOpen}
       button={

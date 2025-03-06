@@ -10,12 +10,14 @@ export default async function ProfilePage() {
   }
 
   return (
-    <>
-      <h2 className="font-bold text-xl">{data?.name}</h2>
-      <p>{data?.email}</p>
+    <div className="flex flex-row justify-between">
+      <div>
+        <h2 className="font-bold text-xl">{data?.name}</h2>
+        <p>{data?.email}</p>
+      </div>
       <div className="flex flex-row gap-1">
         <EditProfile user={data} />
       </div>
-    </>
+    </div>
   );
 }

@@ -17,13 +17,15 @@ export default async function SamplePage({
   }
 
   return (
-    <>
-      <h2 className="font-bold text-xl">{data?.name}</h2>
-      <p>{data?.description}</p>
+    <div className="flex flex-row justify-between">
+      <div>
+        <h2 className="font-bold text-xl">{data?.name}</h2>
+        <p>{data?.description}</p>
+      </div>
       <div className="flex flex-row gap-1">
         <EditSample sample={data} />
         <DeleteSample sample={data} />
       </div>
-    </>
+    </div>
   );
 }
