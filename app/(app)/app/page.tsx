@@ -1,25 +1,59 @@
+import { AddSample } from "@/components/create-sample";
+import { DeleteSample } from "@/components/delete-sample";
+import { EditSample } from "@/components/edit-sample";
 import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { getSamples } from "@/lib/db/queries";
 
-export default async function AppPage() {
-  const data = await getSamples();
+import { LucideLink2 } from "lucide-react";
+import Link from "next/link";
 
-  console.log(data);
+export default async function AppPage() {
+  const { data } = await getSamples();
 
   return (
-    <div>
-      <header className="flex flex-row justify-between items-center">
-        <h2>Samples</h2>
-        <Button size="sm">Add Sample</Button>
+    <>
+      <header className="flex flex-row justify-between items-center pb-4">
+        <h2 className="font-bold">Samples</h2>
+        <AddSample />
       </header>
-      <ul>
-        {data.data?.documents.map((sample) => (
-          <li key={sample.$id} className="border-b border-gray-200 py-2">
-            <p className="font-semibold">{sample.name}</p>
-            <p className="text-sm">{sample.description}</p>
-          </li>
-        ))}
-      </ul>
-    </div>
+      <Table>
+        <TableCaption>A list of your recent samples.</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead className="w-full">Description</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data?.documents.map((sample) => (
+            <TableRow key={sample.$id}>
+              <TableCell>
+                <Button asChild variant="link" className="p-0!">
+                  <Link href={`/app/${sample.$id}`}>
+                    {sample.name}
+                    <LucideLink2 />
+                  </Link>
+                </Button>
+              </TableCell>
+              <TableCell className="w-full">{sample.description}</TableCell>
+              <TableCell className="inline-flex gap-2 justify-end">
+                <EditSample sample={sample} />
+                <DeleteSample sample={sample} />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </>
   );
 }

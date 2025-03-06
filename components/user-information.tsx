@@ -10,10 +10,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { logOut } from "@/lib/auth";
+import { getInitials } from "@/lib/utils";
 
 import { LucideLogOut } from "lucide-react";
+import { Models } from "node-appwrite";
+import { useMemo } from "react";
 
-export function UserInformation() {
+export function UserInformation({
+  user,
+}: {
+  user: Models.User<Models.Preferences>;
+}) {
+  const initals = useMemo(() => {
+    return getInitials(user.name);
+  }, [user.name]);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -21,10 +32,10 @@ export function UserInformation() {
           variant="ghost"
           className="flex flex-row items-center gap-2 rounded-full pr-1 pl-3"
         >
-          <p className="text-sm">Hello, Kenneth bass</p>
+          <p className="text-sm">Hello, {user.name}</p>
           <Avatar className="size-7">
             <AvatarFallback className="bg-primary text-sm text-primary-foreground">
-              KB
+              {initals}
             </AvatarFallback>
           </Avatar>
         </Button>

@@ -1,10 +1,15 @@
+"use server";
+
 import { Result } from "@/interfaces/result.interface";
 import { getLoggedInUser } from "@/lib/auth";
 import { Sample } from "@/interfaces/sample.interface";
 import { createSessionClient } from "@/lib/server/appwrite";
 import { DATABASE_ID, SAMPLE_COLLECTION_ID } from "@/lib/constants";
 
-import { ID, Models } from "node-appwrite";
+import { ID, Models, Permission, Role } from "node-appwrite";
+import { z } from "zod";
+import { addSampleSchema } from "@/components/create-sample";
+import { editSampleSchema } from "@/components/edit-sample";
 
 /**
  * Get the current user
@@ -114,7 +119,7 @@ export async function getSampleById(
  * Create a sample
  * @param {Object} params The parameters for creating a sample
  * @param {string} [params.id] The ID of the sample (optional)
- * @param {Sample} params.data The sample data
+ * @param {z.infer<typeof addSampleSchema>} params.data The sample data
  * @param {string[]} [params.permissions] The permissions for the sample (optional)
  * @returns {Promise<Result<Sample>>} The created sample
  */
@@ -124,7 +129,7 @@ export async function createSample({
   permissions = [],
 }: {
   id?: string;
-  data: Sample;
+  data: z.infer<typeof addSampleSchema>;
   permissions?: string[];
 }): Promise<Result<Sample>> {
   const user = await getLoggedInUser();
@@ -137,6 +142,12 @@ export async function createSample({
   }
 
   const { database } = await createSessionClient();
+
+  permissions = [
+    ...permissions,
+    Permission.read(Role.user(user.$id)),
+    Permission.write(Role.user(user.$id)),
+  ];
 
   try {
     const sample = await database.createDocument<Sample>(
@@ -164,17 +175,17 @@ export async function createSample({
  * Update a sample
  * @param {Object} params The parameters for creating a sample
  * @param {string} [params.id] The ID of the sample
- * @param {Sample} params.data The sample data
+ * @param {z.infer<typeof editSampleSchema>} params.data The sample data
  * @param {string[]} [params.permissions] The permissions for the sample (optional)
  * @returns {Promise<Result<Sample>>} The updated sample
  */
 export async function updateSample({
   id,
   data,
-  permissions = [],
+  permissions = undefined,
 }: {
   id: string;
-  data: Sample;
+  data: z.infer<typeof editSampleSchema>;
   permissions?: string[];
 }): Promise<Result<Sample>> {
   const user = await getLoggedInUser();

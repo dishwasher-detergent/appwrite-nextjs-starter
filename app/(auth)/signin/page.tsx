@@ -9,38 +9,55 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { signInWithEmail } from "./action";
+import { signInWithEmail } from "@/lib/auth";
+import { signInSchema, type SignInFormData } from "@/lib/auth/schemas";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { LucideLoader2, LucideLogIn } from "lucide-react";
 import Link from "next/link";
-import { useActionState, useEffect } from "react";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-
-const initialState = {
-  message: "",
-  success: false,
-};
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [state, formAction, isPending] = useActionState(
-    signInWithEmail,
-    initialState
-  );
+  const [isPending, setIsPending] = useState(false);
 
-  useEffect(() => {
-    if (state.success) {
-      toast.success(state.message);
-      router.push("/app");
-    }
+  const form = useForm<SignInFormData>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-    if (!state.success && state.message != "") {
-      toast.error(state.message);
+  async function onSubmit(values: SignInFormData) {
+    try {
+      setIsPending(true);
+      const result = await signInWithEmail(values);
+
+      if (result.success) {
+        toast.success(result.message);
+        router.push("/app");
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      toast.error("An error occurred during sign in");
+    } finally {
+      setIsPending(false);
     }
-  }, [state]);
+  }
 
   return (
     <Card>
@@ -51,37 +68,53 @@ export default function LoginPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+            <FormField
+              control={form.control}
               name="email"
-              placeholder="user@example.com"
-              required
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="email"
+                      placeholder="user@example.com"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              required
+            <FormField
+              control={form.control}
               name="password"
-              placeholder="Password"
-              minLength={8}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="password" placeholder="Password" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <Button className="w-full" type="submit" disabled={isPending}>
-            Log In
-            {isPending ? (
-              <LucideLoader2 className="ml-2 size-3.5 animate-spin" />
-            ) : (
-              <LucideLogIn className="ml-2 size-3.5" />
-            )}
-          </Button>
-        </form>
+            <Button className="w-full" type="submit" disabled={isPending}>
+              {isPending ? (
+                <>
+                  Signing in
+                  <LucideLoader2 className="ml-2 size-3.5 animate-spin" />
+                </>
+              ) : (
+                <>
+                  Sign In
+                  <LucideLogIn className="ml-2 size-3.5" />
+                </>
+              )}
+            </Button>
+          </form>
+        </Form>
       </CardContent>
       <CardFooter>
         <p className="bg-muted text-muted-foreground w-full overflow-hidden rounded-md p-2 text-center text-sm font-bold">
