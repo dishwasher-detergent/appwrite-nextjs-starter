@@ -18,11 +18,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import { signUpWithEmail, signUpWithGithub } from "@/lib/auth";
 import { signUpSchema, type SignUpFormData } from "@/lib/auth/schemas";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LucideLoader2, LucideUserPlus } from "lucide-react";
+import { LucideGithub, LucideLoader2, LucideUserPlus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -30,7 +31,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function SignUpPage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<SignUpFormData>({
@@ -58,14 +58,14 @@ export default function SignUpPage() {
   }
 
   return (
-    <Card>
+    <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Sign Up</CardTitle>
+        <CardTitle>Sign Up</CardTitle>
         <CardDescription>
           Enter your email below to create your account.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
             <FormField
@@ -130,23 +130,41 @@ export default function SignUpPage() {
             </Button>
           </form>
         </Form>
-        <form action={signUpWithGithub}>
-          <Button type="submit">Github</Button>
+        <Separator />
+        <form className="w-full" action={signUpWithGithub}>
+          <Button type="submit" variant="secondary" className="w-full">
+            Github
+            <LucideGithub className="ml-2 size-3.5" />
+          </Button>
         </form>
       </CardContent>
       <CardFooter>
-        <p className="bg-muted text-muted-foreground w-full overflow-hidden rounded-md p-2 text-center text-sm font-bold">
-          Already have an account?
-          <Button
-            variant="link"
-            asChild
-            className="text-muted-foreground p-1 text-sm font-bold"
-          >
-            <Link href="/signin" className="underline">
-              Sign In here
-            </Link>
-          </Button>
-        </p>
+        <div className="bg-muted text-muted-foreground w-full overflow-hidden rounded-md p-2 text-center text-sm font-bold">
+          <p>
+            Already have an account?
+            <Button
+              variant="link"
+              asChild
+              className="text-muted-foreground p-1 text-sm font-bold"
+            >
+              <Link href="/signin" className="underline">
+                Sign In here
+              </Link>
+            </Button>
+          </p>
+          <p>
+            Forgot your password?
+            <Button
+              variant="link"
+              asChild
+              className="text-muted-foreground p-1 font-bold"
+            >
+              <Link href="/recover" className="underline">
+                Reset Here
+              </Link>
+            </Button>
+          </p>
+        </div>
       </CardFooter>
     </Card>
   );

@@ -18,56 +18,57 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { signInWithEmail, signUpWithGithub } from "@/lib/auth";
-import { signInSchema, type SignInFormData } from "@/lib/auth/schemas";
+import { createPasswordRecovery } from "@/lib/auth";
+import {
+  resetPasswordSchema,
+  type ResetPasswordFormData,
+} from "@/lib/auth/schemas";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LucideGithub, LucideLoader2, LucideLogIn } from "lucide-react";
+import { LucideLoader2, LucideMail } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-export default function LoginPage() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
+export default function ResetPasswordPage() {
+  const [isPending, setIsPending] = useState(false);
 
-  const form = useForm<SignInFormData>({
-    resolver: zodResolver(signInSchema),
+  const form = useForm<ResetPasswordFormData>({
+    resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
-  async function onSubmit(values: SignInFormData) {
+  async function onSubmit(values: ResetPasswordFormData) {
     try {
-      setLoading(true);
-      const result = await signInWithEmail(values);
+      setIsPending(true);
 
-      if (!result.success) {
-        toast.error(result.message);
+      const data = await createPasswordRecovery(values);
+
+      if (data.success) {
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
       }
     } catch (error) {
-      console.log(error);
-
-      toast.error("An error occurred during sign in");
+      toast.error("An error occurred while requesting password reset");
     } finally {
-      setLoading(false);
+      setIsPending(false);
+      form.reset();
     }
   }
 
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>Sign In</CardTitle>
+        <CardTitle>Password</CardTitle>
         <CardDescription>
-          Enter your email below to sign in to your account.
+          Enter your email address and we'll send you a password reset link.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
             <FormField
@@ -87,45 +88,25 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="password" placeholder="Password" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <Button
               className="w-full"
               type="submit"
-              disabled={loading || !form.formState.isValid}
+              disabled={isPending || !form.formState.isValid}
             >
-              {loading ? (
+              {isPending ? (
                 <>
-                  Signing in
+                  Sending Reset Link
                   <LucideLoader2 className="ml-2 size-3.5 animate-spin" />
                 </>
               ) : (
                 <>
-                  Sign In
-                  <LucideLogIn className="ml-2 size-3.5" />
+                  Send Reset Link
+                  <LucideMail className="ml-2 size-3.5" />
                 </>
               )}
             </Button>
           </form>
         </Form>
-        <Separator />
-        <form className="w-full" action={signUpWithGithub}>
-          <Button type="submit" variant="secondary" className="w-full">
-            Github
-            <LucideGithub className="ml-2 size-3.5" />
-          </Button>
-        </form>
       </CardContent>
       <CardFooter>
         <div className="bg-muted text-muted-foreground w-full overflow-hidden rounded-md p-2 text-center text-sm font-bold">
@@ -142,14 +123,14 @@ export default function LoginPage() {
             </Button>
           </p>
           <p>
-            Forgot your password?
+            Remember your password?
             <Button
               variant="link"
               asChild
-              className="text-muted-foreground p-1 font-bold"
+              className="text-muted-foreground p-1 text-sm font-bold"
             >
-              <Link href="/recover" className="underline">
-                Reset Here
+              <Link href="/signin" className="underline">
+                Sign In Here
               </Link>
             </Button>
           </p>

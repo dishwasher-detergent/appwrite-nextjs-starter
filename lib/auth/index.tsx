@@ -1,8 +1,12 @@
 "use server";
 
 import { createAdminClient, createSessionClient } from "@/lib/server/appwrite";
-import { COOKIE_KEY } from "@/lib/constants";
-import { SignInFormData, SignUpFormData } from "./schemas";
+import { COOKIE_KEY, HOSTNAME } from "@/lib/constants";
+import {
+  ResetPasswordFormData,
+  SignInFormData,
+  SignUpFormData,
+} from "./schemas";
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -41,8 +45,6 @@ export async function signInWithEmail(formData: SignInFormData) {
       sameSite: "strict",
       secure: true,
     });
-
-    return redirect("/app");
   } catch (err) {
     const error = err as Error;
     return {
@@ -50,6 +52,8 @@ export async function signInWithEmail(formData: SignInFormData) {
       message: error.message,
     };
   }
+
+  return redirect("/app");
 }
 
 export async function signUpWithEmail(formData: SignUpFormData) {
@@ -69,8 +73,43 @@ export async function signUpWithEmail(formData: SignUpFormData) {
       sameSite: "strict",
       secure: true,
     });
+  } catch (err) {
+    const error = err as Error;
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
 
-    return redirect("/app");
+  return redirect("/app");
+}
+
+export async function signUpWithGithub() {
+  const { account } = await createAdminClient();
+  const origin = (await headers()).get("origin");
+
+  const redirectUrl = await account.createOAuth2Token(
+    OAuthProvider.Github,
+    `${origin}/api/auth/callback`,
+    `${origin}/signup`
+  );
+
+  return redirect(redirectUrl);
+}
+
+export async function createPasswordRecovery(formData: ResetPasswordFormData) {
+  const email = formData.email;
+
+  const { account } = await createAdminClient();
+  const origin = (await headers()).get("origin");
+
+  try {
+    await account.createRecovery(email, `${origin}/reset`);
+
+    return {
+      success: true,
+      message: "Password recovery email sent",
+    };
   } catch (err) {
     const error = err as Error;
     return {
@@ -80,15 +119,24 @@ export async function signUpWithEmail(formData: SignUpFormData) {
   }
 }
 
-export async function signUpWithGithub() {
+export async function resetPassword(
+  id: string,
+  token: string,
+  password: string
+) {
   const { account } = await createAdminClient();
-  const origin = (await headers()).get("origin");
 
-  const redirectUrl = await account.createOAuth2Token(
-    OAuthProvider.Github,
-    `${origin}/auth/callback`,
-    `${origin}/signup`
-  );
+  try {
+    await account.updateRecovery(id, token, password);
+  } catch (err) {
+    console.log(err);
 
-  return redirect(redirectUrl);
+    const error = err as Error;
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+
+  return redirect("/signin");
 }
