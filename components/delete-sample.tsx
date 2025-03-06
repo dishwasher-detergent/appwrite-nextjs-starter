@@ -21,7 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { deleteSample } from "@/lib/db/queries";
+import { deleteSample } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import { Sample } from "@/interfaces/sample.interface";
 import { DeleteSampleFormData, deleteSampleSchema } from "@/lib/db/schemas";

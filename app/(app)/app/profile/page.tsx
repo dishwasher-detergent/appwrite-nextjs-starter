@@ -1,5 +1,5 @@
 import { EditProfile } from "@/components/edit-profile";
-import { getUser } from "@/lib/db/queries";
+import { getUser } from "@/lib/db";
 import { redirect } from "next/navigation";
 
 export default async function ProfilePage() {

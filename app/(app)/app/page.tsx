@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getSamples } from "@/lib/db/queries";
+import { getSamples } from "@/lib/db";
 
 import { LucideLink2 } from "lucide-react";
 import Link from "next/link";

@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { updateSample } from "@/lib/db/queries";
+import { updateSample } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import { Sample } from "@/interfaces/sample.interface";
 import { EditSampleFormData, editSampleSchema } from "@/lib/db/schemas";

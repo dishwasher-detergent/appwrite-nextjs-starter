@@ -1,6 +1,6 @@
 import { DeleteSample } from "@/components/delete-sample";
 import { EditSample } from "@/components/edit-sample";
-import { getSampleById } from "@/lib/db/queries";
+import { getSampleById } from "@/lib/db";
 
 import { redirect } from "next/navigation";
 
