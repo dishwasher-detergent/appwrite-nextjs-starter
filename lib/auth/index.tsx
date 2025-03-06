@@ -4,9 +4,9 @@ import { createAdminClient, createSessionClient } from "@/lib/server/appwrite";
 import { COOKIE_KEY } from "@/lib/constants";
 import { SignInFormData, SignUpFormData } from "./schemas";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { ID } from "node-appwrite";
+import { ID, OAuthProvider } from "node-appwrite";
 
 export async function getLoggedInUser() {
   try {
@@ -23,7 +23,7 @@ export async function logOut() {
   account.deleteSession("current");
   (await cookies()).delete(COOKIE_KEY);
 
-  redirect("/signin");
+  return redirect("/signin");
 }
 
 export async function signInWithEmail(formData: SignInFormData) {
@@ -42,10 +42,7 @@ export async function signInWithEmail(formData: SignInFormData) {
       secure: true,
     });
 
-    return {
-      success: true,
-      message: "Login successful",
-    };
+    return redirect("/app");
   } catch (err) {
     const error = err as Error;
     return {
@@ -73,10 +70,7 @@ export async function signUpWithEmail(formData: SignUpFormData) {
       secure: true,
     });
 
-    return {
-      success: true,
-      message: "Sign up successful",
-    };
+    return redirect("/app");
   } catch (err) {
     const error = err as Error;
     return {
@@ -84,4 +78,17 @@ export async function signUpWithEmail(formData: SignUpFormData) {
       message: error.message,
     };
   }
+}
+
+export async function signUpWithGithub() {
+  const { account } = await createAdminClient();
+  const origin = (await headers()).get("origin");
+
+  const redirectUrl = await account.createOAuth2Token(
+    OAuthProvider.Github,
+    `${origin}/auth/callback`,
+    `${origin}/signup`
+  );
+
+  return redirect(redirectUrl);
 }

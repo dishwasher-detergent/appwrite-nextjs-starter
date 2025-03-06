@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signInWithEmail } from "@/lib/auth";
+import { signInWithEmail, signUpWithGithub } from "@/lib/auth";
 import { signInSchema, type SignInFormData } from "@/lib/auth/schemas";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -46,10 +46,7 @@ export default function LoginPage() {
       setLoading(true);
       const result = await signInWithEmail(values);
 
-      if (result.success) {
-        toast.success(result.message);
-        router.push("/app");
-      } else {
+      if (!result.success) {
         toast.error(result.message);
       }
     } catch (error) {
@@ -119,6 +116,9 @@ export default function LoginPage() {
             </Button>
           </form>
         </Form>
+        <form action={signUpWithGithub}>
+          <Button type="submit">Github</Button>
+        </form>
       </CardContent>
       <CardFooter>
         <p className="bg-muted text-muted-foreground w-full overflow-hidden rounded-md p-2 text-center text-sm font-bold">
