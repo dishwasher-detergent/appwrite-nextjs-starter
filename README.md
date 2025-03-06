@@ -14,7 +14,6 @@ A starter template for building web applications with Next.js and Appwrite.
   - 📁 File Storage Implementations
 - 👤 **User Management**
   - 👨‍💻 Profile Editing & Customization
-  - 🔒 User Preferences & Settings
 - 🛡️ Protected Routes
 - 🏗️ Next.js 15 App Router
 - 🎨 Tailwind CSS for Styling
