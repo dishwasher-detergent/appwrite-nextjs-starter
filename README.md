@@ -110,7 +110,7 @@ pnpm install
 
 3. Create a `.env` file based on the .`env.sample` file:
 
-Create an API key in Appwrite, with the permissions `session.write` and upadte the `.env` with that key.
+   - Create an API key in Appwrite, with the permissions `session.write` and upadte the `.env` with that key.
 
 4. Start the development server:
 
