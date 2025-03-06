@@ -29,30 +29,53 @@ A starter template for building web applications with Next.js and Appwrite.
 - 🔧 [pnpm](https://pnpm.io/)
 - ☁️ [Appwrite](https://cloud.appwrite.io)
 
-### 🛠️ Installation
+### 🛠️ Getting Started
 
 1. Clone this repository:
 
 ```bash
 git clone https://github.com/diswasher-detergent/appwrite-nextjs-starter.git
-cd appwrite-nextjs-starter
 ```
 
-2. Install dependencies:
+## 🚢 Deploying Project using the Appwrite CLI
+
+[Appwrite CLI](https://appwrite.io/docs/tooling/command-line/installation) allows you to automate and streamline your Appwrite workflows.
+
+### 📥 Installation
+
+Install the Appwrite CLI globally:
 
 ```bash
-pnpm install
+npm install -g appwrite-cli
 ```
 
-3. Create a `.env` file in the root directory with the following variables:
+### 🔧 Setup
 
-4. Start the development server:
+1. Login to your Appwrite account:
 
 ```bash
-pnpm run dev
+appwrite login
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+### 🚀 Push to Appwrite
+
+1. Deploy the project:
+
+```bash
+appwrite push settings
+```
+
+2. Deploy the database:
+
+```bash
+appwrite push collections
+```
+
+3. Deploy the bucket:
+
+```bash
+appwrite push buckets
+```
 
 ## 🔑 Adding GitHub OAuth to Appwrite
 
@@ -74,32 +97,29 @@ https://cloud.appwrite.io/v1/account/sessions/oauth2/callback/github/appwrite-ne
 
 6. 💾 Save your changes.
 
-## 🚢 Deploying Using the Appwrite CLI
-
-[Appwrite CLI](https://appwrite.io/docs/tooling/command-line/installation) allows you to automate and streamline your Appwrite workflows.
-
-### 📥 Installation
-
-Install the Appwrite CLI globally:
+## 🏃 Running Locally
 
 ```bash
-npm install -g appwrite-cli
+cd appwrite-nextjs-starter
 ```
 
-### 🔧 Setup
-
-1. Login to your Appwrite account:
+2. Install dependencies:
 
 ```bash
-appwrite login
+pnpm install
 ```
 
-### 🚀 Deploy
+3. Create a `.env` file based on the .`env.sample` file:
+
+Create an API key in Appwrite, with the permissions `session.write` and upadte the `.env` with that key.
+
+4. Start the development server:
 
 ```bash
-appwrite push settings
-appwrite push collections
+pnpm run dev
 ```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
 ## 👥 Contributing
 
