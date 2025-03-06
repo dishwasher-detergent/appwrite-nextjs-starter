@@ -12,7 +12,8 @@ import {
 import { logOut } from "@/lib/auth";
 import { getInitials } from "@/lib/utils";
 
-import { LucideLogOut } from "lucide-react";
+import { LucideLogOut, LucideUser } from "lucide-react";
+import Link from "next/link";
 import { Models } from "node-appwrite";
 import { useMemo } from "react";
 
@@ -41,6 +42,14 @@ export function UserInformation({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem asChild>
+          <Link href="/app/profile">
+            Profile
+            <DropdownMenuShortcut>
+              <LucideUser className="size-3" />
+            </DropdownMenuShortcut>
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={logOut}>
           Logout
           <DropdownMenuShortcut>

@@ -109,33 +109,31 @@ export default function ResetPasswordPage() {
           </form>
         </Form>
       </CardContent>
-      <CardFooter>
-        <div className="bg-muted text-muted-foreground w-full overflow-hidden rounded-md p-2 text-center text-sm font-bold">
-          <p>
-            Don&apos;t have an account?
-            <Button
-              variant="link"
-              asChild
-              className="text-muted-foreground p-1 font-bold"
-            >
-              <Link href="/signup" className="underline">
-                Sign Up Here
-              </Link>
-            </Button>
-          </p>
-          <p>
-            Remember your password?
-            <Button
-              variant="link"
-              asChild
-              className="text-muted-foreground p-1 text-sm font-bold"
-            >
-              <Link href="/signin" className="underline">
-                Sign In Here
-              </Link>
-            </Button>
-          </p>
-        </div>
+      <CardFooter className="flex flex-col items-start">
+        <p className="text-sm text-muted-foreground">
+          Don&apos;t have an account?
+          <Button
+            variant="link"
+            asChild
+            className="text-muted-foreground p-1 text-sm"
+          >
+            <Link href="/signup" className="underline">
+              Sign Up Here
+            </Link>
+          </Button>
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Remember your password?
+          <Button
+            variant="link"
+            asChild
+            className="text-muted-foreground p-1 text-sm"
+          >
+            <Link href="/signin" className="underline">
+              Sign In Here
+            </Link>
+          </Button>
+        </p>
       </CardFooter>
     </Card>
   );
