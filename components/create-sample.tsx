@@ -147,7 +147,7 @@ function CreateForm({ className, setOpen }: FormProps) {
             )}
           />
         </div>
-        <Button type="submit" disabled={loading}>
+        <Button type="submit" disabled={loading || !form.formState.isValid}>
           Create
           {loading ? (
             <LucideLoader2 className="mr-2 size-3.5 animate-spin" />

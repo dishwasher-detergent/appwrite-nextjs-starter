@@ -31,7 +31,7 @@ import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [isPending, setIsPending] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
@@ -43,7 +43,7 @@ export default function LoginPage() {
 
   async function onSubmit(values: SignInFormData) {
     try {
-      setIsPending(true);
+      setLoading(true);
       const result = await signInWithEmail(values);
 
       if (result.success) {
@@ -55,7 +55,7 @@ export default function LoginPage() {
     } catch (error) {
       toast.error("An error occurred during sign in");
     } finally {
-      setIsPending(false);
+      setLoading(false);
     }
   }
 
@@ -100,8 +100,12 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-            <Button className="w-full" type="submit" disabled={isPending}>
-              {isPending ? (
+            <Button
+              className="w-full"
+              type="submit"
+              disabled={loading || !form.formState.isValid}
+            >
+              {loading ? (
                 <>
                   Signing in
                   <LucideLoader2 className="ml-2 size-3.5 animate-spin" />

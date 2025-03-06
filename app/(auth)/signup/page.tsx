@@ -31,7 +31,7 @@ import { toast } from "sonner";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const [isPending, setIsPending] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
@@ -44,7 +44,7 @@ export default function SignUpPage() {
 
   async function onSubmit(values: SignUpFormData) {
     try {
-      setIsPending(true);
+      setLoading(true);
       const result = await signUpWithEmail(values);
 
       if (result.success) {
@@ -56,7 +56,7 @@ export default function SignUpPage() {
     } catch (error) {
       toast.error("An error occurred during sign up");
     } finally {
-      setIsPending(false);
+      setLoading(false);
     }
   }
 
@@ -114,8 +114,12 @@ export default function SignUpPage() {
                 </FormItem>
               )}
             />
-            <Button className="w-full" type="submit" disabled={isPending}>
-              {isPending ? (
+            <Button
+              className="w-full"
+              type="submit"
+              disabled={loading || !form.formState.isValid}
+            >
+              {loading ? (
                 <>
                   Signing up
                   <LucideLoader2 className="ml-2 size-3.5 animate-spin" />

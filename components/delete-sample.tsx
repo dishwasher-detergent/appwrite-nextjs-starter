@@ -130,7 +130,11 @@ function DeleteForm({ className, setOpen, sample }: FormProps) {
             )}
           />
         </div>
-        <Button type="submit" variant="destructive" disabled={loading}>
+        <Button
+          type="submit"
+          variant="destructive"
+          disabled={loading || !form.formState.isValid}
+        >
           Delete
           {loading ? (
             <LucideLoader2 className="mr-2 size-3.5 animate-spin" />
