@@ -5,11 +5,9 @@ import { getLoggedInUser } from "@/lib/auth";
 import { Sample } from "@/interfaces/sample.interface";
 import { createSessionClient } from "@/lib/server/appwrite";
 import { DATABASE_ID, SAMPLE_COLLECTION_ID } from "@/lib/constants";
+import { AddSampleFormData, EditSampleFormData } from "./schemas";
 
 import { ID, Models, Permission, Role } from "node-appwrite";
-import { z } from "zod";
-import { addSampleSchema } from "@/components/create-sample";
-import { editSampleSchema } from "@/components/edit-sample";
 
 /**
  * Get the current user
@@ -129,7 +127,7 @@ export async function createSample({
   permissions = [],
 }: {
   id?: string;
-  data: z.infer<typeof addSampleSchema>;
+  data: AddSampleFormData;
   permissions?: string[];
 }): Promise<Result<Sample>> {
   const user = await getLoggedInUser();
@@ -185,7 +183,7 @@ export async function updateSample({
   permissions = undefined,
 }: {
   id: string;
-  data: z.infer<typeof editSampleSchema>;
+  data: EditSampleFormData;
   permissions?: string[];
 }): Promise<Result<Sample>> {
   const user = await getLoggedInUser();

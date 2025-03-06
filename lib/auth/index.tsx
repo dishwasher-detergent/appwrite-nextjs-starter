@@ -1,7 +1,8 @@
 "use server";
 
 import { createAdminClient, createSessionClient } from "@/lib/server/appwrite";
-import { COOKIE_KEY, HOSTNAME } from "@/lib/constants";
+import { COOKIE_KEY } from "@/lib/constants";
+import { AuthResponse } from "@/interfaces/result.interface";
 import {
   ResetPasswordFormData,
   SignInFormData,
@@ -11,10 +12,15 @@ import {
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { ID, OAuthProvider } from "node-appwrite";
-import { AuthResponse } from "@/interfaces/result.interface";
+import { Account, ID, Models, OAuthProvider } from "node-appwrite";
 
-export async function getLoggedInUser() {
+/**
+ * Retrieves the currently logged-in user.
+ *
+ * @returns {Promise<Models.User<Models.Preferences> | null>} A promise that resolves to the account information
+ * of the logged-in user, or null if no user is logged in.
+ */
+export async function getLoggedInUser(): Promise<Models.User<Models.Preferences> | null> {
   try {
     const { account } = await createSessionClient();
     return await account.get();
@@ -23,7 +29,11 @@ export async function getLoggedInUser() {
   }
 }
 
-export async function logOut() {
+/**
+ * Logs out the currently logged-in user.
+ * @returns {Promise<boolean>} A promise that resolves to true if the user is logged in, false otherwise.
+ */
+export async function logOut(): Promise<boolean> {
   const { account } = await createSessionClient();
 
   account.deleteSession("current");
@@ -32,7 +42,14 @@ export async function logOut() {
   return redirect("/signin");
 }
 
-export async function signInWithEmail(formData: SignInFormData) {
+/**
+ * Signs in a user with an email and password.
+ * @param {SignInFormData} formData The sign-in form data.
+ * @returns {Promise<AuthResponse>} A promise that resolves to an authentication response.
+ */
+export async function signInWithEmail(
+  formData: SignInFormData
+): Promise<AuthResponse> {
   const email = formData.email;
   const password = formData.password;
 
@@ -62,6 +79,11 @@ export async function signInWithEmail(formData: SignInFormData) {
   }
 }
 
+/**
+ * Signs up a user with an email and password.
+ * @param {SignUpFormData} formData The sign-up form data.
+ * @returns {Promise<AuthResponse>} A promise that resolves to an authentication response.
+ */
 export async function signUpWithEmail(
   formData: SignUpFormData
 ): Promise<AuthResponse> {
@@ -96,7 +118,11 @@ export async function signUpWithEmail(
   }
 }
 
-export async function signUpWithGithub() {
+/**
+ * Signs up a user with GitHub OAuth.
+ * @returns {Promise<void>} A promise that resolves to a redirect to the GitHub OAuth page.
+ */
+export async function signUpWithGithub(): Promise<void> {
   const { account } = await createAdminClient();
   const origin = (await headers()).get("origin");
 
@@ -109,7 +135,14 @@ export async function signUpWithGithub() {
   return redirect(redirectUrl);
 }
 
-export async function createPasswordRecovery(formData: ResetPasswordFormData) {
+/**
+ * Signs up a user with Google OAuth.
+ * @param {ResetPasswordFormData} formData
+ * @returns {Promise<AuthResponse>} A promise that resolves to an authentication response.
+ */
+export async function createPasswordRecovery(
+  formData: ResetPasswordFormData
+): Promise<AuthResponse> {
   const email = formData.email;
 
   const { account } = await createAdminClient();
@@ -131,11 +164,18 @@ export async function createPasswordRecovery(formData: ResetPasswordFormData) {
   }
 }
 
+/**
+ * Resets a user's password.
+ * @param {string} id
+ * @param {string} token
+ * @param {string} password
+ * @returns {Promise<AuthResponse>} A promise that resolves to an authentication response.
+ */
 export async function resetPassword(
   id: string,
   token: string,
   password: string
-) {
+): Promise<AuthResponse> {
   const { account } = await createAdminClient();
 
   try {
@@ -155,6 +195,12 @@ export async function resetPassword(
   }
 }
 
+/**
+ * Updates the user's profile.
+ * @param {Object} data The parameters for updating a user
+ * @param {string} [data.name] The users name
+ * @returns {Promise<AuthResponse>} A promise that resolves to an authentication response.
+ */
 export async function updateProfile({ data }: { data: UpdateProfileFormData }) {
   const { account } = await createSessionClient();
 
