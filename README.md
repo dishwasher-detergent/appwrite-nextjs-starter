@@ -25,8 +25,8 @@ A starter template for building web applications with Next.js and Appwrite.
 
 ### 📋 Prerequisites
 
-- 📦 Node.js 20.x or later
-- 🔧 pnpm
+- 📦 [Node.js 22.x or later](https://nodejs.org/en/download)
+- 🔧 [pnpm](https://pnpm.io/)
 - ☁️ [Appwrite](https://cloud.appwrite.io)
 
 ### 🛠️ Installation
@@ -58,7 +58,7 @@ pnpm run dev
 
 To enable GitHub authentication in your Appwrite project:
 
-1. 🔗 Go to your [GitHub Developer Settings](https://github.com/settings/developers) and create a new OAuth App.
+1. 🔗 Go to your [GitHub Developer Settings](https://github.com/settings/apps) and create a new App.
 
 2. 🔄 Set the **Authorization callback URL** to:
 
