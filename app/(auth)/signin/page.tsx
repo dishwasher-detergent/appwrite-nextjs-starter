@@ -47,13 +47,14 @@ export default function LoginPage() {
       setLoading(true);
       const result = await signInWithEmail(values);
 
-      if (!result.success) {
+      if (result.success) {
+        toast.success(result.message);
+        router.push(result.redirect!);
+      } else {
         toast.error(result.message);
       }
     } catch (error) {
-      console.log(error);
-
-      toast.error("An error occurred during sign in");
+      toast.error("An unexpected error occurred");
     } finally {
       setLoading(false);
     }

@@ -27,12 +27,14 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LucideLoader2, LucideMail } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function ResetPasswordPage() {
-  const [isPending, setIsPending] = useState(false);
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
@@ -43,20 +45,19 @@ export default function ResetPasswordPage() {
 
   async function onSubmit(values: ResetPasswordFormData) {
     try {
-      setIsPending(true);
+      setLoading(true);
 
-      const data = await createPasswordRecovery(values);
+      const result = await createPasswordRecovery(values);
 
-      if (data.success) {
-        toast.success(data.message);
+      if (result.success) {
+        toast.success(result.message);
       } else {
-        toast.error(data.message);
+        toast.error(result.message);
       }
     } catch (error) {
-      toast.error("An error occurred while requesting password reset");
+      toast.error("An unexpected error occurred");
     } finally {
-      setIsPending(false);
-      form.reset();
+      setLoading(false);
     }
   }
 
@@ -91,9 +92,9 @@ export default function ResetPasswordPage() {
             <Button
               className="w-full"
               type="submit"
-              disabled={isPending || !form.formState.isValid}
+              disabled={loading || !form.formState.isValid}
             >
-              {isPending ? (
+              {loading ? (
                 <>
                   Sending Reset Link
                   <LucideLoader2 className="ml-2 size-3.5 animate-spin" />

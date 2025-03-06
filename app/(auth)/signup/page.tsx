@@ -31,6 +31,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function SignUpPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<SignUpFormData>({
@@ -47,11 +48,14 @@ export default function SignUpPage() {
       setLoading(true);
       const result = await signUpWithEmail(values);
 
-      if (!result.success) {
+      if (result.success) {
+        toast.success(result.message);
+        router.push(result.redirect!);
+      } else {
         toast.error(result.message);
       }
     } catch (error) {
-      toast.error("An error occurred during sign up");
+      toast.error("An unexpected error occurred");
     } finally {
       setLoading(false);
     }

@@ -33,7 +33,7 @@ import { toast } from "sonner";
 export default function ResetPasswordConfirmPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isPending, setIsPending] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const secret = searchParams.get("secret");
   const userId = searchParams.get("userId");
@@ -57,18 +57,19 @@ export default function ResetPasswordConfirmPage() {
     }
 
     try {
-      setIsPending(true);
-      const response = await resetPassword(userId, secret, values.password);
+      setLoading(true);
+      const result = await resetPassword(userId, secret, values.password);
 
-      if (response.success) {
-        toast.success(response.message);
+      if (result.success) {
+        toast.success(result.message);
+        router.push(result.redirect!);
       } else {
-        toast.error(response.message);
+        toast.error(result.message);
       }
     } catch (error) {
-      toast.error("Failed to reset password. Please try again.");
+      toast.error("An unexpected error occurred");
     } finally {
-      setIsPending(false);
+      setLoading(false);
     }
   }
 
@@ -118,9 +119,9 @@ export default function ResetPasswordConfirmPage() {
             <Button
               className="w-full"
               type="submit"
-              disabled={isPending || !form.formState.isValid}
+              disabled={loading || !form.formState.isValid}
             >
-              {isPending ? (
+              {loading ? (
                 <>
                   Resetting Password
                   <LucideLoader2 className="ml-2 size-3.5 animate-spin" />

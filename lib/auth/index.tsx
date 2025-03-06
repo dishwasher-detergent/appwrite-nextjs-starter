@@ -11,6 +11,7 @@ import {
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { ID, OAuthProvider } from "node-appwrite";
+import { AuthResponse } from "@/interfaces/result.interface";
 
 export async function getLoggedInUser() {
   try {
@@ -45,6 +46,12 @@ export async function signInWithEmail(formData: SignInFormData) {
       sameSite: "strict",
       secure: true,
     });
+
+    return {
+      success: true,
+      message: "Signed in successfully",
+      redirect: "/app",
+    };
   } catch (err) {
     const error = err as Error;
     return {
@@ -52,11 +59,11 @@ export async function signInWithEmail(formData: SignInFormData) {
       message: error.message,
     };
   }
-
-  return redirect("/app");
 }
 
-export async function signUpWithEmail(formData: SignUpFormData) {
+export async function signUpWithEmail(
+  formData: SignUpFormData
+): Promise<AuthResponse> {
   const name = formData.name;
   const email = formData.email;
   const password = formData.password;
@@ -73,6 +80,12 @@ export async function signUpWithEmail(formData: SignUpFormData) {
       sameSite: "strict",
       secure: true,
     });
+
+    return {
+      success: true,
+      message: "Account created successfully",
+      redirect: "/app",
+    };
   } catch (err) {
     const error = err as Error;
     return {
@@ -80,8 +93,6 @@ export async function signUpWithEmail(formData: SignUpFormData) {
       message: error.message,
     };
   }
-
-  return redirect("/app");
 }
 
 export async function signUpWithGithub() {
@@ -108,7 +119,7 @@ export async function createPasswordRecovery(formData: ResetPasswordFormData) {
 
     return {
       success: true,
-      message: "Password recovery email sent",
+      message: "A recovery email has been sent to your inbox",
     };
   } catch (err) {
     const error = err as Error;
@@ -128,15 +139,17 @@ export async function resetPassword(
 
   try {
     await account.updateRecovery(id, token, password);
-  } catch (err) {
-    console.log(err);
 
+    return {
+      success: true,
+      message: "Password reset successfully",
+      redirect: "/signin",
+    };
+  } catch (err) {
     const error = err as Error;
     return {
       success: false,
       message: error.message,
     };
   }
-
-  return redirect("/signin");
 }
