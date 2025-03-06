@@ -2,6 +2,25 @@
 
 A starter template for building web applications with Next.js and Appwrite.
 
+## ✨ Features
+
+- 🔐 **Authentication Flows**
+  - 📧 Email & Password Sign In/Sign Up
+  - 🔄 Password Recovery Process
+  - 🔑 OAuth Integration (GitHub, Google, etc.)
+- 📊 **Data Management**
+  - ✏️ Complete CRUD Operations Examples
+  - 🗄️ Database Integration with Appwrite
+  - 📁 File Storage Implementations
+- 👤 **User Management**
+  - 👨‍💻 Profile Editing & Customization
+  - 🔒 User Preferences & Settings
+- 🛡️ Protected Routes
+- 🏗️ Next.js 15 App Router
+- 🎨 Tailwind CSS for Styling
+- 📱 Responsive Design
+- 🧩 Modular Component Architecture
+
 ## 🏁 Getting Started
 
 ### 📋 Prerequisites
