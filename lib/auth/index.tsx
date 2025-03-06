@@ -6,6 +6,7 @@ import {
   ResetPasswordFormData,
   SignInFormData,
   SignUpFormData,
+  UpdateProfileFormData,
 } from "./schemas";
 
 import { cookies, headers } from "next/headers";
@@ -144,6 +145,25 @@ export async function resetPassword(
       success: true,
       message: "Password reset successfully",
       redirect: "/signin",
+    };
+  } catch (err) {
+    const error = err as Error;
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+}
+
+export async function updateProfile({ data }: { data: UpdateProfileFormData }) {
+  const { account } = await createSessionClient();
+
+  try {
+    await account.updateName(data.name);
+
+    return {
+      success: true,
+      message: "Profile updated successfully",
     };
   } catch (err) {
     const error = err as Error;

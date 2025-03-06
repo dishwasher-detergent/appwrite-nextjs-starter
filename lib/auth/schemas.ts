@@ -1,3 +1,4 @@
+import { PROFILE_NAME_MAX_LENGTH } from "@/constants/profile.constants";
 import { z } from "zod";
 
 export const signInSchema = z.object({
@@ -11,7 +12,7 @@ export const signUpSchema = z.object({
   name: z
     .string()
     .min(2, "Name must be at least 2 characters")
-    .max(50, "Name must be less than 50 characters"),
+    .max(PROFILE_NAME_MAX_LENGTH, "Name must be less than 50 characters"),
   email: z.string().min(1, "Email is required").email("Invalid email address"),
   password: z
     .string()
@@ -45,3 +46,12 @@ export const newPasswordSchema = z
   });
 
 export type NewPasswordFormData = z.infer<typeof newPasswordSchema>;
+
+export const updateProfileSchema = z.object({
+  name: z
+    .string()
+    .min(2, "Name must be at least 2 characters")
+    .max(PROFILE_NAME_MAX_LENGTH, "Name must be less than 50 characters"),
+});
+
+export type UpdateProfileFormData = z.infer<typeof updateProfileSchema>;
