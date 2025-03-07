@@ -1,9 +1,11 @@
 import * as React from "react";
 import { useRef, useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
 import { LucideX } from "lucide-react";
-import { Badge } from "./badge";
-import { Input } from "./input";
+import Image from "next/image";
+
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
 
 type ImageInputProps = {
@@ -95,7 +97,7 @@ function ImageInput({ className, value, onChange, ...props }: ImageInputProps) {
             >
               <LucideX className="size-4 text-white" />
             </button>
-            <img
+            <Image
               src={previewUrl}
               alt="Preview"
               className="object-cover size-full"

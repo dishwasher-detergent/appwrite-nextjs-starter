@@ -1,6 +1,8 @@
 import { EditProfile } from "@/components/edit-profile";
 import { AVATAR_BUCKET_ID, ENDPOINT, PROJECT_ID } from "@/lib/constants";
 import { getUser } from "@/lib/db";
+
+import Image from "next/image";
 import { redirect } from "next/navigation";
 
 export default async function ProfilePage() {
@@ -14,7 +16,7 @@ export default async function ProfilePage() {
     <div className="flex flex-row justify-between">
       <div className="flex flex-row gap-2">
         {data?.avatar && (
-          <img
+          <Image
             src={`${ENDPOINT}/storage/buckets/${AVATAR_BUCKET_ID}/files/${data.avatar}/view?project=${PROJECT_ID}`}
             alt={data?.name}
             className="size-20 rounded-md object-cover bg-primary"

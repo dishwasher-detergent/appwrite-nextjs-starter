@@ -3,6 +3,8 @@ import { EditSample } from "@/components/edit-sample";
 import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
 import { getSampleById } from "@/lib/db";
 
+import Image from "next/image";
+
 import { redirect } from "next/navigation";
 
 export default async function SamplePage({
@@ -21,7 +23,7 @@ export default async function SamplePage({
     <div className="flex flex-row justify-between">
       <div className="flex flex-row gap-2">
         {data?.image && (
-          <img
+          <Image
             src={`${ENDPOINT}/storage/buckets/${SAMPLE_BUCKET_ID}/files/${data.image}/view?project=${PROJECT_ID}`}
             alt={data?.name}
             className="size-20 rounded-md object-cover bg-primary"

@@ -15,6 +15,7 @@ import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
 import { getSamples } from "@/lib/db";
 
 import { LucideLink2 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 export default async function AppPage() {
@@ -41,7 +42,7 @@ export default async function AppPage() {
             <TableRow key={sample.$id}>
               <TableCell>
                 {sample.image && (
-                  <img
+                  <Image
                     src={`${ENDPOINT}/storage/buckets/${SAMPLE_BUCKET_ID}/files/${sample.image}/view?project=${PROJECT_ID}`}
                     alt={sample.name}
                     className="size-8 rounded-md object-cover bg-primary"
