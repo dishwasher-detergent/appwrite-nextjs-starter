@@ -29,6 +29,7 @@ import {
 } from "@/constants/sample.constants";
 import { ImageInput } from "./ui/image-input";
 import { uploadSampleImage } from "@/lib/storage";
+import { SAMPLE_BUCKET_ID } from "@/lib/constants";
 
 export function AddSample() {
   const [open, setOpen] = useState(false);
@@ -170,7 +171,7 @@ function CreateForm({ className, setOpen }: FormProps) {
               <FormItem>
                 <FormLabel>Picture</FormLabel>
                 <FormControl>
-                  <ImageInput {...field} />
+                  <ImageInput bucketId={SAMPLE_BUCKET_ID} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

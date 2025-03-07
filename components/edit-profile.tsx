@@ -26,6 +26,7 @@ import { PROFILE_NAME_MAX_LENGTH } from "@/constants/profile.constants";
 import { ImageInput } from "@/components/ui/image-input";
 import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
 import { User } from "@/interfaces/user.interface";
+import { AVATAR_BUCKET_ID } from "@/lib/constants";
 
 export function EditProfile({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
@@ -151,7 +152,7 @@ function EditForm({ className, setOpen, user }: FormProps) {
               <FormItem>
                 <FormLabel>Avatar</FormLabel>
                 <FormControl>
-                  <ImageInput {...field} />
+                  <ImageInput bucketId={AVATAR_BUCKET_ID} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

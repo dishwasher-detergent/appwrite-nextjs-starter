@@ -12,9 +12,10 @@ type ImageInputProps = {
   className?: string;
   value?: File | string | null;
   onChange?: (file: File | null) => void;
+  bucketId: string;
 } & Omit<React.ComponentProps<"input">, "type" | "value" | "onChange">;
 
-function ImageInput({ className, value, onChange, ...props }: ImageInputProps) {
+function ImageInput({ className, value, onChange, bucketId, ...props }: ImageInputProps) {
   const [fileName, setFileName] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -31,7 +32,7 @@ function ImageInput({ className, value, onChange, ...props }: ImageInputProps) {
 
     if (value && typeof value === "string") {
       setPreviewUrl(
-        `${ENDPOINT}/storage/buckets/${SAMPLE_BUCKET_ID}/files/${value}/view?project=${PROJECT_ID}`
+        `${ENDPOINT}/storage/buckets/${bucketId}/files/${value}/view?project=${PROJECT_ID}`
       );
     }
 
