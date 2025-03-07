@@ -1,8 +1,8 @@
 "use server";
 
 import { API_KEY, COOKIE_KEY, ENDPOINT, PROJECT_ID } from "@/lib/constants";
+
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import {
   Account,
   Client,
@@ -52,18 +52,6 @@ export async function createAdminClient() {
   return {
     get account() {
       return new Account(client);
-    },
-    get database() {
-      return new Databases(client);
-    },
-    get storage() {
-      return new Storage(client);
-    },
-    get users() {
-      return new Users(client);
-    },
-    get teams() {
-      return new Teams(client);
     },
   };
 }

@@ -27,6 +27,8 @@ import {
   DESCRIPTION_MAX_LENGTH,
   NAME_MAX_LENGTH,
 } from "@/constants/sample.constants";
+import { ImageInput } from "./ui/image-input";
+import { uploadSampleImage } from "@/lib/storage";
 
 export function AddSample() {
   const [open, setOpen] = useState(false);
@@ -62,11 +64,26 @@ function CreateForm({ className, setOpen }: FormProps) {
     defaultValues: {
       name: "",
       description: "",
+      image: null,
     },
   });
 
   async function onSubmit(values: AddSampleFormData) {
     setLoading(true);
+
+    if (values.image) {
+      const image = await uploadSampleImage({
+        data: values.image,
+      });
+
+      if (!image.success) {
+        toast.error(image.message);
+        setLoading(false);
+        return;
+      }
+
+      values.image = image.data?.$id;
+    }
 
     const data = await createSample({
       data: values,
@@ -141,6 +158,19 @@ function CreateForm({ className, setOpen }: FormProps) {
                       {field?.value?.length ?? 0}/{DESCRIPTION_MAX_LENGTH}
                     </Badge>
                   </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="image"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Sample</FormLabel>
+                <FormControl>
+                  <ImageInput {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

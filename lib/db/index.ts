@@ -63,10 +63,12 @@ export async function getSamples(
       message: "Samples successfully retrieved.",
       data: samples,
     };
-  } catch (error) {
+  } catch (err) {
+    const error = err as Error;
+
     return {
       success: false,
-      message: "Failed to retrieve samples.",
+      message: error.message,
     };
   }
 }
@@ -105,10 +107,12 @@ export async function getSampleById(
       message: "Sample successfully retrieved.",
       data: sample,
     };
-  } catch (error) {
+  } catch (err) {
+    const error = err as Error;
+
     return {
       success: false,
-      message: "Sample not found.",
+      message: error.message,
     };
   }
 }
@@ -161,10 +165,12 @@ export async function createSample({
       message: "Sample successfully created.",
       data: sample,
     };
-  } catch (error) {
+  } catch (err) {
+    const error = err as Error;
+
     return {
       success: false,
-      message: "Failed to create sample.",
+      message: error.message,
     };
   }
 }
@@ -211,10 +217,12 @@ export async function updateSample({
       message: "Sample successfully updated.",
       data: sample,
     };
-  } catch (error) {
+  } catch (err) {
+    const error = err as Error;
+
     return {
       success: false,
-      message: "Failed to update sample.",
+      message: error.message,
     };
   }
 }
@@ -243,10 +251,12 @@ export async function deleteSample(id: string): Promise<Result<Sample>> {
       success: true,
       message: "Sample successfully deleted.",
     };
-  } catch (error) {
+  } catch (err) {
+    const error = err as Error;
+
     return {
       success: false,
-      message: "Failed to delete sample.",
+      message: error.message,
     };
   }
 }

@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
 import { getSamples } from "@/lib/db";
 
 import { LucideLink2 } from "lucide-react";
@@ -29,6 +30,7 @@ export default async function AppPage() {
         <TableCaption>A list of your recent samples.</TableCaption>
         <TableHeader>
           <TableRow>
+            <TableHead>Image</TableHead>
             <TableHead>Name</TableHead>
             <TableHead className="w-full">Description</TableHead>
             <TableHead>Actions</TableHead>
@@ -37,6 +39,15 @@ export default async function AppPage() {
         <TableBody>
           {data?.documents.map((sample) => (
             <TableRow key={sample.$id}>
+              <TableCell>
+                {sample.image && (
+                  <img
+                    src={`${ENDPOINT}/storage/buckets/${SAMPLE_BUCKET_ID}/files/${sample.image}/view?project=${PROJECT_ID}`}
+                    alt={sample.name}
+                    className="size-8 rounded-md object-cover bg-primary"
+                  />
+                )}
+              </TableCell>
               <TableCell>
                 <Button asChild variant="link" className="p-0!">
                   <Link href={`/app/${sample.$id}`}>
