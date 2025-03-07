@@ -20,16 +20,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Models } from "node-appwrite";
 import { UpdateProfileFormData, updateProfileSchema } from "@/lib/auth/schemas";
 import { updateProfile } from "@/lib/auth";
 import { PROFILE_NAME_MAX_LENGTH } from "@/constants/profile.constants";
+import { ImageInput } from "@/components/ui/image-input";
+import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
+import { User } from "@/interfaces/user.interface";
 
-export function EditProfile({
-  user,
-}: {
-  user: Models.User<Models.Preferences>;
-}) {
+export function EditProfile({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -51,7 +49,7 @@ export function EditProfile({
 
 interface FormProps extends React.ComponentProps<"form"> {
   setOpen: (e: boolean) => void;
-  user: Models.User<Models.Preferences>;
+  user: User;
 }
 
 function EditForm({ className, setOpen, user }: FormProps) {
@@ -67,6 +65,30 @@ function EditForm({ className, setOpen, user }: FormProps) {
 
   async function onSubmit(values: UpdateProfileFormData) {
     setLoading(true);
+
+    if (values.image instanceof File) {
+      const image = await uploadAvatarImage({
+        data: values.image,
+      });
+
+      if (!image.success) {
+        toast.error(image.message);
+        setLoading(false);
+        return;
+      }
+
+      values.image = image.data?.$id;
+    } else if (values.image === null && user.image) {
+      const image = await deleteAvatarImage(user.image);
+
+      if (!image.success) {
+        toast.error(image.message);
+        setLoading(false);
+        return;
+      }
+
+      values.image = null;
+    }
 
     const data = await updateProfile({
       data: values,
@@ -115,6 +137,19 @@ function EditForm({ className, setOpen, user }: FormProps) {
                       {field?.value?.length}/{PROFILE_NAME_MAX_LENGTH}
                     </Badge>
                   </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="image"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Avatar</FormLabel>
+                <FormControl>
+                  <ImageInput {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

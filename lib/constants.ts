@@ -9,10 +9,14 @@ export const API_KEY = process.env.APPWRITE_API_KEY as string;
 // Collections
 export const SAMPLE_COLLECTION_ID = process.env
   .NEXT_PUBLIC_SAMPLE_COLLECTION_ID as string;
+export const USER_COLLECTION_ID = process.env
+  .NEXT_PUBLIC_USER_COLLECTION_ID as string;
 
 // Buckets
 export const SAMPLE_BUCKET_ID = process.env
   .NEXT_PUBLIC_SAMPLE_BUCKET_ID as string;
+export const AVATAR_BUCKET_ID = process.env
+  .NEXT_PUBLIC_AVATARava_BUCKET_ID as string;
 
 // Cookie
 export const COOKIE_KEY = `a_session_${PROJECT_ID}`;

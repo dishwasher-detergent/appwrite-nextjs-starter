@@ -52,6 +52,7 @@ export const updateProfileSchema = z.object({
     .string()
     .min(2, "Name must be at least 2 characters")
     .max(PROFILE_NAME_MAX_LENGTH, "Name must be less than 50 characters"),
+  image: z.union([z.string(), z.instanceof(File), z.null()]).optional(),
 });
 
 export type UpdateProfileFormData = z.infer<typeof updateProfileSchema>;

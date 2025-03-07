@@ -180,7 +180,7 @@ function CreateForm({ className, setOpen, sample }: FormProps) {
             name="image"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Sample</FormLabel>
+                <FormLabel>Picture</FormLabel>
                 <FormControl>
                   <ImageInput {...field} />
                 </FormControl>

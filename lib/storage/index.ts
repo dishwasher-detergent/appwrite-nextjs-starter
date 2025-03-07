@@ -2,7 +2,7 @@
 
 import { getLoggedInUser } from "@/lib/auth";
 import { createSessionClient } from "@/lib/server/appwrite";
-import { SAMPLE_BUCKET_ID } from "@/lib/constants";
+import { AVATAR_BUCKET_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
 import { Result } from "@/interfaces/result.interface";
 
 import { ID, Models, Permission, Role } from "node-appwrite";
@@ -75,6 +75,84 @@ export async function deleteSampleImage(id: string): Promise<Result<any>> {
     return {
       success: true,
       message: "Sample image successfully deleted.",
+    };
+  } catch (err) {
+    const error = err as Error;
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+}
+
+export async function uploadAvatarImage({
+  id = ID.unique(),
+  data,
+  permissions = [],
+}: {
+  id?: string;
+  data: File;
+  permissions?: string[];
+}): Promise<Result<Models.File>> {
+  const user = await getLoggedInUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in to perform this action.",
+    };
+  }
+
+  const { storage } = await createSessionClient();
+
+  permissions = [
+    ...permissions,
+    Permission.read(Role.user(user.$id)),
+    Permission.write(Role.user(user.$id)),
+  ];
+
+  try {
+    const response = await storage.createFile(
+      AVATAR_BUCKET_ID,
+      id,
+      data,
+      permissions
+    );
+
+    return {
+      success: true,
+      message: "Avatar image uploaded successfully.",
+      data: response,
+    };
+  } catch (err) {
+    const error = err as Error;
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+}
+
+export async function deleteAvatarImage(id: string): Promise<Result<any>> {
+  const user = await getLoggedInUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in to perform this action.",
+    };
+  }
+
+  const { storage } = await createSessionClient();
+
+  try {
+    await storage.deleteFile(AVATAR_BUCKET_ID, id);
+
+    return {
+      success: true,
+      message: "Avatar image successfully deleted.",
     };
   } catch (err) {
     const error = err as Error;

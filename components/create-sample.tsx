@@ -168,7 +168,7 @@ function CreateForm({ className, setOpen }: FormProps) {
             name="image"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Sample</FormLabel>
+                <FormLabel>Picture</FormLabel>
                 <FormControl>
                   <ImageInput {...field} />
                 </FormControl>

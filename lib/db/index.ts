@@ -1,21 +1,24 @@
 "use server";
 
+import { ID, Models, Permission, Role } from "node-appwrite";
+
 import { Result } from "@/interfaces/result.interface";
 import { getLoggedInUser } from "@/lib/auth";
 import { Sample } from "@/interfaces/sample.interface";
 import { createSessionClient } from "@/lib/server/appwrite";
-import { DATABASE_ID, SAMPLE_COLLECTION_ID } from "@/lib/constants";
+import {
+  DATABASE_ID,
+  SAMPLE_COLLECTION_ID,
+  USER_COLLECTION_ID,
+} from "@/lib/constants";
 import { AddSampleFormData, EditSampleFormData } from "./schemas";
-
-import { ID, Models, Permission, Role } from "node-appwrite";
+import { User, UserData } from "@/interfaces/user.interface";
 
 /**
  * Get the current user
- * @returns {Promise<Result<Models.User<Models.Preferences>>} The current user
+ * @returns {Promise<Result<User>} The current user
  */
-export async function getUser(): Promise<
-  Result<Models.User<Models.Preferences>>
-> {
+export async function getUser(): Promise<Result<User>> {
   const user = await getLoggedInUser();
 
   if (!user) {
@@ -25,11 +28,31 @@ export async function getUser(): Promise<
     };
   }
 
-  return {
-    success: true,
-    message: "User successfully retrieved.",
-    data: user,
-  };
+  const { database } = await createSessionClient();
+
+  try {
+    const data = await database.getDocument<UserData>(
+      DATABASE_ID,
+      USER_COLLECTION_ID,
+      user.$id
+    );
+
+    return {
+      success: true,
+      message: "Samples successfully retrieved.",
+      data: {
+        ...user,
+        ...data,
+      },
+    };
+  } catch (err) {
+    const error = err as Error;
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
 }
 
 /**
