@@ -1,5 +1,4 @@
 import { Nav } from "@/components/ui/nav";
-import { getLoggedInUser } from "@/lib/auth";
 
 export default async function AppLayout({
   children,

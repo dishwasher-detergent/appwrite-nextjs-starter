@@ -2,6 +2,7 @@
 
 import { createAdminClient, createSessionClient } from "@/lib/server/appwrite";
 import { COOKIE_KEY, DATABASE_ID, USER_COLLECTION_ID } from "@/lib/constants";
+import { createUserData } from "@/lib/db";
 import { AuthResponse } from "@/interfaces/result.interface";
 import {
   ResetPasswordFormData,
@@ -12,8 +13,7 @@ import {
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { Account, ID, Models, OAuthProvider } from "node-appwrite";
-import { createUserData } from "../db";
+import { ID, Models, OAuthProvider } from "node-appwrite";
 
 /**
  * Retrieves the currently logged-in user.

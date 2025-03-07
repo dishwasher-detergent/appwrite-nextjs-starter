@@ -33,7 +33,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function ResetPasswordPage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<ResetPasswordFormData>({
@@ -54,7 +53,7 @@ export default function ResetPasswordPage() {
       } else {
         toast.error(result.message);
       }
-    } catch (error) {
+    } catch {
       toast.error("An unexpected error occurred");
     } finally {
       setLoading(false);

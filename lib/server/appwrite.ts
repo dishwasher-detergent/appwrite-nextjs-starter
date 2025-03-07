@@ -9,7 +9,6 @@ import {
   Databases,
   Storage,
   Teams,
-  Users,
 } from "node-appwrite";
 
 export async function createSessionClient(setSession: boolean = true) {

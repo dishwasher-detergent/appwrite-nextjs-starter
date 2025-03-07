@@ -6,7 +6,6 @@ import { AVATAR_BUCKET_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
 import { Result } from "@/interfaces/result.interface";
 
 import { ID, Models, Permission, Role } from "node-appwrite";
-import { InputFile } from "node-appwrite/file";
 
 /**
  * Uploads a sample image.

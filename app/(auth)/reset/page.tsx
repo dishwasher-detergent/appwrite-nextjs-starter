@@ -66,7 +66,7 @@ export default function ResetPasswordConfirmPage() {
       } else {
         toast.error(result.message);
       }
-    } catch (error) {
+    } catch {
       toast.error("An unexpected error occurred");
     } finally {
       setLoading(false);
