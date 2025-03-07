@@ -78,8 +78,8 @@ function EditForm({ className, setOpen, user }: FormProps) {
       }
 
       values.image = image.data?.$id;
-    } else if (values.image === null && user.image) {
-      const image = await deleteAvatarImage(user.image);
+    } else if (values.image === null && user.avatar) {
+      const image = await deleteAvatarImage(user.avatar);
 
       if (!image.success) {
         toast.error(image.message);
@@ -91,6 +91,7 @@ function EditForm({ className, setOpen, user }: FormProps) {
     }
 
     const data = await updateProfile({
+      id: user.$id,
       data: values,
     });
 

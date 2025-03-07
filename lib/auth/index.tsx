@@ -1,7 +1,7 @@
 "use server";
 
 import { createAdminClient, createSessionClient } from "@/lib/server/appwrite";
-import { COOKIE_KEY } from "@/lib/constants";
+import { COOKIE_KEY, DATABASE_ID, USER_COLLECTION_ID } from "@/lib/constants";
 import { AuthResponse } from "@/interfaces/result.interface";
 import {
   ResetPasswordFormData,
@@ -201,11 +201,20 @@ export async function resetPassword(
  * @param {string} [data.name] The users name
  * @returns {Promise<AuthResponse>} A promise that resolves to an authentication response.
  */
-export async function updateProfile({ data }: { data: UpdateProfileFormData }) {
-  const { account } = await createSessionClient();
+export async function updateProfile({
+  id,
+  data,
+}: {
+  id: string;
+  data: UpdateProfileFormData;
+}) {
+  const { account, database } = await createSessionClient();
 
   try {
     await account.updateName(data.name);
+    await database.updateDocument(DATABASE_ID, USER_COLLECTION_ID, id, {
+      avatar: data.image,
+    });
 
     return {
       success: true,
