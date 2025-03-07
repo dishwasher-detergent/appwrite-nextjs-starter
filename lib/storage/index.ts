@@ -67,9 +67,9 @@ export async function uploadSampleImage({
 /**
  * Deletes a sample image.
  * @param {string} id
- * @returns {Promise<Result<any>>} A promise that resolves to a result object.
+ * @returns {Promise<Result<undefined>>} A promise that resolves to a result object.
  */
-export async function deleteSampleImage(id: string): Promise<Result<any>> {
+export async function deleteSampleImage(id: string): Promise<Result<undefined>> {
   const user = await getLoggedInUser();
 
   if (!user) {
@@ -158,9 +158,9 @@ export async function uploadAvatarImage({
 /**
  * Deletes an avatar image.
  * @param {string} id
- * @returns {Promise<Result<any>>} A promise that resolves to a result object.
+ * @returns {Promise<Result<undefined>>} A promise that resolves to a result object.
  */
-export async function deleteAvatarImage(id: string): Promise<Result<any>> {
+export async function deleteAvatarImage(id: string): Promise<Result<undefined>> {
   const user = await getLoggedInUser();
 
   if (!user) {
