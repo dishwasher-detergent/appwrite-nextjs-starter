@@ -1,5 +1,6 @@
 import { DeleteSample } from "@/components/delete-sample";
 import { EditSample } from "@/components/edit-sample";
+import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
 import { getSampleById } from "@/lib/db";
 
 import { redirect } from "next/navigation";
@@ -18,9 +19,18 @@ export default async function SamplePage({
 
   return (
     <div className="flex flex-row justify-between">
-      <div>
-        <h2 className="font-bold text-xl">{data?.name}</h2>
-        <p>{data?.description}</p>
+      <div className="flex flex-row gap-2">
+        {data?.image && (
+          <img
+            src={`${ENDPOINT}/storage/buckets/${SAMPLE_BUCKET_ID}/files/${data.image}/view?project=${PROJECT_ID}`}
+            alt={data?.name}
+            className="size-20 rounded-md object-cover bg-primary"
+          />
+        )}
+        <div>
+          <h2 className="font-bold text-xl">{data?.name}</h2>
+          <p>{data?.description}</p>
+        </div>
       </div>
       <div className="flex flex-row gap-1">
         <EditSample sample={data} />
