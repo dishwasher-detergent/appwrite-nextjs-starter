@@ -144,7 +144,7 @@ export async function getSampleById(
  * Create a sample
  * @param {Object} params The parameters for creating a sample
  * @param {string} [params.id] The ID of the sample (optional)
- * @param {z.infer<typeof addSampleSchema>} params.data The sample data
+ * @param {AddSampleFormData} params.data The sample data
  * @param {string[]} [params.permissions] The permissions for the sample (optional)
  * @returns {Promise<Result<Sample>>} The created sample
  */
@@ -202,7 +202,7 @@ export async function createSample({
  * Update a sample
  * @param {Object} params The parameters for creating a sample
  * @param {string} [params.id] The ID of the sample
- * @param {z.infer<typeof editSampleSchema>} params.data The sample data
+ * @param {EditSampleFormData} params.data The sample data
  * @param {string[]} [params.permissions] The permissions for the sample (optional)
  * @returns {Promise<Result<Sample>>} The updated sample
  */
@@ -280,6 +280,44 @@ export async function deleteSample(id: string): Promise<Result<Sample>> {
     return {
       success: false,
       message: error.message,
+    };
+  }
+}
+
+export async function createUserData(id: string): Promise<Result<UserData>> {
+  const user = await getLoggedInUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in to perform this action.",
+    };
+  }
+
+  const { database } = await createSessionClient();
+
+  try {
+    await database.getDocument<UserData>(DATABASE_ID, USER_COLLECTION_ID, id);
+
+    return {
+      success: true,
+      message: "User data already exists.",
+    };
+  } catch (err) {
+    console.log(err);
+
+    await database.createDocument<UserData>(
+      DATABASE_ID,
+      USER_COLLECTION_ID,
+      id,
+      {
+        avatar: null,
+      }
+    );
+
+    return {
+      success: true,
+      message: "User data successfully created.",
     };
   }
 }

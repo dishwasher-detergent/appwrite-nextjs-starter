@@ -13,6 +13,7 @@ import {
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Account, ID, Models, OAuthProvider } from "node-appwrite";
+import { createUserData } from "../db";
 
 /**
  * Retrieves the currently logged-in user.
@@ -94,7 +95,8 @@ export async function signUpWithEmail(
   const { account } = await createAdminClient();
 
   try {
-    await account.create(ID.unique(), email, password, name);
+    const id = ID.unique();
+    await account.create(id, email, password, name);
     const session = await account.createEmailPasswordSession(email, password);
 
     (await cookies()).set(COOKIE_KEY, session.secret, {
@@ -103,6 +105,8 @@ export async function signUpWithEmail(
       sameSite: "strict",
       secure: true,
     });
+
+    await createUserData(session.userId);
 
     return {
       success: true,
@@ -207,7 +211,7 @@ export async function updateProfile({
 }: {
   id: string;
   data: UpdateProfileFormData;
-}) {
+}): Promise<AuthResponse> {
   const { account, database } = await createSessionClient();
 
   try {

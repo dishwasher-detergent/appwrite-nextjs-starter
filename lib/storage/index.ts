@@ -8,6 +8,14 @@ import { Result } from "@/interfaces/result.interface";
 import { ID, Models, Permission, Role } from "node-appwrite";
 import { InputFile } from "node-appwrite/file";
 
+/**
+ * Uploads a sample image.
+ * @param {Object} params The parameters for creating a sample image
+ * @param {string} [params.id] The ID of the sample
+ * @param {File} params.data The image data
+ * @param {string[]} [params.permissions] The permissions for the image (optional)
+ * @returns {Promise<Result<Models.File>>} The file
+ */
 export async function uploadSampleImage({
   id = ID.unique(),
   data,
@@ -57,6 +65,11 @@ export async function uploadSampleImage({
   }
 }
 
+/**
+ * Deletes a sample image.
+ * @param {string} id
+ * @returns {Promise<Result<any>>} A promise that resolves to a result object.
+ */
 export async function deleteSampleImage(id: string): Promise<Result<any>> {
   const user = await getLoggedInUser();
 
@@ -86,6 +99,14 @@ export async function deleteSampleImage(id: string): Promise<Result<any>> {
   }
 }
 
+/**
+ * Uploads an avatar image.
+ * @param {Object} params The parameters for creating a avatar image
+ * @param {string} [params.id] The ID of the avatar
+ * @param {File} params.data The image data
+ * @param {string[]} [params.permissions] The permissions for the image (optional)
+ * @returns {Promise<Result<Models.File>>} The file
+ */
 export async function uploadAvatarImage({
   id = ID.unique(),
   data,
@@ -135,6 +156,11 @@ export async function uploadAvatarImage({
   }
 }
 
+/**
+ * Deletes an avatar image.
+ * @param {string} id
+ * @returns {Promise<Result<any>>} A promise that resolves to a result object.
+ */
 export async function deleteAvatarImage(id: string): Promise<Result<any>> {
   const user = await getLoggedInUser();
 

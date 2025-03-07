@@ -1,4 +1,5 @@
 import { COOKIE_KEY } from "@/lib/constants";
+import { createUserData } from "@/lib/db";
 import { createAdminClient } from "@/lib/server/appwrite";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -20,6 +21,8 @@ export async function GET(request: NextRequest) {
     sameSite: "strict",
     secure: true,
   });
+
+  await createUserData(session.userId);
 
   return NextResponse.redirect(`${request.nextUrl.origin}/app`);
 }

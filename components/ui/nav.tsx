@@ -1,10 +1,10 @@
 import { UserInformation } from "@/components/user-information";
-import { getLoggedInUser } from "@/lib/auth";
+import { getUser } from "@/lib/db";
 
 import Link from "next/link";
 
 export async function Nav() {
-  const user = await getLoggedInUser();
+  const { data } = await getUser();
 
   return (
     <header className="sticky top-0 z-10 w-full border-b bg-background/90 backdrop-blur-xs">
@@ -13,7 +13,7 @@ export async function Nav() {
           <Link href="/app">Appwrite NextJS Starter</Link>
         </h1>
         <div className="flex flex-row items-center gap-2">
-          {user && <UserInformation user={user} />}
+          {data && <UserInformation user={data} />}
         </div>
       </div>
     </header>
