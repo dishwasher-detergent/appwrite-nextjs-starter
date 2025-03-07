@@ -60,7 +60,7 @@ function EditForm({ className, setOpen, user }: FormProps) {
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
       name: user.name,
-      avatar: user.avatar
+      image: user.avatar
     },
   });
 
