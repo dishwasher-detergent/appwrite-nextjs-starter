@@ -38,11 +38,6 @@ export default function ResetPasswordConfirmPage() {
   const secret = searchParams.get("secret");
   const userId = searchParams.get("userId");
 
-  if (!secret || !userId) {
-    router.push("/signin");
-    return null;
-  }
-
   const form = useForm<NewPasswordFormData>({
     resolver: zodResolver(newPasswordSchema),
     defaultValues: {
@@ -50,6 +45,11 @@ export default function ResetPasswordConfirmPage() {
       confirmPassword: "",
     },
   });
+
+  if (!secret || !userId) {
+    router.push("/signin");
+    return null;
+  }
 
   async function onSubmit(values: NewPasswordFormData) {
     if (!userId || !secret) {
