@@ -75,7 +75,23 @@
             "indexes": []
         }
     ],
-    "buckets": [],
+    "buckets": [
+        {
+            "$id": "sample",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"any\")"
+            ],
+            "fileSecurity": true,
+            "name": "sample",
+            "enabled": true,
+            "maximumFileSize": 50000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        }
+    ],
     "teams": [],
     "functions": []
 }
