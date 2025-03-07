@@ -29,6 +29,7 @@ import {
   NAME_MAX_LENGTH,
 } from "@/constants/sample.constants";
 import { ImageInput } from "@/components/ui/image-input";
+import { deleteSampleImage, uploadSampleImage } from "@/lib/storage";
 
 export function EditSample({ sample }: { sample: Sample }) {
   const [open, setOpen] = useState(false);
@@ -70,6 +71,30 @@ function CreateForm({ className, setOpen, sample }: FormProps) {
 
   async function onSubmit(values: EditSampleFormData) {
     setLoading(true);
+
+    if (values.image instanceof File) {
+      const image = await uploadSampleImage({
+        data: values.image,
+      });
+
+      if (!image.success) {
+        toast.error(image.message);
+        setLoading(false);
+        return;
+      }
+
+      values.image = image.data?.$id;
+    } else if (values.image === null && sample.image) {
+      const image = await deleteSampleImage(sample.image);
+
+      if (!image.success) {
+        toast.error(image.message);
+        setLoading(false);
+        return;
+      }
+
+      values.image = null;
+    }
 
     const data = await updateSample({
       id: sample.$id,

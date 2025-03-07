@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 import { Sample } from "@/interfaces/sample.interface";
 import { DeleteSampleFormData, deleteSampleSchema } from "@/lib/db/schemas";
 import { NAME_MAX_LENGTH } from "@/constants/sample.constants";
+import { deleteSampleImage } from "@/lib/storage";
 
 export function DeleteSample({ sample }: { sample: Sample }) {
   const [open, setOpen] = useState(false);
@@ -74,6 +75,16 @@ function DeleteForm({ className, setOpen, sample }: FormProps) {
       toast.error("Name does not match.");
       setLoading(false);
       return;
+    }
+
+    if (sample.image) {
+      const image = await deleteSampleImage(sample.image);
+
+      if (!image.success) {
+        toast.error(image.message);
+        setLoading(false);
+        return;
+      }
     }
 
     const data = await deleteSample(sample.$id);

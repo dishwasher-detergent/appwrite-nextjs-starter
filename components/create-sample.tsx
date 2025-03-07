@@ -71,7 +71,7 @@ function CreateForm({ className, setOpen }: FormProps) {
   async function onSubmit(values: AddSampleFormData) {
     setLoading(true);
 
-    if (values.image) {
+    if (values.image instanceof File) {
       const image = await uploadSampleImage({
         data: values.image,
       });

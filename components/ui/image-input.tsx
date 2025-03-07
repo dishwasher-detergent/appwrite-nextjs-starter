@@ -101,7 +101,7 @@ function ImageInput({ className, value, onChange, ...props }: ImageInputProps) {
               className="object-cover size-full"
             />
           </div>
-          <Badge className="truncate">{fileName}</Badge>
+          {fileName && <Badge className="truncate">{fileName}</Badge>}
         </div>
       )}
     </div>
