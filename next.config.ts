@@ -6,6 +6,15 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "50mb",
     },
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cloud.appwrite.io",
+        port: "",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
