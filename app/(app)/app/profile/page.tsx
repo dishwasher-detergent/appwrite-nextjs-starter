@@ -1,9 +1,10 @@
+import Image from "next/image";
+import { redirect } from "next/navigation";
+
 import { EditProfile } from "@/components/edit-profile";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -11,9 +12,6 @@ import {
 } from "@/components/ui/table";
 import { AVATAR_BUCKET_ID, ENDPOINT, PROJECT_ID } from "@/lib/constants";
 import { getUser, getUserLogs } from "@/lib/db";
-
-import Image from "next/image";
-import { redirect } from "next/navigation";
 
 export default async function ProfilePage() {
   const { data } = await getUser();

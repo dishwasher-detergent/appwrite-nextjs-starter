@@ -1,7 +1,4 @@
-import {
-  PROFILE_ABOUT_MAX_LENGTH,
-  PROFILE_NAME_MAX_LENGTH,
-} from "@/constants/profile.constants";
+import { PROFILE_NAME_MAX_LENGTH } from "@/constants/profile.constants";
 import { z } from "zod";
 
 export const signInSchema = z.object({
