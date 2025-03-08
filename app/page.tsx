@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { ModeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { getLoggedInUser } from "@/lib/auth";
 
@@ -15,7 +14,7 @@ export default async function Home() {
             <Link href="/app">Appwrite NextJS Starter</Link>
           </h1>
           <div className="flex items-center gap-2">
-            <ModeToggle />
+            {/* <ModeToggle /> */}
             {user ? (
               <Button size="sm" asChild>
                 <Link href="/app">Go to App</Link>
@@ -28,6 +27,8 @@ export default async function Home() {
           </div>
         </nav>
       </header>
+
+      {/* Everything below here is setup instructions */}
       <div className="max-w-4xl mx-auto px-4 py-8 w-full">
         <header className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">
