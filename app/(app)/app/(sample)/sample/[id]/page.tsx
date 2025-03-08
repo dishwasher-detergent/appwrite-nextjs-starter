@@ -1,11 +1,10 @@
+import Image from "next/image";
+import { redirect } from "next/navigation";
+
 import { DeleteSample } from "@/components/delete-sample";
 import { EditSample } from "@/components/edit-sample";
 import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
 import { getSampleById } from "@/lib/db";
-
-import Image from "next/image";
-
-import { redirect } from "next/navigation";
 
 export default async function SamplePage({
   params,

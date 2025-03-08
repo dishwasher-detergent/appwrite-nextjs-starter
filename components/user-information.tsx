@@ -1,5 +1,9 @@
 "use client";
 
+import { LucideLogOut, LucideUser } from "lucide-react";
+import Link from "next/link";
+import { useMemo } from "react";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,10 +17,6 @@ import { User } from "@/interfaces/user.interface";
 import { logOut } from "@/lib/auth";
 import { AVATAR_BUCKET_ID, ENDPOINT, PROJECT_ID } from "@/lib/constants";
 import { getInitials } from "@/lib/utils";
-
-import { LucideLogOut, LucideUser } from "lucide-react";
-import Link from "next/link";
-import { useMemo } from "react";
 
 export function UserInformation({ user }: { user: User }) {
   const initals = useMemo(() => {

@@ -18,19 +18,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { ImageInput } from "@/components/ui/image-input";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { updateSample } from "@/lib/db";
-import { cn } from "@/lib/utils";
-import { Sample } from "@/interfaces/sample.interface";
-import { EditSampleFormData, editSampleSchema } from "@/lib/db/schemas";
 import {
   DESCRIPTION_MAX_LENGTH,
   NAME_MAX_LENGTH,
 } from "@/constants/sample.constants";
-import { ImageInput } from "@/components/ui/image-input";
-import { deleteSampleImage, uploadSampleImage } from "@/lib/storage";
+import { Sample } from "@/interfaces/sample.interface";
 import { SAMPLE_BUCKET_ID } from "@/lib/constants";
+import { updateSample } from "@/lib/db";
+import { EditSampleFormData, editSampleSchema } from "@/lib/db/schemas";
+import { deleteSampleImage, uploadSampleImage } from "@/lib/storage";
+import { cn } from "@/lib/utils";
 
 export function EditSample({ sample }: { sample: Sample }) {
   const [open, setOpen] = useState(false);

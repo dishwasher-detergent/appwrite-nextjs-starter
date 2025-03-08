@@ -20,12 +20,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { deleteSample } from "@/lib/db";
-import { cn } from "@/lib/utils";
-import { Sample } from "@/interfaces/sample.interface";
-import { DeleteSampleFormData, deleteSampleSchema } from "@/lib/db/schemas";
 import { NAME_MAX_LENGTH } from "@/constants/sample.constants";
+import { Sample } from "@/interfaces/sample.interface";
+import { deleteSample } from "@/lib/db";
+import { DeleteSampleFormData, deleteSampleSchema } from "@/lib/db/schemas";
 import { deleteSampleImage } from "@/lib/storage";
+import { cn } from "@/lib/utils";
 
 export function DeleteSample({ sample }: { sample: Sample }) {
   const [open, setOpen] = useState(false);

@@ -16,8 +16,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  modals,
 }: Readonly<{
   children: React.ReactNode;
+  modals: React.ReactNode;
 }>) {
   return (
     <html lang="en">
@@ -25,7 +27,9 @@ export default function RootLayout({
         className={`${karla.variable} min-h-dvh overflow-x-hidden antialiased flex flex-col`}
       >
         {children}
+        {modals}
         <Toaster />
+        <div id="modal-root" />
       </body>
     </html>
   );

@@ -1,5 +1,11 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
+
+import { DeleteSample } from "@/components/delete-sample";
+import { EditSample } from "@/components/edit-sample";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,13 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Sample } from "@/interfaces/sample.interface";
-import { EditSample } from "@/components/edit-sample";
-import { DeleteSample } from "@/components/delete-sample";
 import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
-
-import Image from "next/image";
-import { Button } from "./ui/button";
-import Link from "next/link";
 
 export function SampleCard(sample: Sample) {
   return (

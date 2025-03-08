@@ -18,19 +18,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { ImageInput } from "@/components/ui/image-input";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { UpdateProfileFormData, updateProfileSchema } from "@/lib/db/schemas";
-import { updateProfile } from "@/lib/db";
+import { Textarea } from "@/components/ui/textarea";
 import {
   PROFILE_ABOUT_MAX_LENGTH,
   PROFILE_NAME_MAX_LENGTH,
 } from "@/constants/profile.constants";
-import { ImageInput } from "@/components/ui/image-input";
-import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
 import { User } from "@/interfaces/user.interface";
 import { AVATAR_BUCKET_ID } from "@/lib/constants";
-import { Textarea } from "@/components/ui/textarea";
+import { updateProfile } from "@/lib/db";
+import { UpdateProfileFormData, updateProfileSchema } from "@/lib/db/schemas";
+import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
+import { cn } from "@/lib/utils";
 
 export function EditProfile({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
