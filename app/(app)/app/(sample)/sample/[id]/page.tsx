@@ -19,49 +19,56 @@ export default async function SamplePage({
   }
 
   return (
-    <article className="space-y-6">
-      <header className="relative">
-        <div
-          role="img"
-          aria-label="Profile banner"
-          className="w-full bg-primary rounded-xl h-32"
-        />
-        <div className="flex items-start justify-between px-4 -mt-16">
-          <figure className="relative flex-shrink-0">
-            {data?.image ? (
-              <Image
-                src={`${ENDPOINT}/storage/buckets/${SAMPLE_BUCKET_ID}/files/${data.image}/view?project=${PROJECT_ID}`}
-                alt={`${data.name}'s image`}
-                className="rounded-full border-4 border-background object-cover bg-primary aspect-square"
-                width={128}
-                height={128}
-                priority
-              />
-            ) : (
-              <div
-                aria-label="Default profile picture"
-                className="rounded-full border-4 border-background bg-muted aspect-square w-32 h-32"
-              />
-            )}
-          </figure>
-          <div className="pt-18 flex flex-row gap-2">
+    <article className="container mx-auto">
+      <header className="mb-8">
+        <div className="flex items-start justify-between">
+          <h1 className="text-4xl font-bold tracking-tight">{data.name}</h1>
+          <div
+            className="flex items-center gap-2"
+            role="toolbar"
+            aria-label="Sample actions"
+          >
             <EditSample sample={data} />
             <DeleteSample sample={data} />
           </div>
         </div>
       </header>
-      <main className="px-4 space-y-6">
-        <div className="max-w-prose">
-          <h1 className="text-2xl font-bold tracking-tight mb-1">
-            {data.name}
-          </h1>
-          <section aria-label="Description">
+      <div className="grid gap-8 md:grid-cols-[256px,1fr]">
+        <figure className="relative">
+          {data?.image ? (
+            <Image
+              src={`${ENDPOINT}/storage/buckets/${SAMPLE_BUCKET_ID}/files/${data.image}/view?project=${PROJECT_ID}`}
+              alt={`Sample image for ${data.name}`}
+              className="rounded-lg border bg-muted object-cover"
+              width={256}
+              height={256}
+              priority
+            />
+          ) : (
+            <div
+              role="img"
+              aria-label="No image available"
+              className="bg-muted grid place-items-center size-64 rounded-lg"
+            >
+              <p className="text-muted-foreground font-medium">No image</p>
+            </div>
+          )}
+          <figcaption className="sr-only">
+            Sample image for {data.name}
+          </figcaption>
+        </figure>
+
+        <main>
+          <section aria-labelledby="description-heading">
+            <h2 id="description-heading" className="text-lg font-semibold mb-2">
+              Description
+            </h2>
             <p className="text-muted-foreground leading-relaxed">
               {data?.description ?? "No description provided."}
             </p>
           </section>
-        </div>
-      </main>
+        </main>
+      </div>
     </article>
   );
 }

@@ -42,8 +42,7 @@ export function EditSample({ sample }: { sample: Sample }) {
       open={open}
       setOpen={setOpen}
       button={
-        <Button size="sm">
-          Edit
+        <Button variant="ghost" size="icon">
           <LucidePencil className="size-3.5" />
         </Button>
       }

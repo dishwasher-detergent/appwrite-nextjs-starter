@@ -29,10 +29,8 @@ export function SampleCard(sample: Sample) {
             sizes="(max-width: 500px)"
           />
         ) : (
-          <div className="w-full aspect-video bg-muted">
-            <p className="flex h-full items-center justify-center text-muted-foreground font-semibold">
-              No image
-            </p>
+          <div className="w-full aspect-video bg-muted grid place-items-center">
+            <p className="text-muted-foreground font-semibold">No image</p>
           </div>
         )}
         <CardHeader className="flex flex-col justify-end bottom-0 absolute w-full p-4 h-full bg-linear-to-t from-primary to-transparent">
