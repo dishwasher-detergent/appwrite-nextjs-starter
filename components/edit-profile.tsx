@@ -75,6 +75,10 @@ function EditForm({ className, setOpen, user }: FormProps) {
     setLoading(true);
 
     if (values.image instanceof File) {
+      if (user.avatar) {
+        await deleteAvatarImage(user.avatar);
+      }
+
       const image = await uploadAvatarImage({
         data: values.image,
       });

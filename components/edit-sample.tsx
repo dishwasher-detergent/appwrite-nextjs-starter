@@ -42,7 +42,8 @@ export function EditSample({ sample }: { sample: Sample }) {
       open={open}
       setOpen={setOpen}
       button={
-        <Button size="icon">
+        <Button size="sm">
+          Edit
           <LucidePencil className="size-3.5" />
         </Button>
       }
@@ -74,6 +75,10 @@ function CreateForm({ className, setOpen, sample }: FormProps) {
     setLoading(true);
 
     if (values.image instanceof File) {
+      if (sample.image) {
+        await deleteSampleImage(sample.image);
+      }
+
       const image = await uploadSampleImage({
         data: values.image,
       });

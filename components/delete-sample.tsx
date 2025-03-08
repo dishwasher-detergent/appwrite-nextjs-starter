@@ -37,7 +37,8 @@ export function DeleteSample({ sample }: { sample: Sample }) {
       open={open}
       setOpen={setOpen}
       button={
-        <Button size="icon" variant="destructive">
+        <Button size="sm" variant="destructive">
+          Delete
           <LucideTrash2 className="size-3.5" />
         </Button>
       }
