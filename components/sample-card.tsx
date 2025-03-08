@@ -23,13 +23,13 @@ export function SampleCard(sample: Sample) {
           <Image
             src={`${ENDPOINT}/storage/buckets/${SAMPLE_BUCKET_ID}/files/${sample.image}/view?project=${PROJECT_ID}`}
             alt={sample.name}
-            className="object-cover bg-primary aspect-square rounded-t-md"
+            className="object-cover bg-primary rounded-t-md"
             width={500}
-            height={500}
+            height={250}
             sizes="(max-width: 500px)"
           />
         ) : (
-          <div className="w-full aspect-square bg-muted rounded-t-md">
+          <div className="w-full aspect-video bg-muted rounded-t-md">
             <p className="flex h-full items-center justify-center text-muted-foreground font-semibold">
               No image
             </p>
