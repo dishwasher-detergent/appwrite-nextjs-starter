@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LucideGithub, LucideLoader2, LucideUserPlus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -21,6 +22,7 @@ import { signUpWithEmail, signUpWithGithub } from "@/lib/auth";
 import { signUpSchema, type SignUpFormData } from "@/lib/auth/schemas";
 
 export function SignUpForm() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<SignUpFormData>({
@@ -39,7 +41,7 @@ export function SignUpForm() {
 
       if (result.success) {
         toast.success(result.message);
-        window.location.replace(result.redirect!);
+        router.push(result.redirect!);
       } else {
         toast.error(result.message);
       }

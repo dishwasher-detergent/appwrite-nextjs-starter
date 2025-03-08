@@ -55,7 +55,7 @@ export function ResetForm() {
 
       if (result.success) {
         toast.success(result.message);
-        window.location.replace(result.redirect!);
+        router.push(result.redirect!);
       } else {
         toast.error(result.message);
       }
