@@ -1,7 +1,3 @@
-"use client";
-
-import { Suspense } from "react";
-
 import { RecoverForm } from "@/app/(auth)/recover/form";
 import { RecoveryFooter } from "@/components/recovery-footer";
 import {
@@ -22,9 +18,7 @@ export default function RecoverPasswordPage() {
           link.
         </DialogDescription>
       </DialogHeader>
-      <Suspense fallback={null}>
-        <RecoverForm />
-      </Suspense>
+      <RecoverForm />
       <DialogFooter className="flex flex-col items-start">
         <RecoveryFooter />
       </DialogFooter>

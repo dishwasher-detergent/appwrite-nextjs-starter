@@ -10,6 +10,10 @@ export function Modal({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [open, setOpen] = useState(true);
 
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   function onDismiss() {
     setOpen(false);
     router.back();

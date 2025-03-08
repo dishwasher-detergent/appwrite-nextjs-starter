@@ -1,4 +1,4 @@
-"use client";
+import { Suspense } from "react";
 
 import { ResetForm } from "@/app/(auth)/reset/form";
 import {
@@ -17,7 +17,9 @@ export default function ResetPasswordPage() {
           Please enter your new password below.
         </DialogDescription>
       </DialogHeader>
-      <ResetForm />
+      <Suspense fallback={null}>
+        <ResetForm />
+      </Suspense>
     </Modal>
   );
 }
