@@ -29,7 +29,7 @@ export function SampleCard(sample: Sample) {
             sizes="(max-width: 500px)"
           />
         ) : (
-          <div className="w-full aspect-video bg-muted grid place-items-center">
+          <div className="w-full aspect-square bg-muted grid place-items-center">
             <p className="text-muted-foreground font-semibold">No image</p>
           </div>
         )}

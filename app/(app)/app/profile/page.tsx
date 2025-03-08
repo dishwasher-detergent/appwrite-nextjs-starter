@@ -27,7 +27,7 @@ export default async function ProfilePage() {
         <div
           role="img"
           aria-label="Profile banner"
-          className="w-full bg-primary rounded-xl h-32"
+          className="w-full bg-linear-to-r from-primary to-secondary rounded-xl h-32"
         />
         <div className="flex items-start justify-between px-4 -mt-16">
           <figure className="relative flex-shrink-0">
