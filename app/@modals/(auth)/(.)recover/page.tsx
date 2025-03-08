@@ -25,5 +25,3 @@ export default function RecoverPasswordPage() {
     </Modal>
   );
 }
-
-export const dynamic = "force-dynamic";

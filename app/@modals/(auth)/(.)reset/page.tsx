@@ -1,10 +1,11 @@
+import { Suspense } from "react";
+
 import { ResetForm } from "@/app/(auth)/reset/form";
 import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Suspense } from "react";
 import { Modal } from "../../modal";
 
 export default function ResetPasswordPage() {
@@ -22,5 +23,3 @@ export default function ResetPasswordPage() {
     </Modal>
   );
 }
-
-export const dynamic = "force-dynamic";

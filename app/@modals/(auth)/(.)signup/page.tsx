@@ -24,5 +24,3 @@ export default function Page() {
     </Modal>
   );
 }
-
-export const dynamic = "force-dynamic";
