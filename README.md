@@ -2,6 +2,16 @@
 
 A starter template for building web applications with Next.js and Appwrite.
 
+## 📚 Overview
+
+This starter template provides everything you need to build a
+modern web application with Next.js and Appwrite. It includes a
+full authentication system, user profile management, and a clean,
+responsive UI.
+
+Perfect for quickly bootstrapping your next project without
+spending time on repetitive setup tasks.
+
 ## ✨ Features
 
 - 🔐 **Authentication Flows**
