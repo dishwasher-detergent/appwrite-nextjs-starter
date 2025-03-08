@@ -10,7 +10,7 @@ import { Modal } from "../../modal";
 
 export default function Page() {
   return (
-    <Modal expectedPath={"signup"}>
+    <Modal>
       <DialogHeader>
         <DialogTitle>Sign Up</DialogTitle>
         <DialogDescription>

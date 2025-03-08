@@ -8,7 +8,7 @@ import { Modal } from "../../modal";
 
 export default function ResetPasswordPage() {
   return (
-    <Modal expectedPath={"reset"}>
+    <Modal>
       <DialogHeader>
         <DialogTitle>Set New Password</DialogTitle>
         <DialogDescription>
