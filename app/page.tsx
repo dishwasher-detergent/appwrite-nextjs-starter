@@ -360,7 +360,7 @@ export default async function Home() {
               </div>
             </li>
             <li>
-              After creating the OAuth App, you'll receive a{" "}
+              After creating the OAuth App, you&apos;ll receive a{" "}
               <strong className="font-semibold">Client ID</strong> and need to
               generate a{" "}
               <strong className="font-semibold">Client Secret</strong>.
