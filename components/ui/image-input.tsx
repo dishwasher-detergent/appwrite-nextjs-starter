@@ -15,7 +15,13 @@ type ImageInputProps = {
   bucketId: string;
 } & Omit<React.ComponentProps<"input">, "type" | "value" | "onChange">;
 
-function ImageInput({ className, value, onChange, bucketId, ...props }: ImageInputProps) {
+function ImageInput({
+  className,
+  value,
+  onChange,
+  bucketId,
+  ...props
+}: ImageInputProps) {
   const [fileName, setFileName] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -89,7 +95,7 @@ function ImageInput({ className, value, onChange, bucketId, ...props }: ImageInp
 
       {previewUrl && (
         <div className="mt-3 relative">
-          <div className="relative rounded-md border overflow-hidden size-32 bg-primary">
+          <div className="relative rounded-md border overflow-hidden size-20 bg-primary">
             <button
               type="button"
               onClick={handleClear}
@@ -101,7 +107,10 @@ function ImageInput({ className, value, onChange, bucketId, ...props }: ImageInp
             <Image
               src={previewUrl}
               alt="Preview"
-              className="object-cover size-full"
+              className="object-cover size-full aspect-square"
+              width={32}
+              height={32}
+              quality={100}
             />
           </div>
           {fileName && <Badge className="truncate">{fileName}</Badge>}

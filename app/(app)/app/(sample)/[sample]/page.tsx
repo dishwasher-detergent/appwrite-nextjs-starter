@@ -26,7 +26,9 @@ export default async function SamplePage({
           <Image
             src={`${ENDPOINT}/storage/buckets/${SAMPLE_BUCKET_ID}/files/${data.image}/view?project=${PROJECT_ID}`}
             alt={data?.name}
-            className="size-20 rounded-md object-cover bg-primary"
+            className="rounded-md object-cover bg-primary aspect-square"
+            width={80}
+            height={80}
           />
         )}
         <div>

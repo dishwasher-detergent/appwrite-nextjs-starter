@@ -45,7 +45,9 @@ export default async function AppPage() {
                   <Image
                     src={`${ENDPOINT}/storage/buckets/${SAMPLE_BUCKET_ID}/files/${sample.image}/view?project=${PROJECT_ID}`}
                     alt={sample.name}
-                    className="size-8 rounded-md object-cover bg-primary"
+                    className="rounded-md object-cover bg-primary aspect-square"
+                    width={32}
+                    height={32}
                   />
                 )}
               </TableCell>

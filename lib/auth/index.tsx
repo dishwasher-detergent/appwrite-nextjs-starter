@@ -1,14 +1,13 @@
 "use server";
 
 import { createAdminClient, createSessionClient } from "@/lib/server/appwrite";
-import { COOKIE_KEY, DATABASE_ID, USER_COLLECTION_ID } from "@/lib/constants";
+import { COOKIE_KEY } from "@/lib/constants";
 import { createUserData } from "@/lib/db";
 import { AuthResponse } from "@/interfaces/result.interface";
 import {
   ResetPasswordFormData,
   SignInFormData,
   SignUpFormData,
-  UpdateProfileFormData,
 } from "./schemas";
 
 import { cookies, headers } from "next/headers";
@@ -189,40 +188,6 @@ export async function resetPassword(
       success: true,
       message: "Password reset successfully",
       redirect: "/signin",
-    };
-  } catch (err) {
-    const error = err as Error;
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
-}
-
-/**
- * Updates the user's profile.
- * @param {Object} data The parameters for updating a user
- * @param {string} [data.name] The users name
- * @returns {Promise<AuthResponse>} A promise that resolves to an authentication response.
- */
-export async function updateProfile({
-  id,
-  data,
-}: {
-  id: string;
-  data: UpdateProfileFormData;
-}): Promise<AuthResponse> {
-  const { account, database } = await createSessionClient();
-
-  try {
-    await account.updateName(data.name);
-    await database.updateDocument(DATABASE_ID, USER_COLLECTION_ID, id, {
-      avatar: data.image,
-    });
-
-    return {
-      success: true,
-      message: "Profile updated successfully",
     };
   } catch (err) {
     const error = err as Error;

@@ -2,7 +2,7 @@
 
 import { ID, Models, Permission, Role } from "node-appwrite";
 
-import { Result } from "@/interfaces/result.interface";
+import { AuthResponse, Result } from "@/interfaces/result.interface";
 import { getLoggedInUser } from "@/lib/auth";
 import { Sample } from "@/interfaces/sample.interface";
 import { createSessionClient } from "@/lib/server/appwrite";
@@ -11,7 +11,11 @@ import {
   SAMPLE_COLLECTION_ID,
   USER_COLLECTION_ID,
 } from "@/lib/constants";
-import { AddSampleFormData, EditSampleFormData } from "./schemas";
+import {
+  AddSampleFormData,
+  EditSampleFormData,
+  UpdateProfileFormData,
+} from "./schemas";
 import { User, UserData } from "@/interfaces/user.interface";
 
 /**
@@ -44,6 +48,75 @@ export async function getUser(): Promise<Result<User>> {
         ...user,
         ...data,
       },
+    };
+  } catch (err) {
+    const error = err as Error;
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+}
+
+/**
+ * Updates the user's profile.
+ * @param {Object} data The parameters for updating a user
+ * @param {string} [data.name] The users name
+ * @returns {Promise<AuthResponse>} A promise that resolves to an authentication response.
+ */
+export async function updateProfile({
+  id,
+  data,
+}: {
+  id: string;
+  data: UpdateProfileFormData;
+}): Promise<AuthResponse> {
+  const { account, database } = await createSessionClient();
+
+  try {
+    await account.updateName(data.name);
+    await database.updateDocument(DATABASE_ID, USER_COLLECTION_ID, id, {
+      avatar: data.image,
+      about: data.about,
+    });
+
+    return {
+      success: true,
+      message: "Profile updated successfully",
+    };
+  } catch (err) {
+    const error = err as Error;
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+}
+
+/**
+ * Get a list of logs
+ * @returns {Promise<Result<Models.LogList>>} The list of logs
+ */
+export async function getUserLogs(): Promise<Result<Models.LogList>> {
+  const user = await getLoggedInUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in to perform this action.",
+    };
+  }
+
+  const { account } = await createSessionClient();
+
+  try {
+    const logs = await account.listLogs();
+
+    return {
+      success: true,
+      message: "Samples successfully retrieved.",
+      data: logs,
     };
   } catch (err) {
     const error = err as Error;

@@ -20,13 +20,17 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { UpdateProfileFormData, updateProfileSchema } from "@/lib/auth/schemas";
-import { updateProfile } from "@/lib/auth";
-import { PROFILE_NAME_MAX_LENGTH } from "@/constants/profile.constants";
+import { UpdateProfileFormData, updateProfileSchema } from "@/lib/db/schemas";
+import { updateProfile } from "@/lib/db";
+import {
+  PROFILE_ABOUT_MAX_LENGTH,
+  PROFILE_NAME_MAX_LENGTH,
+} from "@/constants/profile.constants";
 import { ImageInput } from "@/components/ui/image-input";
 import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
 import { User } from "@/interfaces/user.interface";
 import { AVATAR_BUCKET_ID } from "@/lib/constants";
+import { Textarea } from "@/components/ui/textarea";
 
 export function EditProfile({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
@@ -38,7 +42,8 @@ export function EditProfile({ user }: { user: User }) {
       open={open}
       setOpen={setOpen}
       button={
-        <Button size="icon">
+        <Button size="sm" variant="secondary">
+          Edit
           <LucidePencil className="size-3.5" />
         </Button>
       }
@@ -61,7 +66,8 @@ function EditForm({ className, setOpen, user }: FormProps) {
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
       name: user.name,
-      image: user.avatar
+      about: user.about,
+      image: user.avatar,
     },
   });
 
@@ -138,6 +144,32 @@ function EditForm({ className, setOpen, user }: FormProps) {
                       variant="secondary"
                     >
                       {field?.value?.length}/{PROFILE_NAME_MAX_LENGTH}
+                    </Badge>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="about"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>About</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Textarea
+                      {...field}
+                      placeholder="Tell us about yourself."
+                      className="pb-8"
+                      maxLength={PROFILE_ABOUT_MAX_LENGTH}
+                    />
+                    <Badge
+                      className="absolute bottom-2 left-2"
+                      variant="secondary"
+                    >
+                      {field?.value?.length ?? 0}/{PROFILE_ABOUT_MAX_LENGTH}
                     </Badge>
                   </div>
                 </FormControl>
