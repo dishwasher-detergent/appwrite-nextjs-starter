@@ -7,20 +7,23 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Modal } from "../../modal";
+import { ModalWrapper } from "../../modal-wrapper";
 
 export default function Page() {
   return (
-    <Modal>
-      <DialogHeader>
-        <DialogTitle>Sign In</DialogTitle>
-        <DialogDescription>
-          Enter your email below to sign in to your account.
-        </DialogDescription>
-      </DialogHeader>
-      <SignInForm />
-      <DialogFooter className="flex flex-col items-start">
-        <SignInFooter />
-      </DialogFooter>
-    </Modal>
+    <ModalWrapper>
+      <Modal>
+        <DialogHeader>
+          <DialogTitle>Sign In</DialogTitle>
+          <DialogDescription>
+            Enter your email below to sign in to your account.
+          </DialogDescription>
+        </DialogHeader>
+        <SignInForm />
+        <DialogFooter className="flex flex-col items-start">
+          <SignInFooter />
+        </DialogFooter>
+      </Modal>
+    </ModalWrapper>
   );
 }

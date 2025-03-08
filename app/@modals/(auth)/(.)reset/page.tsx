@@ -7,19 +7,22 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Modal } from "../../modal";
+import { ModalWrapper } from "../../modal-wrapper";
 
 export default function ResetPasswordPage() {
   return (
-    <Modal>
-      <DialogHeader>
-        <DialogTitle>Set New Password</DialogTitle>
-        <DialogDescription>
-          Please enter your new password below.
-        </DialogDescription>
-      </DialogHeader>
-      <Suspense fallback={null}>
-        <ResetForm />
-      </Suspense>
-    </Modal>
+    <ModalWrapper>
+      <Modal>
+        <DialogHeader>
+          <DialogTitle>Set New Password</DialogTitle>
+          <DialogDescription>
+            Please enter your new password below.
+          </DialogDescription>
+        </DialogHeader>
+        <Suspense fallback={null}>
+          <ResetForm />
+        </Suspense>
+      </Modal>
+    </ModalWrapper>
   );
 }
