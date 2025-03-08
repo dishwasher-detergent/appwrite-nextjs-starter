@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Karla } from "next/font/google";
 import { Toaster } from "sonner";
 
+import { ThemeProvider } from "@/providers/theme-provider";
 import "./globals.css";
 
 const karla = Karla({
@@ -26,17 +27,17 @@ export default function RootLayout({
       <body
         className={`${karla.variable} min-h-dvh overflow-x-hidden antialiased flex flex-col`}
       >
-        {/* <ThemeProvider
+        <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
-        > */}
-        {children}
-        {modals}
-        <Toaster />
-        <div id="modal-root" />
-        {/* </ThemeProvider> */}
+        >
+          {children}
+          {modals}
+          <Toaster />
+          <div id="modal-root" />
+        </ThemeProvider>
       </body>
     </html>
   );
