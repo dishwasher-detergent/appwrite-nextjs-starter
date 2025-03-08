@@ -20,21 +20,43 @@ A starter template for building web applications with Next.js and Appwrite.
 - 📱 Responsive Design
 - 🧩 Modular Component Architecture
 
-## 🏁 Getting Started
-
-### 📋 Prerequisites
+## 📋 Prerequisites
 
 - 📦 [Node.js 22.x or later](https://nodejs.org/en/download)
 - 🔧 [pnpm](https://pnpm.io/)
 - ☁️ [Appwrite](https://cloud.appwrite.io)
 
-### 🛠️ Getting Started
+## ⚙️ Installation
 
 1. Clone this repository:
 
 ```bash
 git clone https://github.com/diswasher-detergent/appwrite-nextjs-starter.git
 ```
+
+2. Navigate to the project:
+
+```bash
+cd appwrite-nextjs-starter
+```
+
+2. Install dependencies:
+
+```bash
+pnpm install
+```
+
+3. Create a `.env` file based on the .`env.sample` file:
+
+   - Create an API key in Appwrite, with the permissions `session.write` and upadte the `.env` with that key.
+
+4. Start the development server:
+
+```bash
+pnpm run dev
+```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
 ## 🚢 Deploying Project using the Appwrite CLI
 
@@ -95,30 +117,6 @@ https://cloud.appwrite.io/v1/account/sessions/oauth2/callback/github/appwrite-ne
 5. ✅ Enable the GitHub provider and enter the **Client ID** and **Client Secret** from GitHub.
 
 6. 💾 Save your changes.
-
-## 🏃 Running Locally
-
-```bash
-cd appwrite-nextjs-starter
-```
-
-2. Install dependencies:
-
-```bash
-pnpm install
-```
-
-3. Create a `.env` file based on the .`env.sample` file:
-
-   - Create an API key in Appwrite, with the permissions `session.write` and upadte the `.env` with that key.
-
-4. Start the development server:
-
-```bash
-pnpm run dev
-```
-
-5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
 ## 👥 Contributing
 
