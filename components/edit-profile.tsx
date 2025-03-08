@@ -66,7 +66,7 @@ function EditForm({ className, setOpen, user }: FormProps) {
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
       name: user.name,
-      about: user.about,
+      about: user.about ?? "",
       image: user.avatar,
     },
   });
