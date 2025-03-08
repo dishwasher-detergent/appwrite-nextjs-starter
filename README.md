@@ -25,10 +25,8 @@ spending time on repetitive setup tasks.
   - 👨‍💻 Profile Editing & Customization
 - 📋 **General**
   - 🛡️ Protected Routes
-  - 🗺️ Parallel Routes
   - 🎨 TailwindCSS
   - 📱 Responsive Design
-  - 🧩 Modular Component Architecture
 
 ## 📋 Prerequisites
 
