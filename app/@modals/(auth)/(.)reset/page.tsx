@@ -1,3 +1,5 @@
+"use client";
+
 import { ResetForm } from "@/app/(auth)/reset/form";
 import {
   DialogDescription,

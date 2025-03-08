@@ -1,3 +1,5 @@
+"use client";
+
 import { SignInForm } from "@/app/(auth)/signin/form";
 import { SignInFooter } from "@/components/signin-footer";
 import {
