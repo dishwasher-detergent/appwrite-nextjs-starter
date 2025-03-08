@@ -14,11 +14,12 @@ A starter template for building web applications with Next.js and Appwrite.
   - 📁 File Storage Implementations
 - 👤 **User Management**
   - 👨‍💻 Profile Editing & Customization
-- 🛡️ Protected Routes
-- 🏗️ Next.js 15 App Router
-- 🎨 Tailwind CSS for Styling
-- 📱 Responsive Design
-- 🧩 Modular Component Architecture
+- 📋 **General**
+  - 🛡️ Protected Routes
+  - 🏗️ Next.js 15 App Router
+  - 🎨 Tailwind CSS for Styling
+  - 📱 Responsive Design
+  - 🧩 Modular Component Architecture
 
 ## 📋 Prerequisites
 
@@ -99,8 +100,6 @@ appwrite push buckets
 ```
 
 ## 🔑 Adding GitHub OAuth to Appwrite
-
-To enable GitHub authentication in your Appwrite project:
 
 1. 🔗 Go to your [GitHub Developer Settings](https://github.com/settings/apps) and create a new App.
 
