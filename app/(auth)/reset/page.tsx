@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { ResetForm } from "./form";
 
-export default function ResetPasswordConfirmPage() {
+export default function ResetPasswordPage() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>

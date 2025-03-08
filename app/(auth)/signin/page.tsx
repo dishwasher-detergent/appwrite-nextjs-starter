@@ -1,6 +1,4 @@
-import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
+import { SignInFooter } from "@/components/signin-footer";
 import {
   Card,
   CardContent,
@@ -11,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { SignInForm } from "./form";
 
-export default function LoginPage() {
+export default function SignInPage() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
@@ -24,30 +22,7 @@ export default function LoginPage() {
         <SignInForm />
       </CardContent>
       <CardFooter className="flex flex-col items-start">
-        <p className="text-sm text-muted-foreground">
-          Don&apos;t have an account?
-          <Button
-            variant="link"
-            asChild
-            className="text-muted-foreground p-1 text-sm"
-          >
-            <Link href="/signup" className="underline">
-              Sign Up Here
-            </Link>
-          </Button>
-        </p>
-        <p className="text-sm text-muted-foreground">
-          Forgot your password?
-          <Button
-            variant="link"
-            asChild
-            className="text-muted-foreground p-1 text-sm"
-          >
-            <Link href="/recover" className="underline">
-              Reset Here
-            </Link>
-          </Button>
-        </p>
+        <SignInFooter />
       </CardFooter>
     </Card>
   );

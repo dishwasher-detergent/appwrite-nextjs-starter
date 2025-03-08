@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -17,7 +17,7 @@ export function Modal({ children }: { children: React.ReactNode }) {
 
   return createPortal(
     <Dialog open={open} onOpenChange={onDismiss}>
-      <DialogContent className="p-0">{children}</DialogContent>
+      <DialogContent>{children}</DialogContent>
     </Dialog>,
     document.getElementById("modal-root")!
   );

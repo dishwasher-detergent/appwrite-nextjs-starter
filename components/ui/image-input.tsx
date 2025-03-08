@@ -1,12 +1,12 @@
-import * as React from "react";
-import { useRef, useState, useEffect } from "react";
 import { LucideX } from "lucide-react";
 import Image from "next/image";
+import * as React from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ENDPOINT, PROJECT_ID } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 type ImageInputProps = {
   className?: string;
@@ -46,7 +46,7 @@ function ImageInput({
     if (!value) {
       setPreviewUrl(null);
     }
-  }, [value]);
+  }, [value, bucketId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
