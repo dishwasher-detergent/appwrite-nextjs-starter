@@ -1,0 +1,6 @@
+pre-push:
+  jobs:
+    - name: lint
+      tags:
+        - frontend
+      run: pnpm run lint
