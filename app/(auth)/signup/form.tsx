@@ -41,7 +41,7 @@ export function SignUpForm() {
 
       if (result.success) {
         toast.success(result.message);
-        router.push(result.redirect!);
+        window.location.replace(result.redirect!);
       } else {
         toast.error(result.message);
       }

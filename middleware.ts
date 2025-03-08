@@ -12,7 +12,7 @@ export default async function middleware(req: NextRequest) {
   const user = await getLoggedInUser();
 
   if (isProtectedRoute && !user) {
-    return NextResponse.redirect(new URL("/login", req.nextUrl));
+    return NextResponse.redirect(new URL("/signin", req.nextUrl));
   }
 
   if (isPublicRoute && user) {

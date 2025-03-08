@@ -1,9 +1,9 @@
 "use server";
 
-import { createAdminClient, createSessionClient } from "@/lib/server/appwrite";
+import { AuthResponse } from "@/interfaces/result.interface";
 import { COOKIE_KEY } from "@/lib/constants";
 import { createUserData } from "@/lib/db";
-import { AuthResponse } from "@/interfaces/result.interface";
+import { createAdminClient, createSessionClient } from "@/lib/server/appwrite";
 import {
   ResetPasswordFormData,
   SignInFormData,
@@ -157,6 +157,7 @@ export async function createPasswordRecovery(
     return {
       success: true,
       message: "A recovery email has been sent to your inbox",
+      redirect: "/reset",
     };
   } catch (err) {
     const error = err as Error;

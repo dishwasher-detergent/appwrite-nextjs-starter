@@ -40,6 +40,7 @@ export function RecoverForm() {
 
       if (result.success) {
         toast.success(result.message);
+        window.location.replace(result.redirect!);
       } else {
         toast.error(result.message);
       }

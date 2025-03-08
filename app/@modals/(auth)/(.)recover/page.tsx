@@ -12,7 +12,7 @@ import { Modal } from "../../modal";
 
 export default function RecoverPasswordPage() {
   return (
-    <Modal>
+    <Modal expectedPath={"recover"}>
       <DialogHeader>
         <DialogTitle>Password Recovery</DialogTitle>
         <DialogDescription>
