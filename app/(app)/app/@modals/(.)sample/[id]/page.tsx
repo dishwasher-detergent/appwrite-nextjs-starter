@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Image from "next/image";
 
-import { Modal } from "./modal";
+import { Modal } from "../../modal";
 import { getSampleById } from "@/lib/db";
 import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
 import {

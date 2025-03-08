@@ -1,6 +1,6 @@
 import { LucideLoader2 } from "lucide-react";
 
-import { Modal } from "./modal";
+import { Modal } from "../../modal";
 import { DialogTitle } from "@/components/ui/dialog";
 
 export default function Loading() {
