@@ -22,3 +22,5 @@ export default function ResetPasswordPage() {
     </Modal>
   );
 }
+
+export const dynamic = "force-dynamic";

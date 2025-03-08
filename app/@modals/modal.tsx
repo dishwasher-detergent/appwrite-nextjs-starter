@@ -18,11 +18,10 @@ export function Modal({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
+    return () => setMounted(false);
   }, []);
 
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
 
   return createPortal(
     <Dialog open={open} onOpenChange={onDismiss}>
