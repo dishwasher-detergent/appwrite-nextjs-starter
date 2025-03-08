@@ -14,6 +14,8 @@ import { DeleteSample } from "@/components/delete-sample";
 import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
 
 import Image from "next/image";
+import { Button } from "./ui/button";
+import Link from "next/link";
 
 export function SampleCard(sample: Sample) {
   return (
@@ -37,7 +39,11 @@ export function SampleCard(sample: Sample) {
         )}
       </CardContent>
       <CardHeader className="p-4">
-        <CardTitle className="truncate">{sample.name}</CardTitle>
+        <CardTitle>
+          <Button className="truncate p-0" variant="link" asChild>
+            <Link href={`/app/sample/${sample.$id}`}>{sample.name}</Link>
+          </Button>
+        </CardTitle>
         <CardDescription className="truncate">
           {sample.description}
         </CardDescription>
