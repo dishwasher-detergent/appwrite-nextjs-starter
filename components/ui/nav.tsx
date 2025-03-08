@@ -2,6 +2,7 @@ import { UserInformation } from "@/components/user-information";
 import { getUser } from "@/lib/db";
 
 import Link from "next/link";
+import { ModeToggle } from "../theme-toggle";
 
 export async function Nav() {
   const { data } = await getUser();
@@ -13,6 +14,7 @@ export async function Nav() {
           <Link href="/app">Appwrite NextJS Starter</Link>
         </h1>
         <div className="flex flex-row items-center gap-2">
+          <ModeToggle />
           {data && <UserInformation user={data} />}
         </div>
       </div>

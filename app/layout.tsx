@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Karla } from "next/font/google";
 import { Toaster } from "sonner";
 
+import { ThemeProvider } from "@/providers/theme-provider";
 import "./globals.css";
 
 const karla = Karla({
@@ -22,14 +23,21 @@ export default function RootLayout({
   modals: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${karla.variable} min-h-dvh overflow-x-hidden antialiased flex flex-col`}
       >
-        {children}
-        {modals}
-        <Toaster />
-        <div id="modal-root" />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          {modals}
+          <Toaster />
+          <div id="modal-root" />
+        </ThemeProvider>
       </body>
     </html>
   );

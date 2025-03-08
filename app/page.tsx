@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ModeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { getLoggedInUser } from "@/lib/auth";
 
@@ -13,15 +14,18 @@ export default async function Home() {
           <h1 className="font-bold">
             <Link href="/app">Appwrite NextJS Starter</Link>
           </h1>
-          {user ? (
-            <Button asChild>
-              <Link href="/app">Go to App</Link>
-            </Button>
-          ) : (
-            <Button asChild>
-              <Link href="/signup">Sign Up</Link>
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            <ModeToggle />
+            {user ? (
+              <Button size="sm" asChild>
+                <Link href="/app">Go to App</Link>
+              </Button>
+            ) : (
+              <Button size="sm" asChild>
+                <Link href="/signup">Sign Up</Link>
+              </Button>
+            )}
+          </div>
         </nav>
       </header>
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -29,7 +33,7 @@ export default async function Home() {
           <h1 className="text-4xl font-bold mb-4">
             🚀 Appwrite NextJS Starter
           </h1>
-          <p className="text-lg text-slate-600">
+          <p className="text-lg text-muted-foreground">
             A Next.js starter template pre-configured with Appwrite,
             authentication flows, and Tailwind CSS.
           </p>
@@ -39,13 +43,13 @@ export default async function Home() {
             <span className="mr-2">📚</span> Overview
           </h2>
           <div className="space-y-4">
-            <p className="text-slate-600">
+            <p>
               This starter template provides everything you need to build a
               modern web application with Next.js and Appwrite. It includes a
               full authentication system, user profile management, and a clean,
               responsive UI.
             </p>
-            <p className="text-slate-600">
+            <p>
               Perfect for quickly bootstrapping your next project without
               spending time on repetitive setup tasks.
             </p>
@@ -156,7 +160,7 @@ export default async function Home() {
               <span className="text-xl">📦</span>
               <a
                 href="https://nodejs.org/en/download"
-                className="text-blue-600 hover:text-blue-800 underline"
+                className="text-primary hover:text-primary/80 underline"
               >
                 Node.js 22.x or later
               </a>
@@ -166,7 +170,7 @@ export default async function Home() {
               <span className="text-xl">🔧</span>
               <a
                 href="https://pnpm.io/"
-                className="text-blue-600 hover:text-blue-800 underline"
+                className="text-primary hover:text-primary/80 underline"
               >
                 pnpm
               </a>
@@ -176,7 +180,7 @@ export default async function Home() {
               <span className="text-xl">☁️</span>
               <a
                 href="https://cloud.appwrite.io"
-                className="text-blue-600 hover:text-blue-800 underline"
+                className="text-primary hover:text-primary/80 underline"
               >
                 Appwrite
               </a>
@@ -245,7 +249,7 @@ export default async function Home() {
                 Open{" "}
                 <a
                   href="http://localhost:3000"
-                  className="text-blue-600 hover:text-blue-800 underline"
+                  className="text-primary hover:text-primary/80 underline"
                 >
                   http://localhost:3000
                 </a>{" "}
@@ -262,7 +266,7 @@ export default async function Home() {
           <p className="mb-4">
             <a
               href="https://appwrite.io/docs/tooling/command-line/installation"
-              className="text-blue-600 hover:text-blue-800 underline"
+              className="text-primary hover:text-primary/80 underline"
             >
               Appwrite CLI
             </a>{" "}
@@ -344,7 +348,7 @@ export default async function Home() {
                 Go to your
                 <a
                   href="https://github.com/settings/apps"
-                  className="text-blue-600 hover:text-blue-800 underline"
+                  className="text-primary hover:text-primary/80 underline"
                 >
                   GitHub Developer Settings
                 </a>
@@ -403,12 +407,12 @@ export default async function Home() {
               href="https://nextjs.org/docs"
               target="_blank"
               rel="noopener noreferrer"
-              className="block p-4 rounded-lg border hover:border-blue-500 transition-colors"
+              className="block p-4 rounded-lg border hover:border-primary/80 transition-colors"
             >
               <h3 className="text-xl font-semibold mb-2">
                 Next.js Documentation
               </h3>
-              <p className="text-slate-600">
+              <p className="text-muted-foreground">
                 Learn about Next.js features and API.
               </p>
             </a>
@@ -416,12 +420,12 @@ export default async function Home() {
               href="https://appwrite.io/docs"
               target="_blank"
               rel="noopener noreferrer"
-              className="block p-4 rounded-lg border hover:border-blue-500 transition-colors"
+              className="block p-4 rounded-lg border hover:border-primary/80 transition-colors"
             >
               <h3 className="text-xl font-semibold mb-2">
                 Appwrite Documentation
               </h3>
-              <p className="text-slate-600">
+              <p className="text-muted-foreground">
                 Learn about Appwrite services and SDKs.
               </p>
             </a>
@@ -431,7 +435,7 @@ export default async function Home() {
           <h2 className="text-2xl font-bold mb-6 flex items-center">
             <span className="mr-2">🤝</span> Contributing
           </h2>
-          <p className="text-slate-600">
+          <p className="text-muted-foreground">
             Contributions are welcome! Feel free to open issues and submit pull
             requests.
           </p>
@@ -440,12 +444,12 @@ export default async function Home() {
           <h2 className="text-2xl font-bold mb-6 flex items-center">
             <span className="mr-2">📃</span> License
           </h2>
-          <p className="text-slate-600">
+          <p className="text-muted-foreground">
             This project is licensed under the MIT License - see the LICENSE
             file for details.
           </p>
         </section>
-        <footer className="text-center text-sm text-slate-600 pt-6 border-t">
+        <footer className="text-center text-sm text-muted-foreground pt-6 border-t">
           <p>© 2025 Appwrite NextJS Starter - MIT License</p>
         </footer>
       </div>
