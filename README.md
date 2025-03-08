@@ -10,14 +10,13 @@ A starter template for building web applications with Next.js and Appwrite.
   - 🔑 OAuth Integration (GitHub, Google, etc.)
 - 📊 **Data Management**
   - ✏️ Complete CRUD Operations Examples
-  - 🗄️ Database Integration with Appwrite
   - 📁 File Storage Implementations
 - 👤 **User Management**
   - 👨‍💻 Profile Editing & Customization
 - 📋 **General**
   - 🛡️ Protected Routes
-  - 🏗️ Next.js 15 App Router
-  - 🎨 Tailwind CSS for Styling
+  - 🗺️ Parallel Routes
+  - 🎨 TailwindCSS
   - 📱 Responsive Design
   - 🧩 Modular Component Architecture
 
