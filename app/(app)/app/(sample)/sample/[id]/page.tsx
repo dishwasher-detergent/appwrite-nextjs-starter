@@ -56,13 +56,11 @@ export default async function SamplePage({
           <h1 className="text-2xl font-bold tracking-tight mb-1">
             {data.name}
           </h1>
-          {data.about && (
-            <section aria-label="Description">
-              <p className="text-muted-foreground leading-relaxed">
-                {data.description}
-              </p>
-            </section>
-          )}
+          <section aria-label="Description">
+            <p className="text-muted-foreground leading-relaxed">
+              {data?.description ?? "No description provided."}
+            </p>
+          </section>
         </div>
       </main>
     </article>

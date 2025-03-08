@@ -45,7 +45,7 @@ export function SampleCard(sample: Sample) {
           </Button>
         </CardTitle>
         <CardDescription className="truncate">
-          {sample.description}
+          {sample?.description ?? "No description provided."}
         </CardDescription>
       </CardHeader>
       <CardFooter className="flex flex-row justify-end gap-1 p-4">
