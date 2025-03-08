@@ -1,5 +1,14 @@
 import { EditProfile } from "@/components/edit-profile";
 import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { AVATAR_BUCKET_ID, ENDPOINT, PROJECT_ID } from "@/lib/constants";
 import { getUser, getUserLogs } from "@/lib/db";
 
@@ -59,22 +68,25 @@ export default async function ProfilePage() {
           )}
         </div>
         <div>
-          <h3 className="font-semibold text-lg">Activity</h3>
-          <ul className="mt-2">
-            {logs?.total ? (
-              logs?.logs.map((log, index) => (
-                <li
-                  key={index}
-                  className="text-muted-foreground flex flex-row gap-2 items-center"
-                >
-                  <Badge>{log.time}</Badge>
-                  {log.event}
-                </li>
-              ))
-            ) : (
-              <li className="text-muted-foreground">No activity</li>
-            )}
-          </ul>
+          <h3 className="font-semibold text-lg mb-1">Activity</h3>
+          <div className="border rounded-md overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Timestamp</TableHead>
+                  <TableHead className="w-full">Event</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {logs?.logs.map((log, id) => (
+                  <TableRow key={id}>
+                    <TableCell>{log.time}</TableCell>
+                    <TableCell className="w-full">{log.event}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </main>
     </article>
