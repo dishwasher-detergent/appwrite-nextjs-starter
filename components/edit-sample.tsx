@@ -128,7 +128,7 @@ function CreateForm({ className, setOpen, sample }: FormProps) {
           className
         )}
       >
-        <div className="h-full space-y-2 overflow-auto p-1">
+        <div className="h-full space-y-4 overflow-auto p-1">
           <FormField
             control={form.control}
             name="name"

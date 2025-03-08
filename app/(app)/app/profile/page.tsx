@@ -57,16 +57,14 @@ export default async function ProfilePage() {
           <h1 className="text-2xl font-bold tracking-tight mb-1">
             {data.name}
           </h1>
-          {data.about && (
-            <section aria-label="About">
-              <p className="text-muted-foreground leading-relaxed">
-                {data.about}
-              </p>
-            </section>
-          )}
+          <section aria-label="About">
+            <p className="text-muted-foreground leading-relaxed">
+              {data.about ?? "Add a description to your profile."}
+            </p>
+          </section>
         </div>
         <div>
-          <h3 className="font-semibold text-lg mb-1">Activity</h3>
+          <h3 className="font-semibold text-lg mb-2">User Activity</h3>
           <div className="border rounded-md overflow-hidden">
             <Table>
               <TableHeader>
