@@ -154,7 +154,6 @@ export default async function Home() {
           <h2 className="text-2xl font-bold mb-6 flex items-center">
             <span className="mr-2">📋</span> Prerequisites
           </h2>
-
           <ul className="space-y-4">
             <li className="flex items-center space-x-3">
               <span className="text-xl">📦</span>
@@ -192,7 +191,7 @@ export default async function Home() {
             <span className="mr-2">⚙️</span> Installation
           </h2>
           <ol className="list-decimal space-y-6">
-            <li className="flex flex-col">
+            <li>
               <p className="mb-2">Clone this repository:</p>
               <div className="bg-gray-900 rounded-lg p-4">
                 <code className="text-green-400 font-mono">
@@ -201,7 +200,7 @@ export default async function Home() {
                 </code>
               </div>
             </li>
-            <li className="flex flex-col">
+            <li>
               <p className="mb-2">Navigate to the project:</p>
               <div className="bg-gray-900 rounded-lg p-4">
                 <code className="text-green-400 font-mono">
@@ -209,13 +208,13 @@ export default async function Home() {
                 </code>
               </div>
             </li>
-            <li className="flex flex-col">
+            <li>
               <p className="mb-2">Install dependencies:</p>
               <div className="bg-gray-900 rounded-lg p-4">
                 <code className="text-green-400 font-mono">pnpm install</code>
               </div>
             </li>
-            <li className="flex flex-col">
+            <li>
               <p className="mb-2">
                 Create a{" "}
                 <code className="bg-gray-100 px-1 py-0.5 rounded">.env</code>{" "}
@@ -223,28 +222,27 @@ export default async function Home() {
                 <code className="bg-gray-100 px-1 py-0.5 rounded">
                   .env.sample
                 </code>{" "}
-                file:
+                file.
               </p>
-              <div className=" mt-2">
-                <p className="flex items-center">
-                  <span className="mr-2">•</span>
-                  Create an API key in Appwrite, with the permissions{" "}
-                  <code className="bg-gray-100 px-1 py-0.5 rounded">
-                    session.write
-                  </code>{" "}
-                  and update the{" "}
-                  <code className="bg-gray-100 px-1 py-0.5 rounded">.env</code>{" "}
-                  with that key.
-                </p>
-              </div>
             </li>
-            <li className="flex flex-col">
+            <li>
+              <p className="flex items-center">
+                Create an API key in Appwrite, with the permissions{" "}
+                <code className="bg-gray-100 px-1 py-0.5 rounded">
+                  session.write
+                </code>{" "}
+                and update the{" "}
+                <code className="bg-gray-100 px-1 py-0.5 rounded">.env</code>{" "}
+                with that key.
+              </p>
+            </li>
+            <li>
               <p className="mb-2">Start the development server:</p>
               <div className="bg-gray-900 rounded-lg p-4">
                 <code className="text-green-400 font-mono">pnpm run dev</code>
               </div>
             </li>
-            <li className="flex flex-col">
+            <li>
               <p className="mb-2">
                 Open{" "}
                 <a
@@ -338,62 +336,48 @@ export default async function Home() {
           <h2 className="text-2xl font-bold mb-6 flex items-center">
             <span className="mr-2">🔑</span> Adding GitHub OAuth to Appwrite
           </h2>
-          <p className="mb-4">
-            To enable GitHub authentication in your Appwrite project:
-          </p>
           <ol className="list-decimal space-y-6 ">
-            <li className="flex items-start">
-              <span className="mr-2">🔗</span>
-              <span>
-                Go to your
-                <a
-                  href="https://github.com/settings/apps"
-                  className="text-primary hover:text-primary/80 underline"
-                >
-                  GitHub Developer Settings
-                </a>
-                and create a new App.
-              </span>
+            <li>
+              Go to your{" "}
+              <a
+                href="https://github.com/settings/apps"
+                className="text-primary hover:text-primary/80 underline"
+              >
+                GitHub Developer Settings
+              </a>{" "}
+              and create a new App.
             </li>
-            <li className="flex items-start">
-              <div>
-                <p className="mb-2">
-                  Set the{" "}
-                  <strong className="font-semibold">
-                    Authorization callback URL
-                  </strong>{" "}
-                  to:
-                </p>
-                <div className="bg-gray-900 rounded-lg p-4 font-mono text-sm text-green-400">
-                  https://cloud.appwrite.io/v1/account/sessions/oauth2/callback/github/appwrite-nextjs-starter
-                </div>
+            <li>
+              <p className="mb-2">
+                Set the{" "}
+                <strong className="font-semibold">
+                  Authorization callback URL
+                </strong>{" "}
+                to:
+              </p>
+              <div className="bg-gray-900 rounded-lg p-4 font-mono text-sm text-green-400">
+                https://cloud.appwrite.io/v1/account/sessions/oauth2/callback/github/appwrite-nextjs-starter
               </div>
             </li>
-            <li className="flex items-start">
-              <span>
-                After creating the OAuth App, you'll receive a{" "}
-                <strong className="font-semibold">Client ID</strong> and need to
-                generate a{" "}
-                <strong className="font-semibold">Client Secret</strong>.
-              </span>
+            <li>
+              After creating the OAuth App, you'll receive a{" "}
+              <strong className="font-semibold">Client ID</strong> and need to
+              generate a{" "}
+              <strong className="font-semibold">Client Secret</strong>.
             </li>
-            <li className="flex items-start">
-              <span>
-                In your Appwrite Console, navigate to{" "}
-                <strong className="font-semibold">Auth</strong> →{" "}
-                <strong className="font-semibold">Settings</strong> →{" "}
-                <strong className="font-semibold">OAuth2 Providers</strong>.
-              </span>
+            <li>
+              In your Appwrite Console, navigate to{" "}
+              <strong className="font-semibold">Auth</strong> →{" "}
+              <strong className="font-semibold">Settings</strong> →{" "}
+              <strong className="font-semibold">OAuth2 Providers</strong>.
             </li>
-            <li className="flex items-start">
-              <span>
-                Enable the GitHub provider and enter the{" "}
-                <strong className="font-semibold">Client ID</strong> and{" "}
-                <strong className="font-semibold">Client Secret</strong> from
-                GitHub.
-              </span>
+            <li>
+              Enable the GitHub provider and enter the{" "}
+              <strong className="font-semibold">Client ID</strong> and{" "}
+              <strong className="font-semibold">Client Secret</strong> from
+              GitHub.
             </li>
-            <li className="flex items-start">
+            <li>
               <span>Save your changes.</span>
             </li>
           </ol>
