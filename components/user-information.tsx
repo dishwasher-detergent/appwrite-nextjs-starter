@@ -28,10 +28,10 @@ export function UserInformation({ user }: { user: User }) {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="flex flex-row items-center gap-2 rounded-full pr-1 pl-3"
+          className="flex flex-row items-center gap-2 rounded-lg pr-1 pl-3"
         >
           <p className="text-sm">Hello, {user.name}</p>
-          <Avatar className="size-7">
+          <Avatar className="size-7 rounded-lg">
             <AvatarImage
               src={`${ENDPOINT}/storage/buckets/${AVATAR_BUCKET_ID}/files/${user.avatar}/view?project=${PROJECT_ID}`}
               alt={user.name}

@@ -65,7 +65,7 @@ export default async function ProfilePage() {
         </div>
         <div>
           <h3 className="font-semibold text-lg mb-2">User Activity</h3>
-          <div className="border rounded-md overflow-hidden">
+          <div className="border rounded-lg overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>

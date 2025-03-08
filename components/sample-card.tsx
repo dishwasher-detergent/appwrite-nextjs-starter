@@ -17,7 +17,7 @@ import { LucideLink } from "lucide-react";
 
 export function SampleCard(sample: Sample) {
   return (
-    <Card className="break-inside-avoid-column rounded-md overflow-hidden py-0 gap-0 ">
+    <Card className="break-inside-avoid-column rounded-lg overflow-hidden py-0 gap-0 ">
       <CardContent className="p-0 relative">
         {sample.image ? (
           <Image
