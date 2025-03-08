@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -9,14 +9,19 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 export function Modal({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [open, setOpen] = useState(true);
-
-  if (typeof window === "undefined") {
-    return null;
-  }
+  const [mounted, setMounted] = useState(false);
 
   function onDismiss() {
     setOpen(false);
     router.back();
+  }
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
   }
 
   return createPortal(
