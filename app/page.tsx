@@ -28,7 +28,7 @@ export default async function Home() {
           </div>
         </nav>
       </header>
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-8 w-full">
         <header className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">
             🚀 Appwrite NextJS Starter
@@ -38,7 +38,7 @@ export default async function Home() {
             authentication flows, and Tailwind CSS.
           </p>
         </header>
-        <section className="max-w-4xl mx-auto py-6">
+        <section className="py-6">
           <h2 className="text-2xl font-bold mb-6 flex items-center">
             <span className="mr-2">📚</span> Overview
           </h2>
@@ -55,7 +55,7 @@ export default async function Home() {
             </p>
           </div>
         </section>
-        <section className="max-w-4xl mx-auto py-6">
+        <section className="py-6">
           <h2 className="text-2xl font-bold mb-6 flex items-center">
             <span className="mr-2">✨</span> Features
           </h2>
@@ -150,7 +150,7 @@ export default async function Home() {
             </li>
           </ul>
         </section>
-        <section className="max-w-4xl mx-auto py-6">
+        <section className="py-6">
           <h2 className="text-2xl font-bold mb-6 flex items-center">
             <span className="mr-2">📋</span> Prerequisites
           </h2>
@@ -186,11 +186,11 @@ export default async function Home() {
             </li>
           </ul>
         </section>
-        <section className="max-w-4xl mx-auto py-6">
+        <section className="py-6">
           <h2 className="text-2xl font-bold mb-6 flex items-center">
             <span className="mr-2">⚙️</span> Installation
           </h2>
-          <ol className="list-decimal space-y-6">
+          <ol className="list-decimal ml-4 space-y-6">
             <li>
               <p className="mb-2">Clone this repository:</p>
               <div className="bg-gray-900 rounded-lg p-4">
@@ -256,7 +256,7 @@ export default async function Home() {
             </li>
           </ol>
         </section>
-        <section className="max-w-4xl mx-auto py-6">
+        <section className="py-6">
           <h2 className="text-2xl font-bold mb-6 flex items-center">
             <span className="mr-2">🚢</span> Deploying Project using the
             Appwrite CLI
@@ -275,7 +275,7 @@ export default async function Home() {
               <h3 className="text-xl font-semibold mb-4 flex items-center">
                 <span className="mr-2">📥</span> Installation
               </h3>
-              <ol className="list-decimal space-y-2">
+              <ol className="list-decimal ml-4 space-y-2">
                 <li>
                   <p className="mb-2">Install the Appwrite CLI globally:</p>
                   <div className="bg-gray-900 rounded-lg p-4">
@@ -290,7 +290,7 @@ export default async function Home() {
               <h3 className="text-xl font-semibold mb-4 flex items-center">
                 <span className="mr-2">🔧</span> Setup
               </h3>
-              <ol className="list-decimal space-y-2">
+              <ol className="list-decimal ml-4 space-y-2">
                 <li>
                   <p className="mb-2">Login to your Appwrite account:</p>
                   <div className="bg-gray-900 rounded-lg p-4">
@@ -303,7 +303,7 @@ export default async function Home() {
               <h3 className="text-xl font-semibold mb-4 flex items-center">
                 <span className="mr-2">🚀</span> Push to Appwrite
               </h3>
-              <ol className="list-decimal space-y-4">
+              <ol className="list-decimal ml-4 space-y-4">
                 <li>
                   <p className="mb-2">Deploy the project:</p>
                   <div className="bg-gray-900 rounded-lg p-4">
@@ -332,11 +332,11 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        <section className="max-w-4xl mx-auto py-6">
+        <section className="py-6">
           <h2 className="text-2xl font-bold mb-6 flex items-center">
             <span className="mr-2">🔑</span> Adding GitHub OAuth to Appwrite
           </h2>
-          <ol className="list-decimal space-y-6 ">
+          <ol className="list-decimal ml-4 space-y-6 ">
             <li>
               Go to your{" "}
               <a
@@ -382,7 +382,7 @@ export default async function Home() {
             </li>
           </ol>
         </section>
-        <section className="max-w-4xl mx-auto py-6">
+        <section className="py-6">
           <h2 className="text-2xl font-bold mb-6 flex items-center">
             <span className="mr-2">🧠</span> Learn More
           </h2>
@@ -415,7 +415,7 @@ export default async function Home() {
             </a>
           </div>
         </section>
-        <section className="max-w-4xl mx-auto py-6">
+        <section className="py-6">
           <h2 className="text-2xl font-bold mb-6 flex items-center">
             <span className="mr-2">🤝</span> Contributing
           </h2>
