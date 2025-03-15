@@ -70,6 +70,43 @@
                     "array": false,
                     "size": 128,
                     "default": null
+                },
+                {
+                    "key": "image",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 128,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "user",
+            "$permissions": [
+                "create(\"users\")"
+            ],
+            "databaseId": "sample",
+            "name": "user",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "avatar",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 128,
+                    "default": null
+                },
+                {
+                    "key": "about",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 256,
+                    "default": null
                 }
             ],
             "indexes": []
@@ -85,7 +122,22 @@
             "fileSecurity": true,
             "name": "sample",
             "enabled": true,
-            "maximumFileSize": 50000000,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "avatar",
+            "$permissions": [
+                "read(\"any\")",
+                "create(\"users\")"
+            ],
+            "fileSecurity": true,
+            "name": "avatar",
+            "enabled": true,
+            "maximumFileSize": 30000000,
             "allowedFileExtensions": [],
             "compression": "none",
             "encryption": true,
