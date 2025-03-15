@@ -3,20 +3,21 @@
 import { ID, Models, Permission, Role } from "node-appwrite";
 
 import { AuthResponse, Result } from "@/interfaces/result.interface";
-import { getLoggedInUser } from "@/lib/auth";
 import { Sample } from "@/interfaces/sample.interface";
-import { createSessionClient } from "@/lib/server/appwrite";
+import { User, UserData } from "@/interfaces/user.interface";
+import { getLoggedInUser } from "@/lib/auth";
 import {
   DATABASE_ID,
   SAMPLE_COLLECTION_ID,
   USER_COLLECTION_ID,
 } from "@/lib/constants";
+import { createSessionClient } from "@/lib/server/appwrite";
+import { revalidateTag, unstable_cache } from "next/cache";
 import {
   AddSampleFormData,
   EditSampleFormData,
   UpdateProfileFormData,
 } from "./schemas";
-import { User, UserData } from "@/interfaces/user.interface";
 
 /**
  * Get the current user
@@ -34,29 +35,38 @@ export async function getUser(): Promise<Result<User>> {
 
   const { database } = await createSessionClient();
 
-  try {
-    const data = await database.getDocument<UserData>(
-      DATABASE_ID,
-      USER_COLLECTION_ID,
-      user.$id
-    );
+  return unstable_cache(
+    async () => {
+      try {
+        const data = await database.getDocument<UserData>(
+          DATABASE_ID,
+          USER_COLLECTION_ID,
+          user.$id
+        );
 
-    return {
-      success: true,
-      message: "Samples successfully retrieved.",
-      data: {
-        ...user,
-        ...data,
-      },
-    };
-  } catch (err) {
-    const error = err as Error;
+        return {
+          success: true,
+          message: "Samples successfully retrieved.",
+          data: {
+            ...user,
+            ...data,
+          },
+        };
+      } catch (err) {
+        const error = err as Error;
 
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
+    ["user"],
+    {
+      tags: ["user"],
+      revalidate: 600,
+    }
+  )();
 }
 
 /**
@@ -80,6 +90,9 @@ export async function updateProfile({
       avatar: data.image,
       about: data.about,
     });
+
+    revalidateTag("user");
+    revalidateTag("user-logs");
 
     return {
       success: true,
@@ -110,22 +123,31 @@ export async function getUserLogs(): Promise<Result<Models.LogList>> {
 
   const { account } = await createSessionClient();
 
-  try {
-    const logs = await account.listLogs();
+  return unstable_cache(
+    async () => {
+      try {
+        const logs = await account.listLogs();
 
-    return {
-      success: true,
-      message: "Samples successfully retrieved.",
-      data: logs,
-    };
-  } catch (err) {
-    const error = err as Error;
+        return {
+          success: true,
+          message: "Samples successfully retrieved.",
+          data: logs,
+        };
+      } catch (err) {
+        const error = err as Error;
 
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
+    ["user-logs"],
+    {
+      tags: ["user-logs"],
+      revalidate: 600,
+    }
+  )();
 }
 
 /**
@@ -147,26 +169,35 @@ export async function getSamples(
 
   const { database } = await createSessionClient();
 
-  try {
-    const samples = await database.listDocuments<Sample>(
-      DATABASE_ID,
-      SAMPLE_COLLECTION_ID,
-      queries
-    );
+  return unstable_cache(
+    async () => {
+      try {
+        const samples = await database.listDocuments<Sample>(
+          DATABASE_ID,
+          SAMPLE_COLLECTION_ID,
+          queries
+        );
 
-    return {
-      success: true,
-      message: "Samples successfully retrieved.",
-      data: samples,
-    };
-  } catch (err) {
-    const error = err as Error;
+        return {
+          success: true,
+          message: "Samples successfully retrieved.",
+          data: samples,
+        };
+      } catch (err) {
+        const error = err as Error;
 
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
+    ["samples"],
+    {
+      tags: ["samples"],
+      revalidate: 600,
+    }
+  )();
 }
 
 /**
@@ -190,27 +221,36 @@ export async function getSampleById(
 
   const { database } = await createSessionClient();
 
-  try {
-    const sample = await database.getDocument<Sample>(
-      DATABASE_ID,
-      SAMPLE_COLLECTION_ID,
-      sampleId,
-      queries
-    );
+  return unstable_cache(
+    async () => {
+      try {
+        const sample = await database.getDocument<Sample>(
+          DATABASE_ID,
+          SAMPLE_COLLECTION_ID,
+          sampleId,
+          queries
+        );
 
-    return {
-      success: true,
-      message: "Sample successfully retrieved.",
-      data: sample,
-    };
-  } catch (err) {
-    const error = err as Error;
+        return {
+          success: true,
+          message: "Sample successfully retrieved.",
+          data: sample,
+        };
+      } catch (err) {
+        const error = err as Error;
 
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
+    ["sample", sampleId],
+    {
+      tags: ["samples", `sample-${sampleId}`],
+      revalidate: 600,
+    }
+  )();
 }
 
 /**
@@ -255,6 +295,8 @@ export async function createSample({
       data,
       permissions
     );
+
+    revalidateTag("samples");
 
     return {
       success: true,
@@ -308,6 +350,9 @@ export async function updateSample({
       permissions
     );
 
+    revalidateTag("samples");
+    revalidateTag(`sample-${id}`);
+
     return {
       success: true,
       message: "Sample successfully updated.",
@@ -342,6 +387,8 @@ export async function deleteSample(id: string): Promise<Result<Sample>> {
 
   try {
     await database.deleteDocument(DATABASE_ID, SAMPLE_COLLECTION_ID, id);
+
+    revalidateTag("samples");
 
     return {
       success: true,
