@@ -51,5 +51,5 @@ export const useSamples = ({ initialSamples }: Props) => {
     };
   }, [client]);
 
-  return { samples: samples, loading };
+  return { samples, loading };
 };
