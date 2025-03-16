@@ -1,15 +1,17 @@
 import { useSession } from "@/hooks/userSession";
 import { Sample } from "@/interfaces/sample.interface";
 import { DATABASE_ID, SAMPLE_COLLECTION_ID } from "@/lib/constants";
+import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
 
 interface Props {
-  initialSamples?: Sample[];
+  initialSample: Sample;
 }
 
-export const useSamples = ({ initialSamples }: Props) => {
-  const [samples, setSamples] = useState<Sample[]>(initialSamples ?? []);
+export const useSample = ({ initialSample }: Props) => {
+  const router = useRouter();
+  const [sample, setSample] = useState<Sample>(initialSample);
   const [loading, setLoading] = useState<boolean>(true);
 
   const { client, loading: sessionLoading } = useSession();
@@ -23,26 +25,14 @@ export const useSamples = ({ initialSamples }: Props) => {
 
     if (client) {
       unsubscribe = client.subscribe<Sample>(
-        `databases.${DATABASE_ID}.collections.${SAMPLE_COLLECTION_ID}.documents`,
+        `databases.${DATABASE_ID}.collections.${SAMPLE_COLLECTION_ID}.documents.${sample?.$id}`,
         (response) => {
-          if (
-            response.events.includes(
-              "databases.*.collections.*.documents.*.create"
-            )
-          ) {
-            setSamples((prev) => [response.payload, ...prev]);
-          }
-
           if (
             response.events.includes(
               "databases.*.collections.*.documents.*.update"
             )
           ) {
-            setSamples((prev) =>
-              prev.map((x) =>
-                x.$id === response.payload.$id ? response.payload : x
-              )
-            );
+            setSample(response.payload);
           }
 
           if (
@@ -50,9 +40,7 @@ export const useSamples = ({ initialSamples }: Props) => {
               "databases.*.collections.*.documents.*.delete"
             )
           ) {
-            setSamples((prev) =>
-              prev.filter((x) => x.$id !== response.payload.$id)
-            );
+            router.push("/app");
           }
         }
       );
@@ -63,5 +51,5 @@ export const useSamples = ({ initialSamples }: Props) => {
     };
   }, [client]);
 
-  return { samples, loading };
+  return { sample, loading };
 };
