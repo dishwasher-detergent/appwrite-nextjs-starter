@@ -1,8 +1,11 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 import { useSession } from "@/hooks/userSession";
 import { Sample } from "@/interfaces/sample.interface";
 import { DATABASE_ID, SAMPLE_COLLECTION_ID } from "@/lib/constants";
-
-import { useEffect, useState } from "react";
+import { getUserById } from "@/lib/db";
 
 interface Props {
   initialSamples?: Sample[];
@@ -24,7 +27,7 @@ export const useSamples = ({ initialSamples }: Props) => {
     if (client) {
       unsubscribe = client.subscribe<Sample>(
         `databases.${DATABASE_ID}.collections.${SAMPLE_COLLECTION_ID}.documents`,
-        (response) => {
+        async (response) => {
           if (
             response.events.includes(
               "databases.*.collections.*.documents.*.create"
@@ -38,9 +41,13 @@ export const useSamples = ({ initialSamples }: Props) => {
               "databases.*.collections.*.documents.*.update"
             )
           ) {
+            const { data } = await getUserById(response.payload.userId);
+
             setSamples((prev) =>
               prev.map((x) =>
-                x.$id === response.payload.$id ? response.payload : x
+                x.$id === response.payload.$id
+                  ? { user: data, ...response.payload }
+                  : x
               )
             );
           }

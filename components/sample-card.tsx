@@ -40,7 +40,7 @@ export function SampleCard(sample: Sample) {
             <p className="text-muted-foreground font-semibold">No image</p>
           </div>
         )}
-        <CardHeader className="flex flex-col justify-end bottom-0 absolute w-full p-4 h-full bg-linear-to-t from-primary to-transparent">
+        <CardHeader className="flex flex-col justify-end bottom-0 absolute w-full p-4 h-full bg-linear-to-t from-primary to-primary/20">
           <CardTitle className="text-primary-foreground">
             <Button
               className="truncate p-0! text-primary-foreground text-xl"

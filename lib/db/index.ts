@@ -308,7 +308,7 @@ export async function getSampleById(
           queries
         );
 
-        const user = await database.getDocument<UserData>(
+        const userRes = await database.getDocument<UserData>(
           DATABASE_ID,
           USER_COLLECTION_ID,
           sample.userId,
@@ -320,7 +320,7 @@ export async function getSampleById(
           message: "Sample successfully retrieved.",
           data: {
             ...sample,
-            user: user,
+            user: userRes,
           },
         };
       } catch (err) {
@@ -436,8 +436,20 @@ export async function updateSample({
       DATABASE_ID,
       SAMPLE_COLLECTION_ID,
       id,
-      data,
+      {
+        ...data,
+        userId: user.$id,
+      },
       permissions
+    );
+
+    console.log(sample);
+
+    const userRes = await database.getDocument<UserData>(
+      DATABASE_ID,
+      USER_COLLECTION_ID,
+      sample.userId,
+      [Query.select(["$id", "name", "avatar"])]
     );
 
     revalidateTag("samples");
@@ -446,7 +458,10 @@ export async function updateSample({
     return {
       success: true,
       message: "Sample successfully updated.",
-      data: sample,
+      data: {
+        ...sample,
+        user: userRes,
+      },
     };
   } catch (err) {
     const error = err as Error;
