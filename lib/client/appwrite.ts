@@ -2,7 +2,7 @@
 
 import { COOKIE_KEY, ENDPOINT, PROJECT_ID } from "@/lib/constants";
 
-import { Account, Client, Databases, Storage, Teams } from "appwrite";
+import { Account, Client } from "appwrite";
 import Cookies from "js-cookie";
 
 export async function createClient() {
@@ -30,15 +30,6 @@ export async function createClient() {
   return {
     get account() {
       return new Account(client);
-    },
-    get database() {
-      return new Databases(client);
-    },
-    get storage() {
-      return new Storage(client);
-    },
-    get team() {
-      return new Teams(client);
     },
     client,
   };
