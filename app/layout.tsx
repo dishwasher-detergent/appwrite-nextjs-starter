@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Karla } from "next/font/google";
 import { Toaster } from "sonner";
 
+import { SessionProvider } from "@/providers/session-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import "./globals.css";
 
@@ -31,9 +32,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <Toaster />
-          <div id="modal-root" />
+          <SessionProvider>
+            {children}
+            <Toaster />
+            <div id="modal-root" />
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

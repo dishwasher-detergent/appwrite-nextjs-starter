@@ -1,5 +1,5 @@
 import { AddSample } from "@/components/create-sample";
-import { SampleCard } from "@/components/sample-card";
+import { Samples } from "@/components/realtime/samples";
 import { getSamples } from "@/lib/db";
 
 export default async function AppPage() {
@@ -11,16 +11,7 @@ export default async function AppPage() {
         <h2 className="font-bold">Samples</h2>
         <AddSample />
       </header>
-      <section className="min-h-full columns-xs items-start gap-4 space-y-4 w-full">
-        {data?.documents?.map((sample) => (
-          <SampleCard key={sample.$id} {...sample} />
-        ))}
-        {data?.documents?.length === 0 && (
-          <p className="font-semibold text-muted-foreground">
-            No samples found
-          </p>
-        )}
-      </section>
+      <Samples initialSamples={data?.documents} />
     </>
   );
 }
