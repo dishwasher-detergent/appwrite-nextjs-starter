@@ -2,13 +2,7 @@
 
 import { getLoggedInUser } from "@/lib/client/appwrite";
 import { Client, Models } from "appwrite";
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, ReactNode, useEffect, useState } from "react";
 
 interface SessionContextType {
   client: Client | null;
@@ -18,7 +12,9 @@ interface SessionContextType {
   refreshUser: () => Promise<void>;
 }
 
-const SessionContext = createContext<SessionContextType | undefined>(undefined);
+export const SessionContext = createContext<SessionContextType | undefined>(
+  undefined
+);
 
 export function SessionProvider({
   children,
@@ -76,16 +72,4 @@ export function SessionProvider({
       {children}
     </SessionContext.Provider>
   );
-}
-
-export function useSession() {
-  if (!SessionContext) {
-    throw new Error("React Context is unavailable in Server Components");
-  }
-
-  const context = useContext(SessionContext);
-  if (context === undefined) {
-    throw new Error("useSession must be used within a SessionProvider");
-  }
-  return context;
 }

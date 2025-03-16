@@ -1,6 +1,6 @@
+import { useSession } from "@/hooks/userSession";
 import { Sample } from "@/interfaces/sample.interface";
 import { DATABASE_ID, SAMPLE_COLLECTION_ID } from "@/lib/constants";
-import { useSession } from "@/providers/session-provider"; // Add import for useSession
 
 import { useEffect, useState } from "react";
 
