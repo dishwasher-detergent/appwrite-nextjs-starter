@@ -5,9 +5,16 @@ import Image from "next/image";
 
 import { DeleteSample } from "@/components/delete-sample";
 import { EditSample } from "@/components/edit-sample";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSample } from "@/hooks/useSample";
 import { Sample as SampleType } from "@/interfaces/sample.interface";
-import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
+import {
+  AVATAR_BUCKET_ID,
+  ENDPOINT,
+  PROJECT_ID,
+  SAMPLE_BUCKET_ID,
+} from "@/lib/constants";
+import { getInitials } from "@/lib/utils";
 
 export function Sample({ initialSample }: { initialSample: SampleType }) {
   const { sample, loading } = useSample({ initialSample });
@@ -32,6 +39,22 @@ export function Sample({ initialSample }: { initialSample: SampleType }) {
             <EditSample sample={sample} />
             <DeleteSample sample={sample} />
           </div>
+        </div>
+        <div className="flex items-center gap-2 mt-2">
+          <Avatar className="h-6 w-6">
+            <AvatarImage
+              src={
+                sample?.user?.avatar
+                  ? `${ENDPOINT}/storage/buckets/${AVATAR_BUCKET_ID}/files/${sample.user.avatar}/view?project=${PROJECT_ID}`
+                  : undefined
+              }
+              alt={sample?.user?.name || "User"}
+            />
+            <AvatarFallback>{getInitials(sample?.user?.name)}</AvatarFallback>
+          </Avatar>
+          <p className="text-sm text-foreground">
+            {sample?.user?.name || "Unknown"}
+          </p>
         </div>
       </header>
       <div className="grid gap-8 md:grid-cols-[256px,1fr]">
@@ -58,7 +81,6 @@ export function Sample({ initialSample }: { initialSample: SampleType }) {
             Sample image for {sample.name}
           </figcaption>
         </figure>
-
         <main>
           <section aria-labelledby="description-heading">
             <h2 id="description-heading" className="text-lg font-semibold mb-2">

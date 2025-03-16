@@ -1,8 +1,10 @@
 "use client";
 
+import { LucideLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,8 +14,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Sample } from "@/interfaces/sample.interface";
-import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
-import { LucideLink } from "lucide-react";
+import {
+  AVATAR_BUCKET_ID,
+  ENDPOINT,
+  PROJECT_ID,
+  SAMPLE_BUCKET_ID,
+} from "@/lib/constants";
+import { getInitials } from "@/lib/utils";
 
 export function SampleCard(sample: Sample) {
   return (
@@ -49,6 +56,22 @@ export function SampleCard(sample: Sample) {
           <CardDescription className="text-primary-foreground line-clamp-3">
             {sample?.description ?? "No description provided."}
           </CardDescription>
+          <div className="flex items-center gap-2 mt-2">
+            <Avatar className="h-6 w-6">
+              <AvatarImage
+                src={
+                  sample?.user?.avatar
+                    ? `${ENDPOINT}/storage/buckets/${AVATAR_BUCKET_ID}/files/${sample.user.avatar}/view?project=${PROJECT_ID}`
+                    : undefined
+                }
+                alt={sample?.user?.name || "User"}
+              />
+              <AvatarFallback>{getInitials(sample?.user?.name)}</AvatarFallback>
+            </Avatar>
+            <p className="text-sm text-primary-foreground">
+              {sample?.user?.name || "Unknown"}
+            </p>
+          </div>
         </CardHeader>
       </CardContent>
     </Card>

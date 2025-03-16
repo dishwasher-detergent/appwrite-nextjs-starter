@@ -11,7 +11,7 @@ export function cn(...inputs: ClassValue[]) {
  * @param maxLength Maximum number of initials to return (default: 2)
  * @returns Uppercase initials string
  */
-export function getInitials(name: string, maxLength: number = 2): string {
+export function getInitials(name?: string, maxLength: number = 2): string {
   if (!name) return "";
 
   return name

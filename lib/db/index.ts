@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidateTag, unstable_cache } from "next/cache";
-import { ID, Models, Permission, Role } from "node-appwrite";
+import { ID, Models, Permission, Query, Role } from "node-appwrite";
 
 import { AuthResponse, Result } from "@/interfaces/result.interface";
 import { Sample } from "@/interfaces/sample.interface";
@@ -64,6 +64,54 @@ export async function getUser(): Promise<Result<User>> {
     ["user"],
     {
       tags: ["user"],
+      revalidate: 600,
+    }
+  )();
+}
+
+/**
+ * Get the current user by ID
+ * @param {string} id The user ID
+ * @returns {Promise<Result<UserData>} The current user
+ */
+export async function getUserById(id: string): Promise<Result<UserData>> {
+  const user = await getLoggedInUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in to perform this action.",
+    };
+  }
+
+  const { database } = await createSessionClient();
+
+  return unstable_cache(
+    async () => {
+      try {
+        const data = await database.getDocument<UserData>(
+          DATABASE_ID,
+          USER_COLLECTION_ID,
+          id
+        );
+
+        return {
+          success: true,
+          message: "Samples successfully retrieved.",
+          data,
+        };
+      } catch (err) {
+        const error = err as Error;
+
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
+    ["user", id],
+    {
+      tags: ["user", `user-${id}`],
       revalidate: 600,
     }
   )();
@@ -178,6 +226,35 @@ export async function getSamples(
           queries
         );
 
+        const userIds = samples.documents.map((sample) => sample.userId);
+        const uniqueUserIds = Array.from(new Set(userIds));
+
+        const users = await database.listDocuments<UserData>(
+          DATABASE_ID,
+          USER_COLLECTION_ID,
+          [
+            Query.equal("$id", uniqueUserIds),
+            Query.select(["$id", "name", "avatar"]),
+          ]
+        );
+
+        const userMap = users.documents.reduce<Record<string, UserData>>(
+          (acc, user) => {
+            if (user) {
+              acc[user.$id] = user;
+            }
+            return acc;
+          },
+          {}
+        );
+
+        const newSamples = samples.documents.map((sample) => ({
+          ...sample,
+          user: userMap[sample.userId],
+        }));
+
+        samples.documents = newSamples;
+
         return {
           success: true,
           message: "Samples successfully retrieved.",
@@ -231,10 +308,20 @@ export async function getSampleById(
           queries
         );
 
+        const user = await database.getDocument<UserData>(
+          DATABASE_ID,
+          USER_COLLECTION_ID,
+          sample.userId,
+          [Query.select(["$id", "name", "avatar"])]
+        );
+
         return {
           success: true,
           message: "Sample successfully retrieved.",
-          data: sample,
+          data: {
+            ...sample,
+            user: user,
+          },
         };
       } catch (err) {
         const error = err as Error;
@@ -292,7 +379,10 @@ export async function createSample({
       DATABASE_ID,
       SAMPLE_COLLECTION_ID,
       id,
-      data,
+      {
+        ...data,
+        userId: user.$id,
+      },
       permissions
     );
 
@@ -424,8 +514,6 @@ export async function createUserData(id: string): Promise<Result<UserData>> {
       message: "User data already exists.",
     };
   } catch (err) {
-    console.log(err);
-
     await database.createDocument<UserData>(
       DATABASE_ID,
       USER_COLLECTION_ID,
