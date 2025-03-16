@@ -513,7 +513,7 @@ export async function createUserData(id: string): Promise<Result<UserData>> {
       success: true,
       message: "User data already exists.",
     };
-  } catch (err) {
+  } catch {
     await database.createDocument<UserData>(
       DATABASE_ID,
       USER_COLLECTION_ID,
