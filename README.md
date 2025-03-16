@@ -21,6 +21,8 @@ spending time on repetitive setup tasks.
 - 📊 **Data Management**
   - ✏️ Complete CRUD Operations Examples
   - 📁 File Storage Implementations
+  - ⚡ Realtime Updates
+  - 🔄 Cache Invalidation
 - 👤 **User Management**
   - 👨‍💻 Profile Editing & Customization
 - 📋 **General**

@@ -102,6 +102,14 @@ export default async function Home() {
                       <span className="mr-2">📁</span>
                       File Storage Implementations
                     </li>
+                    <li className="flex items-center">
+                      <span className="mr-2">⚡</span>
+                      Realtime Updates
+                    </li>
+                    <li className="flex items-center">
+                      <span className="mr-2">🔄</span>
+                      Cache Invalidation
+                    </li>
                   </ul>
                 </div>
               </div>
