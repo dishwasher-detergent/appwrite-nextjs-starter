@@ -11,7 +11,7 @@ export default async function TeamPage({
   const { data, success } = await getTeamById(teamId);
 
   if (!success || !data) {
-    redirect("/app");
+    return <p>Failed</p>
   }
 
   return <p>{data.name}</p>;
