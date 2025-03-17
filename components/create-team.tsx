@@ -78,12 +78,17 @@ function CreateForm({ className, setOpen }: FormProps) {
         data: values,
     });
 
+    if(!data.data || !success) {
+      // Show toast or something
+      return;
+    }
+
     if (values.image instanceof File) {
         const image = await uploadAvatarImage({
             data: values.image,
             permissions: [
-                Permission.read(Role.team(data!.data.$id)),
-                Permission.write(Role.team(data!.data.$id, ADMIN_ROLE)),
+                Permission.read(Role.team(data.data.$id)),
+                Permission.write(Role.team(data.data.$id, ADMIN_ROLE)),
             ]
         });
 
