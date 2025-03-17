@@ -1,11 +1,11 @@
 import { UserInformation } from "@/components/user-information";
-import { getUser } from "@/lib/auth";
+import { getUserData } from "@/lib/auth";
 
 import Link from "next/link";
 import { ModeToggle } from "../theme-toggle";
 
 export async function Nav() {
-  const { data } = await getUser();
+  const { data } = await getUserData();
 
   return (
     <header className="sticky top-0 z-10 w-full border-b bg-background/90 backdrop-blur-xs">

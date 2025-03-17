@@ -59,7 +59,7 @@ export async function getCachedLoggedInUser(): Promise<Models.User<Models.Prefer
  * Get the current user
  * @returns {Promise<Result<User>} The current user
  */
-export async function getUser(): Promise<Result<User>> {
+export async function getUserData(): Promise<Result<User>> {
   const user = await getCachedLoggedInUser();
 
   if (!user) {
