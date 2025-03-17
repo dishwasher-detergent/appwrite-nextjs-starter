@@ -130,6 +130,7 @@ export async function uploadAvatarImage({
 
   permissions = [
     ...permissions,
+    Permission.read(Role.users()),
     Permission.read(Role.user(user.$id)),
     Permission.write(Role.user(user.$id)),
   ];
