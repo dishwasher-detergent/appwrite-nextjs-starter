@@ -24,7 +24,7 @@ export function TeamCard(team: TeamData) {
   return (
     <Card className="rounded-lg overflow-hidden py-0">
       <CardContent className="p-1 relative flex flex-row gap-1">
-        <Avatar className="h-24 w-24 rounded-lg">
+        <Avatar className="size-18 rounded-lg">
             <AvatarImage
                 src={
                     team.avatar
@@ -33,12 +33,12 @@ export function TeamCard(team: TeamData) {
                 }
                 alt={team.name || "Unknown"}
             />
-            <AvatarFallback>{getInitials(team.name)}</AvatarFallback>
+            <AvatarFallback className="rounded-lg">{getInitials(team.name)}</AvatarFallback>
         </Avatar>
-        <CardHeader className="flex flex-col justify-end w-full h-full py-2">
-          <CardTitle className="text-primary-foreground">
+        <CardHeader className="flex flex-col justify-end w-full h-full p-2">
+          <CardTitle>
             <Button
-              className="truncate p-0! text-primary-foreground text-lg"
+              className="truncate p-0! text-lg"
               variant="link"
               asChild
             >
@@ -48,7 +48,7 @@ export function TeamCard(team: TeamData) {
               </Link>
             </Button>
           </CardTitle>
-          <CardDescription className="text-primary-foreground line-clamp-3">
+          <CardDescription className="line-clamp-3">
             {team?.about ?? "No about provided."}
           </CardDescription>
         </CardHeader>
