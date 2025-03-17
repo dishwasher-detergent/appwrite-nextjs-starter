@@ -145,7 +145,7 @@ export async function createTeam({
   ];
 
   try {
-    const teamResponse = await team.create(data.name, data.about);
+    const teamResponse = await team.create(id, data.name);
 
     permissions = [
       ...permissions,
@@ -156,12 +156,11 @@ export async function createTeam({
     const teamData = await database.createDocument<TeamData>(
       DATABASE_ID,
       TEAM_COLLECTION_ID,
-      id,
+      teamResponse.$id,
       {
         name: data.name,
         about: data.about,
         avatar: data.image,
-        teamId: teamResponse.$id,
       },
       permissions
     );
