@@ -32,12 +32,13 @@ export function DeleteTeam({ team }: { team: TeamData }) {
 
   return (
     <DyanmicDrawer
-      title="Delete Team"
-      description={`Delete ${team.name}.`}
+      title={`Delete ${team.name}.`}
+      description="This is permanent and cannot be undone."
       open={open}
       setOpen={setOpen}
       button={
-        <Button size="icon" variant="destructive">
+        <Button size="sm" variant="destructive">
+          Delete
           <LucideTrash2 className="size-3.5" />
         </Button>
       }

@@ -37,8 +37,8 @@ export function EditSample({ sample }: { sample: Sample }) {
 
   return (
     <DyanmicDrawer
-      title="Edit Sample"
-      description="Edit an existing Sample"
+      title={`Edit ${sample.name}`}
+      description="Make any changes to this sample."
       open={open}
       setOpen={setOpen}
       button={

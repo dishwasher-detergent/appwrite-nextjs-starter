@@ -37,8 +37,8 @@ export function EditTeam({ team }: { team: TeamData }) {
 
   return (
     <DyanmicDrawer
-      title="Edit Team"
-      description={`Edit ${team.name}.`}
+      title={`Edit ${team.name}.`}
+      description="Make any changes to this team."
       open={open}
       setOpen={setOpen}
       button={

@@ -32,8 +32,8 @@ export function DeleteSample({ sample }: { sample: Sample }) {
 
   return (
     <DyanmicDrawer
-      title="Delete Sample"
-      description="Delete an existing Sample"
+      title={`Delete ${sample.name}`}
+      description="This is permanent and cannot be undone."
       open={open}
       setOpen={setOpen}
       button={
