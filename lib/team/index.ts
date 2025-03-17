@@ -158,7 +158,9 @@ export async function createTeam({
       TEAM_COLLECTION_ID,
       id,
       {
-        ...data,
+        name: data.name,
+        about: data.about,
+        avatar: data.image,
         teamId: teamResponse.$id,
       },
       permissions
