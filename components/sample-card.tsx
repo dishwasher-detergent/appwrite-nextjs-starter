@@ -47,7 +47,7 @@ export function SampleCard(sample: Sample) {
               variant="link"
               asChild
             >
-              <Link href={`/app/sample/${sample.$id}`}>
+              <Link href={`/app/samples/${sample.$id}`}>
                 {sample.name}
                 <LucideLink />
               </Link>
