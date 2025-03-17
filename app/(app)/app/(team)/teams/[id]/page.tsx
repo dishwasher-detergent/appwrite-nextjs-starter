@@ -1,3 +1,6 @@
+import { redirect } from "next/navigation";
+import Image from "next/image";
+
 import { getTeamById } from "@/lib/team";
 
 export default async function TeamPage({
@@ -9,7 +12,7 @@ export default async function TeamPage({
   const { data, success, message } = await getTeamById(teamId);
 
   if (!success || !data) {
-    return <p>{message}</p>
+    redirect("/app");
   }
 
   return (
