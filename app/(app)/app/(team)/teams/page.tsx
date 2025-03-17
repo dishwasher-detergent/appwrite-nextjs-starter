@@ -13,7 +13,7 @@ export default async function TeamsPage() {
                 <CreateTeam />
             </header>
             <section>
-                {data.map((team) => <Link href={`/app/teams/${team.$id}`} key={team.$id}>{team.name}</Link>)}
+                {data?.map((team) => <Link href={`/app/teams/${team.$id}`} key={team.$id}>{team.name}</Link>)}
             </section>
         </>
     )
