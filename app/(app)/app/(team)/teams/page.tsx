@@ -4,7 +4,7 @@ import { listTeams } from "@/lib/team";
 import { CreateTeam } from "@/components/create-team";
 
 export async function TeamsPage() {
-    const { data, success } = await listTeams();
+    const { data } = await listTeams();
 
     return (
         <>
