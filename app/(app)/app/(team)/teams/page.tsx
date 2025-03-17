@@ -3,7 +3,7 @@ import Link from "next/link";
 import { listTeams } from "@/lib/team";
 import { CreateTeam } from "@/components/create-team";
 
-export async function TeamsPage() {
+export default async function TeamsPage() {
     const { data } = await listTeams();
 
     return (
