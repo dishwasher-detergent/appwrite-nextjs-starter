@@ -1,5 +1,5 @@
 import { UserInformation } from "@/components/user-information";
-import { getUser } from "@/lib/db";
+import { getUser } from "@/lib/auth";
 
 import Link from "next/link";
 import { ModeToggle } from "../theme-toggle";
