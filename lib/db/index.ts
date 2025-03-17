@@ -46,7 +46,7 @@ export async function getUser(): Promise<Result<User>> {
 
         return {
           success: true,
-          message: "Samples successfully retrieved.",
+          message: "User successfully retrieved.",
           data: {
             ...user,
             ...data,
@@ -97,7 +97,7 @@ export async function getUserById(id: string): Promise<Result<UserData>> {
 
         return {
           success: true,
-          message: "Samples successfully retrieved.",
+          message: "User successfully retrieved.",
           data,
         };
       } catch (err) {
