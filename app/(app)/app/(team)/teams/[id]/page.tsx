@@ -3,6 +3,8 @@ import Image from "next/image";
 
 import { getTeamById } from "@/lib/team";
 import { ENDPOINT, AVATAR_BUCKET_ID, PROJECT_ID } from "@/lib/constants";
+import { EditTeam } from "@/components/edit-team";
+import { DeleteTeam } from "@/components/delete-team";
 
 export default async function TeamPage({
   params,
@@ -26,8 +28,8 @@ export default async function TeamPage({
             role="toolbar"
             aria-label="Team actions"
           >
-            <p>Edit Team</p>
-            <p>Delete Team</p>
+            <EditTeam team={data} />
+            <DeleteTeam team={data} />
           </div>
         </div>
       </header>

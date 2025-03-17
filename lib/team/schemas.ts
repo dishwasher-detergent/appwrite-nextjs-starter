@@ -16,3 +16,9 @@ export const addTeamSchema = z.object({
 });
 
 export type AddTeamFormData = z.infer<typeof addTeamSchema>;
+
+export const deleteTeamSchema = z.object({
+  name: z.string().min(1).max(TEAM_NAME_MAX_LENGTH),
+});
+
+export type DeleteTeamFormData = z.infer<typeof deleteTeamSchema>;
