@@ -99,7 +99,8 @@ export async function listTeams(): Promise<Result<TeamData[]>> {
       } catch (err) {
         const error = err as Error;
 
-
+        // This is where you would look to something like Splunk, or LogRocket.
+        console.error(error);
         
         return {
           success: false,
