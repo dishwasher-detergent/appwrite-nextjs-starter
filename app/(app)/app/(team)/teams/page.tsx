@@ -12,7 +12,7 @@ export default async function TeamsPage() {
                 <CreateTeam />
             </header>
             <section>
-                {data?.map((team) => <TeamCard team={team} />)}
+                {data?.map((team) => <TeamCard key={team.$id} team={team} />)}
             </section>
         </>
     )
