@@ -10,8 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getUser, getUserLogs } from "@/lib/auth";
 import { AVATAR_BUCKET_ID, ENDPOINT, PROJECT_ID } from "@/lib/constants";
-import { getUser, getUserLogs } from "@/lib/db";
 
 export default async function ProfilePage() {
   const { data } = await getUser();

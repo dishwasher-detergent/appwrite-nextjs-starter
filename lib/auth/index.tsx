@@ -1,19 +1,21 @@
 "use server";
 
-import { AuthResponse } from "@/interfaces/result.interface";
-import { COOKIE_KEY } from "@/lib/constants";
+import { revalidateTag, unstable_cache } from "next/cache";
+import { cookies, headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { ID, Models, OAuthProvider } from "node-appwrite";
+
+import { AuthResponse, Response, Result } from "@/interfaces/result.interface";
+import { User, UserData } from "@/interfaces/user.interface";
+import { COOKIE_KEY, DATABASE_ID, USER_COLLECTION_ID } from "@/lib/constants";
 import { createUserData } from "@/lib/db";
 import { createAdminClient, createSessionClient } from "@/lib/server/appwrite";
 import {
   ResetPasswordFormData,
   SignInFormData,
   SignUpFormData,
+  UpdateProfileFormData,
 } from "./schemas";
-
-import { revalidateTag, unstable_cache } from "next/cache";
-import { cookies, headers } from "next/headers";
-import { redirect } from "next/navigation";
-import { ID, Models, OAuthProvider } from "node-appwrite";
 
 /**
  * Retrieves the currently logged-in user.
@@ -52,6 +54,186 @@ export async function getCachedLoggedInUser(): Promise<Models.User<Models.Prefer
     { tags: ["logged_in_user"], revalidate: 600 }
   )();
 }
+
+/**
+ * Get the current user
+ * @returns {Promise<Result<User>} The current user
+ */
+export async function getUser(): Promise<Result<User>> {
+  const user = await getCachedLoggedInUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in to perform this action.",
+    };
+  }
+
+  const { database } = await createSessionClient();
+
+  return unstable_cache(
+    async () => {
+      try {
+        const data = await database.getDocument<UserData>(
+          DATABASE_ID,
+          USER_COLLECTION_ID,
+          user.$id
+        );
+
+        return {
+          success: true,
+          message: "Samples successfully retrieved.",
+          data: {
+            ...user,
+            ...data,
+          },
+        };
+      } catch (err) {
+        const error = err as Error;
+
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
+    ["user"],
+    {
+      tags: ["user"],
+      revalidate: 600,
+    }
+  )();
+}
+
+/**
+ * Get the current user by ID
+ * @param {string} id The user ID
+ * @returns {Promise<Result<UserData>} The current user
+ */
+export async function getUserById(id: string): Promise<Result<UserData>> {
+  const user = await getCachedLoggedInUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in to perform this action.",
+    };
+  }
+
+  const { database } = await createSessionClient();
+
+  return unstable_cache(
+    async () => {
+      try {
+        const data = await database.getDocument<UserData>(
+          DATABASE_ID,
+          USER_COLLECTION_ID,
+          id
+        );
+
+        return {
+          success: true,
+          message: "Samples successfully retrieved.",
+          data,
+        };
+      } catch (err) {
+        const error = err as Error;
+
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
+    ["user", id],
+    {
+      tags: ["user", `user-${id}`],
+      revalidate: 600,
+    }
+  )();
+}
+
+/**
+ * Updates the user's profile.
+ * @param {Object} data The parameters for updating a user
+ * @param {string} [data.name] The users name
+ * @returns {Promise<Response>} A promise that resolves to an authentication response.
+ */
+export async function updateProfile({
+  id,
+  data,
+}: {
+  id: string;
+  data: UpdateProfileFormData;
+}): Promise<Response> {
+  const { account, database } = await createSessionClient();
+
+  try {
+    await account.updateName(data.name);
+    await database.updateDocument(DATABASE_ID, USER_COLLECTION_ID, id, {
+      avatar: data.image,
+      about: data.about,
+    });
+
+    revalidateTag("user");
+    revalidateTag("user-logs");
+
+    return {
+      success: true,
+      message: "Profile updated successfully",
+    };
+  } catch (err) {
+    const error = err as Error;
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+}
+
+/**
+ * Get a list of logs
+ * @returns {Promise<Result<Models.LogList>>} The list of logs
+ */
+export async function getUserLogs(): Promise<Result<Models.LogList>> {
+  const user = await getCachedLoggedInUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in to perform this action.",
+    };
+  }
+
+  const { account } = await createSessionClient();
+
+  return unstable_cache(
+    async () => {
+      try {
+        const logs = await account.listLogs();
+
+        return {
+          success: true,
+          message: "Samples successfully retrieved.",
+          data: logs,
+        };
+      } catch (err) {
+        const error = err as Error;
+
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
+    ["user-logs"],
+    {
+      tags: ["user-logs"],
+      revalidate: 600,
+    }
+  )();
+}
+
 /**
  * Logs out the currently logged-in user.
  * @returns {Promise<boolean>} A promise that resolves to true if the user is logged in, false otherwise.
