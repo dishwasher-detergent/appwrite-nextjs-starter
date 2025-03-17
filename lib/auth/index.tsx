@@ -10,6 +10,7 @@ import {
   SignUpFormData,
 } from "./schemas";
 
+import { unstable_cache } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { ID, Models, OAuthProvider } from "node-appwrite";
@@ -20,14 +21,18 @@ import { ID, Models, OAuthProvider } from "node-appwrite";
  * @returns {Promise<Models.User<Models.Preferences> | null>} A promise that resolves to the account information
  * of the logged-in user, or null if no user is logged in.
  */
-export async function getLoggedInUser(): Promise<Models.User<Models.Preferences> | null> {
-  try {
-    const { account } = await createSessionClient();
-    return await account.get();
-  } catch {
-    return null;
-  }
-}
+export const getLoggedInUser = unstable_cache(
+  async (): Promise<Models.User<Models.Preferences> | null> => {
+    try {
+      const { account } = await createSessionClient();
+      return await account.get();
+    } catch {
+      return null;
+    }
+  },
+  ["logged_in_user"],
+  { tags: ["logged_in_user"], revalidate: 600 }
+);
 
 /**
  * Logs out the currently logged-in user.
