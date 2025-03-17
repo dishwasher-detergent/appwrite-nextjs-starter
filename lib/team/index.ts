@@ -9,7 +9,7 @@ import { TeamData } from "@/interfaces/team.interface";
 import { getCachedLoggedInUser } from "@/lib/auth";
 import { DATABASE_ID, TEAM_COLLECTION_ID } from "@/lib/constants";
 import { createSessionClient } from "@/lib/server/appwrite";
-import { AddTeamFormData } from "./schema";
+import { AddTeamFormData } from "./schemas";
 
 /**
  * Get a team by ID
