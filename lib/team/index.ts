@@ -145,7 +145,10 @@ export async function createTeam({
   ];
 
   try {
-    const teamResponse = await team.create(id, data.name);
+    const teamResponse = await team.create(id, data.name, [
+      ADMIN_ROLE,
+      OWNER_ROLE
+    ]);
 
     permissions = [
       ...permissions,
