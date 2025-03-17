@@ -82,8 +82,8 @@ function CreateForm({ className, setOpen }: FormProps) {
         const image = await uploadAvatarImage({
             data: values.image,
             permissions: [
-                Permission.read(Role.team(data.$id)),
-                Permission.write(Role.team(data.$id, ADMIN_ROLE)),
+                Permission.read(Role.team(data!.data.$id)),
+                Permission.write(Role.team(data!.data.$id, ADMIN_ROLE)),
             ]
         });
 
