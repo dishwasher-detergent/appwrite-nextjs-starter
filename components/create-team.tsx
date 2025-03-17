@@ -29,7 +29,7 @@ import {
 import { SAMPLE_BUCKET_ID } from "@/lib/constants";
 import { createTeam } from "@/lib/team";
 import { AddTeamFormData, addTeamSchema } from "@/lib/team/schema";
-import { uploadTeamImage } from "@/lib/storage";
+import { uploadAvatarImage } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 import { ImageInput } from "@/components/ui/image-input";
 
