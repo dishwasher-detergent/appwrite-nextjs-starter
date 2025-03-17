@@ -229,7 +229,11 @@ export async function updateTeam({
       DATABASE_ID,
       TEAM_COLLECTION_ID,
       id,
-      data,
+      {
+        name: data.name,
+        about: data.about,
+        avatar: data.image,
+      },
       permissions
     );
 
