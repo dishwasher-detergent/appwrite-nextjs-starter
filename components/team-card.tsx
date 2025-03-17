@@ -35,7 +35,7 @@ export function TeamCard(team: TeamData) {
             />
             <AvatarFallback className="rounded-lg">{getInitials(team.name)}</AvatarFallback>
         </Avatar>
-        <CardHeader className="flex flex-col justify-end w-full h-full px-2">
+        <CardHeader className="flex flex-col gap-0 w-full h-full px-2">
           <CardTitle>
             <Button
               className="truncate p-0! text-lg h-auto"
