@@ -50,6 +50,9 @@ export async function getTeamById(id: string): Promise<Result<TeamData>> {
       } catch (err) {
         const error = err as Error;
 
+        // This is where you would look to something like Splunk, or LogRocket.
+        console.error(error);
+        
         return {
           success: false,
           message: error.message,
@@ -96,6 +99,8 @@ export async function listTeams(): Promise<Result<TeamData[]>> {
       } catch (err) {
         const error = err as Error;
 
+
+        
         return {
           success: false,
           message: error.message,
@@ -178,6 +183,7 @@ export async function createTeam({
   } catch (err) {
     const error = err as Error;
 
+    // This is where you would look to something like Splunk, or LogRocket.
     console.error(error);
 
     return {
@@ -237,6 +243,9 @@ export async function updateTeam({
   } catch (err) {
     const error = err as Error;
 
+    // This is where you would look to something like Splunk, or LogRocket.
+    console.error(error);
+    
     return {
       success: false,
       message: error.message,
@@ -274,6 +283,9 @@ export async function deleteTeam(id: string): Promise<Result<TeamData>> {
   } catch (err) {
     const error = err as Error;
 
+    // This is where you would look to something like Splunk, or LogRocket.
+    console.error(error);
+  
     return {
       success: false,
       message: error.message,
@@ -340,6 +352,10 @@ export async function leaveTeam(teamId: string): Promise<Result<string>> {
     };
   } catch (err) {
     const error = err as Error;
+
+    // This is where you would look to something like Splunk, or LogRocket.
+    console.error(error);
+    
     return {
       success: false,
       message: error.message,
@@ -396,6 +412,10 @@ export async function removeMember(
     };
   } catch (err) {
     const error = err as Error;
+
+    // This is where you would look to something like Splunk, or LogRocket.
+    console.error(error);
+    
     return {
       success: false,
       message: error.message,
@@ -436,6 +456,10 @@ export async function promoteToAdmin(
     };
   } catch (err) {
     const error = err as Error;
+
+    // This is where you would look to something like Splunk, or LogRocket.
+    console.error(error);
+    
     return {
       success: false,
       message: error.message,
@@ -482,6 +506,10 @@ export async function promoteToOwner(
     };
   } catch (err) {
     const error = err as Error;
+
+    // This is where you would look to something like Splunk, or LogRocket.
+    console.error(error);
+    
     return {
       success: false,
       message: error.message,
@@ -522,6 +550,10 @@ export async function removeAdminRole(
     };
   } catch (err) {
     const error = err as Error;
+
+    // This is where you would look to something like Splunk, or LogRocket.
+    console.error(error);
+    
     return {
       success: false,
       message: error.message,
