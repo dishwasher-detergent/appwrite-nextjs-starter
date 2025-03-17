@@ -1,9 +1,9 @@
 "use server";
 
-import { getLoggedInUser } from "@/lib/auth";
-import { createSessionClient } from "@/lib/server/appwrite";
-import { AVATAR_BUCKET_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
 import { Result } from "@/interfaces/result.interface";
+import { getCachedLoggedInUser } from "@/lib/auth";
+import { AVATAR_BUCKET_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
+import { createSessionClient } from "@/lib/server/appwrite";
 
 import { ID, Models, Permission, Role } from "node-appwrite";
 
@@ -24,7 +24,7 @@ export async function uploadSampleImage({
   data: File;
   permissions?: string[];
 }): Promise<Result<Models.File>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -69,8 +69,10 @@ export async function uploadSampleImage({
  * @param {string} id
  * @returns {Promise<Result<undefined>>} A promise that resolves to a result object.
  */
-export async function deleteSampleImage(id: string): Promise<Result<undefined>> {
-  const user = await getLoggedInUser();
+export async function deleteSampleImage(
+  id: string
+): Promise<Result<undefined>> {
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -115,7 +117,7 @@ export async function uploadAvatarImage({
   data: File;
   permissions?: string[];
 }): Promise<Result<Models.File>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -160,8 +162,10 @@ export async function uploadAvatarImage({
  * @param {string} id
  * @returns {Promise<Result<undefined>>} A promise that resolves to a result object.
  */
-export async function deleteAvatarImage(id: string): Promise<Result<undefined>> {
-  const user = await getLoggedInUser();
+export async function deleteAvatarImage(
+  id: string
+): Promise<Result<undefined>> {
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {

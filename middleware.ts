@@ -1,3 +1,5 @@
+"use server";
+
 import { getLoggedInUser } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 

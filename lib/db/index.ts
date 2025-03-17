@@ -6,7 +6,7 @@ import { ID, Models, Permission, Query, Role } from "node-appwrite";
 import { AuthResponse, Result } from "@/interfaces/result.interface";
 import { Sample } from "@/interfaces/sample.interface";
 import { User, UserData } from "@/interfaces/user.interface";
-import { getLoggedInUser } from "@/lib/auth";
+import { getCachedLoggedInUser } from "@/lib/auth";
 import {
   DATABASE_ID,
   SAMPLE_COLLECTION_ID,
@@ -24,7 +24,7 @@ import {
  * @returns {Promise<Result<User>} The current user
  */
 export async function getUser(): Promise<Result<User>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -75,7 +75,7 @@ export async function getUser(): Promise<Result<User>> {
  * @returns {Promise<Result<UserData>} The current user
  */
 export async function getUserById(id: string): Promise<Result<UserData>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -160,7 +160,7 @@ export async function updateProfile({
  * @returns {Promise<Result<Models.LogList>>} The list of logs
  */
 export async function getUserLogs(): Promise<Result<Models.LogList>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -206,7 +206,7 @@ export async function getUserLogs(): Promise<Result<Models.LogList>> {
 export async function getSamples(
   queries: string[] = []
 ): Promise<Result<Models.DocumentList<Sample>>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -287,7 +287,7 @@ export async function getSampleById(
   sampleId: string,
   queries: string[] = []
 ): Promise<Result<Sample>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -357,7 +357,7 @@ export async function createSample({
   data: AddSampleFormData;
   permissions?: string[];
 }): Promise<Result<Sample>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -432,7 +432,7 @@ export async function updateSample({
   data: EditSampleFormData;
   permissions?: string[];
 }): Promise<Result<Sample>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -489,7 +489,7 @@ export async function updateSample({
  * @returns {Promise<Result<Sample>>} The deleted sample
  */
 export async function deleteSample(id: string): Promise<Result<Sample>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -520,7 +520,7 @@ export async function deleteSample(id: string): Promise<Result<Sample>> {
 }
 
 export async function createUserData(id: string): Promise<Result<UserData>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {

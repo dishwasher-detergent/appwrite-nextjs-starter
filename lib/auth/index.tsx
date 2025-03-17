@@ -21,7 +21,22 @@ import { ID, Models, OAuthProvider } from "node-appwrite";
  * @returns {Promise<Models.User<Models.Preferences> | null>} A promise that resolves to the account information
  * of the logged-in user, or null if no user is logged in.
  */
-export const getLoggedInUser = unstable_cache(
+export async function getLoggedInUser(): Promise<Models.User<Models.Preferences> | null> {
+  try {
+    const { account } = await createSessionClient();
+    return await account.get();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Retrieves the cached currently logged-in user.
+ *
+ * @returns {Promise<Models.User<Models.Preferences> | null>} A promise that resolves to the account information
+ * of the logged-in user, or null if no user is logged in.
+ */
+export const getCachedLoggedInUser = unstable_cache(
   async (): Promise<Models.User<Models.Preferences> | null> => {
     try {
       const { account } = await createSessionClient();
