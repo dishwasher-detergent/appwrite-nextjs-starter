@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Permission } from "node-appwrite";
+import { Permission, Role } from "node-appwrite";
 
 import { ADMIN_ROLE } from "@/constants/team.constants";
 import { Badge } from "@/components/ui/badge";
