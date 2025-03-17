@@ -78,7 +78,7 @@ function CreateForm({ className, setOpen }: FormProps) {
         data: values,
     });
 
-    if(!data.data || !success) {
+    if(!data.data || !data.success) {
       // Show toast or something
       return;
     }
