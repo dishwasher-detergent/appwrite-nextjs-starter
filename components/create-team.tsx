@@ -79,10 +79,6 @@ function CreateForm({ className, setOpen }: FormProps) {
     });
 
     if (values.image instanceof File) {
-        if (user.avatar) {
-            await deleteAvatarImage(user.avatar);
-        }
-
         const image = await uploadAvatarImage({
             data: values.image,
             permissions: [
