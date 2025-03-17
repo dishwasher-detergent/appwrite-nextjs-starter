@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { listTeams } from "@/lib/team";
 import { CreateTeam } from "@/components/create-team";
 import { TeamCard } from "@/components/team-card";
