@@ -23,8 +23,8 @@ import { getInitials } from "@/lib/utils";
 export function TeamCard(team: TeamData) {
   return (
     <Card className="rounded-lg overflow-hidden py-0">
-      <CardContent className="p-0 relative flex flex-row gap-1">
-        <Avatar className="h-6 w-6">
+      <CardContent className="p-1 relative flex flex-row gap-1">
+        <Avatar className="h-24 w-24 rounded-lg">
             <AvatarImage
                 src={
                     team.avatar
@@ -35,10 +35,10 @@ export function TeamCard(team: TeamData) {
             />
             <AvatarFallback>{getInitials(team.name)}</AvatarFallback>
         </Avatar>
-        <CardHeader className="flex flex-col justify-end bottom-0 absolute w-full p-4 h-full bg-linear-to-t from-primary to-primary/20">
+        <CardHeader className="flex flex-col justify-end w-full h-full py-2">
           <CardTitle className="text-primary-foreground">
             <Button
-              className="truncate p-0! text-primary-foreground text-xl"
+              className="truncate p-0! text-primary-foreground text-lg"
               variant="link"
               asChild
             >
