@@ -36,19 +36,22 @@ export async function getLoggedInUser(): Promise<Models.User<Models.Preferences>
  * @returns {Promise<Models.User<Models.Preferences> | null>} A promise that resolves to the account information
  * of the logged-in user, or null if no user is logged in.
  */
-export const getCachedLoggedInUser = unstable_cache(
-  async (): Promise<Models.User<Models.Preferences> | null> => {
-    try {
-      const { account } = await createSessionClient();
-      return await account.get();
-    } catch {
-      return null;
-    }
-  },
-  ["logged_in_user"],
-  { tags: ["logged_in_user"], revalidate: 600 }
-);
+export async function getCachedLoggedInUser(): Promise<Models.User<Models.Preferences> | null> {
+  const { account } = await createSessionClient();
 
+  return unstable_cache(
+    async (): Promise<Models.User<Models.Preferences> | null> => {
+      try {
+        return await account.get();
+      } catch (err) {
+        console.log(err);
+        return null;
+      }
+    },
+    ["logged_in_user"],
+    { tags: ["logged_in_user"], revalidate: 600 }
+  )();
+}
 /**
  * Logs out the currently logged-in user.
  * @returns {Promise<boolean>} A promise that resolves to true if the user is logged in, false otherwise.

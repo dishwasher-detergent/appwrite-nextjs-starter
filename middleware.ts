@@ -1,7 +1,8 @@
 "use server";
 
-import { getLoggedInUser } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+
+import { getLoggedInUser } from "@/lib/auth";
 
 const protectedRoutes = ["/app"];
 const publicRoutes = ["/signin", "/signup"];
