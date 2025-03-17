@@ -10,7 +10,7 @@ import {
   SignUpFormData,
 } from "./schemas";
 
-import { unstable_cache } from "next/cache";
+import { revalidateTag, unstable_cache } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { ID, Models, OAuthProvider } from "node-appwrite";
@@ -44,6 +44,8 @@ export async function logOut(): Promise<boolean> {
   account.deleteSession("current");
   (await cookies()).delete(COOKIE_KEY);
 
+  revalidateTag("logged_in_user");
+
   return redirect("/signin");
 }
 
@@ -62,6 +64,8 @@ export async function signInWithEmail(
 
   try {
     const session = await account.createEmailPasswordSession(email, password);
+
+    revalidateTag("logged_in_user");
 
     (await cookies()).set(COOKIE_KEY, session.secret, {
       path: "/",
@@ -97,6 +101,8 @@ export async function signUpWithEmail(
   const password = formData.password;
 
   const { account } = await createAdminClient();
+
+  revalidateTag("logged_in_user");
 
   try {
     const id = ID.unique();
