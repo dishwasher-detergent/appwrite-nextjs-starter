@@ -9,7 +9,7 @@ export default async function TeamPage({
   params: Promise<{ id: string }>;
 }) {
   const { id: teamId } = await params;
-  const { data, success, message } = await getTeamById(teamId);
+  const { data, success } = await getTeamById(teamId);
 
   if (!success || !data) {
     redirect("/app");
