@@ -37,7 +37,7 @@ export async function getTeamById(id: string): Promise<Result<TeamData>> {
           id
         );
 
-        const memberships = await team.listMemberships(data.teamId);
+        const memberships = await team.listMemberships(data.$id);
 
         return {
           success: true,
