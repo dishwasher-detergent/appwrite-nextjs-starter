@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 
 import { getTeamById } from "@/lib/team";
+import { ENDPOINT, AVATAR_BUCKET_ID, PROJECT_ID } from "@/lib/constants";
 
 export default async function TeamPage({
   params,
