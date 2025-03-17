@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation";
-
 import { getTeamById } from "@/lib/team";
 
 export default async function TeamPage({
