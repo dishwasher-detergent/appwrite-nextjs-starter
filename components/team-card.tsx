@@ -48,7 +48,7 @@ export function TeamCard(team: TeamData) {
               </Link>
             </Button>
           </CardTitle>
-          <CardDescription className="line-clamp-3">
+          <CardDescription className="line-clamp-2">
             {team?.about ?? "No about provided."}
           </CardDescription>
         </CardHeader>
