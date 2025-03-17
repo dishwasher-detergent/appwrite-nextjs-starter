@@ -4,6 +4,7 @@ import { COOKIE_KEY, ENDPOINT, PROJECT_ID } from "@/lib/constants";
 
 import { Account, Client } from "appwrite";
 import Cookies from "js-cookie";
+import { unstable_cache } from "next/cache";
 
 export async function createClient() {
   const client = new Client().setEndpoint(ENDPOINT).setProject(PROJECT_ID);
@@ -35,17 +36,24 @@ export async function createClient() {
   };
 }
 
-export async function getLoggedInUser() {
-  try {
-    const client = await createClient();
-    return {
-      user: await client.account.get(),
-      client: client.client,
-    };
-  } catch {
-    return {
-      user: null,
-      client: null,
-    };
+export const getLoggedInUser = unstable_cache(
+  async () => {
+    try {
+      const client = await createClient();
+      return {
+        user: await client.account.get(),
+        client: client.client,
+      };
+    } catch {
+      return {
+        user: null,
+        client: null,
+      };
+    }
+  },
+  ["client_user"],
+  {
+    tags: ["client_user"],
+    revalidate: 600,
   }
-}
+);

@@ -33,7 +33,15 @@ export const useSamples = ({ initialSamples }: Props) => {
               "databases.*.collections.*.documents.*.create"
             )
           ) {
-            setSamples((prev) => [response.payload, ...prev]);
+            const { data } = await getUserById(response.payload.userId);
+
+            setSamples((prev) => [
+              {
+                ...response.payload,
+                user: data,
+              },
+              ...prev,
+            ]);
           }
 
           if (

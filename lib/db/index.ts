@@ -386,12 +386,24 @@ export async function createSample({
       permissions
     );
 
+    const userRes = await database.getDocument<UserData>(
+      DATABASE_ID,
+      USER_COLLECTION_ID,
+      sample.userId,
+      [Query.select(["$id", "name", "avatar"])]
+    );
+
+    console.log(userRes);
+
     revalidateTag("samples");
 
     return {
       success: true,
       message: "Sample successfully created.",
-      data: sample,
+      data: {
+        ...sample,
+        user: userRes,
+      },
     };
   } catch (err) {
     const error = err as Error;
@@ -442,8 +454,6 @@ export async function updateSample({
       },
       permissions
     );
-
-    console.log(sample);
 
     const userRes = await database.getDocument<UserData>(
       DATABASE_ID,

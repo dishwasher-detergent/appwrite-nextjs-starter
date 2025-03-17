@@ -1,9 +1,10 @@
 import { AddSample } from "@/components/create-sample";
 import { Samples } from "@/components/realtime/samples";
 import { getSamples } from "@/lib/db";
+import { Query } from "node-appwrite";
 
 export default async function AppPage() {
-  const { data } = await getSamples();
+  const { data } = await getSamples([Query.orderDesc("$createdAt")]);
 
   return (
     <>
