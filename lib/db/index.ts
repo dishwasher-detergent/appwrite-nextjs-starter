@@ -220,7 +220,7 @@ export async function listSamples(
   const { database } = await createSessionClient();
 
   return unstable_cache(
-    async () => {
+    async (queries) => {
       try {
         const samples = await database.listDocuments<Sample>(
           DATABASE_ID,
@@ -296,10 +296,10 @@ export async function listSamples(
     },
     ["samples"],
     {
-      tags: ["samples"],
+      tags: ["samples", `samples-${queries.join("-")}`],
       revalidate: 600,
     }
-  )();
+  )(queries);
 }
 
 /**
