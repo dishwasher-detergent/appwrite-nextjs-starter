@@ -52,7 +52,7 @@ export function UserInformation({ user }: { user: User }) {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/app/profile">
+          <Link href={`/app/users/${user.$id}`}>
             Profile
             <DropdownMenuShortcut>
               <LucideUser className="size-3" />

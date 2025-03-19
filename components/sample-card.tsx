@@ -93,9 +93,12 @@ export function SampleCard(sample: Sample) {
                   {getInitials(sample?.user?.name)}
                 </AvatarFallback>
               </Avatar>
-              <p className="text-sm text-primary-foreground">
+              <Link
+                className="text-sm text-primary-foreground"
+                href={`/app/users/${sample.userId}`}
+              >
                 {sample?.user?.name || "Unknown"}
-              </p>
+              </Link>
             </div>
           </div>
         </CardHeader>
