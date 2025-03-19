@@ -1,8 +1,9 @@
+import { Query } from "node-appwrite";
+
 import { AddSample } from "@/components/create-sample";
 import { Samples } from "@/components/realtime/samples";
 import { listSamples } from "@/lib/db";
 import { getTeamById } from "@/lib/team";
-import { Query } from "node-appwrite";
 
 export default async function SamplesPage({
   params,

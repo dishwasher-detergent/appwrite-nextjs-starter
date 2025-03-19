@@ -9,10 +9,11 @@ import { Sample } from "@/interfaces/sample.interface";
 interface SamplesProps {
   initialSamples?: Sample[];
   teamId?: string;
+  userId?: string;
 }
 
-export function Samples({ initialSamples, teamId }: SamplesProps) {
-  const { loading, samples } = useSamples({ initialSamples, teamId });
+export function Samples({ initialSamples, teamId, userId }: SamplesProps) {
+  const { loading, samples } = useSamples({ initialSamples, teamId, userId });
 
   if (loading)
     return (

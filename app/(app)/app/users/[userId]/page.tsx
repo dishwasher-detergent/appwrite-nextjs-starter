@@ -1,6 +1,7 @@
 import { LucideEllipsisVertical } from "lucide-react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
+import { Query } from "node-appwrite";
 
 import { EditProfile } from "@/components/edit-profile";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -10,20 +11,22 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { getUserData, getUserLogs } from "@/lib/auth";
+import { Samples } from "@/components/realtime/samples";
+import { listSamples } from "@/lib/db";
+import { getUserById } from "@/lib/auth";
 import { AVATAR_BUCKET_ID, ENDPOINT, PROJECT_ID } from "@/lib/constants";
 
-export default async function ProfilePage() {
-  const { data } = await getUserData();
-  const { data: logs } = await getUserLogs();
+export default async function ProfilePage({
+  params,
+}: {
+  params: Promise<{ userId: string }>;
+}) {
+  const { userId } = await params;
+  const { data } = await getUserById(userId);
+  const { data: sampleData } = await listSamples([
+    Query.orderDesc("$createdAt"),
+    Query.equal("userId", userId),
+  ]);
 
   if (!data) {
     redirect("/app");
@@ -34,7 +37,7 @@ export default async function ProfilePage() {
       <header className="relative">
         <div
           role="img"
-          aria-label="Team banner"
+          aria-label="User banner"
           className="w-full bg-linear-to-r from-primary to-secondary rounded-xl h-48"
         />
         <div className="flex items-start justify-between px-4 -mt-30">
@@ -84,25 +87,8 @@ export default async function ProfilePage() {
           </section>
         </div>
         <div>
-          <h3 className="font-semibold text-lg mb-2">User Activity</h3>
-          <div className="border rounded-lg overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Timestamp</TableHead>
-                  <TableHead className="w-full">Event</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {logs?.logs.map((log, id) => (
-                  <TableRow key={id}>
-                    <TableCell>{log.time}</TableCell>
-                    <TableCell className="w-full">{log.event}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <h3 className="font-semibold text-lg mb-2">Samples</h3>
+          <Samples initialSamples={sampleData?.documents} userId={userId} />
         </div>
       </main>
     </article>

@@ -11,9 +11,10 @@ import { getTeamById } from "@/lib/team";
 interface Props {
   initialSamples?: Sample[];
   teamId?: string;
+  userId?: string;
 }
 
-export const useSamples = ({ initialSamples, teamId }: Props) => {
+export const useSamples = ({ initialSamples, teamId, userId }: Props) => {
   const [samples, setSamples] = useState<Sample[]>(initialSamples ?? []);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -31,6 +32,7 @@ export const useSamples = ({ initialSamples, teamId }: Props) => {
         `databases.${DATABASE_ID}.collections.${SAMPLE_COLLECTION_ID}.documents`,
         async (response) => {
           if (teamId && response.payload.teamId !== teamId) return;
+          if (userId && response.payload.userId !== userId) return;
 
           if (
             response.events.includes(
