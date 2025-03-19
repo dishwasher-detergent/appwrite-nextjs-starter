@@ -6,4 +6,8 @@ export interface UserData extends Models.Document {
   name: string;
 }
 
+export interface UserMemberData extends UserData {
+  roles: string[];
+}
+
 export interface User extends Models.User<Models.Preferences>, UserData {}

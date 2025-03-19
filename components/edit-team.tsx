@@ -9,6 +9,10 @@ import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+} from "@/components/ui/dropdown-menu";
 import { DyanmicDrawer } from "@/components/ui/dynamic-drawer";
 import {
   Form,
@@ -27,9 +31,9 @@ import {
 } from "@/constants/team.constants";
 import { TeamData } from "@/interfaces/team.interface";
 import { AVATAR_BUCKET_ID } from "@/lib/constants";
-import { updateTeam } from "@/lib/team";
-import { AddTeamFormData, addTeamSchema } from "@/lib/team/schemas";
 import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
+import { updateTeam } from "@/lib/team";
+import { EditTeamFormData, editTeamSchema } from "@/lib/team/schemas";
 import { cn } from "@/lib/utils";
 
 export function EditTeam({ team }: { team: TeamData }) {
@@ -42,10 +46,17 @@ export function EditTeam({ team }: { team: TeamData }) {
       open={open}
       setOpen={setOpen}
       button={
-        <Button size="sm" variant="secondary">
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.preventDefault();
+            setOpen(!open);
+          }}
+        >
           Edit
-          <LucidePencil className="size-3.5" />
-        </Button>
+          <DropdownMenuShortcut>
+            <LucidePencil className="size-3.5" />
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
       }
     >
       <EditForm setOpen={setOpen} team={team} />
@@ -62,8 +73,8 @@ function EditForm({ className, setOpen, team }: FormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const form = useForm<AddTeamFormData>({
-    resolver: zodResolver(addTeamSchema),
+  const form = useForm<EditTeamFormData>({
+    resolver: zodResolver(editTeamSchema),
     defaultValues: {
       name: team.name,
       about: team.about ?? "",
@@ -71,7 +82,7 @@ function EditForm({ className, setOpen, team }: FormProps) {
     },
   });
 
-  async function onSubmit(values: AddTeamFormData) {
+  async function onSubmit(values: EditTeamFormData) {
     setLoading(true);
 
     if (values.image instanceof File) {

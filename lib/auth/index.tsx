@@ -57,14 +57,18 @@ export async function getCachedLoggedInUser(): Promise<Models.User<Models.Prefer
  * @returns {Promise<boolean>} A promise that resolves to true if the user is logged in, false otherwise.
  */
 export async function logOut(): Promise<boolean> {
+  await deleteSession();
+
+  return redirect("/signin");
+}
+
+export async function deleteSession(): Promise<void> {
   const { account } = await createSessionClient();
 
   account.deleteSession("current");
   (await cookies()).delete(COOKIE_KEY);
 
   revalidateTag("logged_in_user");
-
-  return redirect("/signin");
 }
 
 /**

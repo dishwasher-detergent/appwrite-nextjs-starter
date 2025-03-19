@@ -1,15 +1,22 @@
 "use server";
 
 import { revalidateTag, unstable_cache } from "next/cache";
-import { ID, Models, Permission, Query, Role, Teams } from "node-appwrite";
+import { ID, Models, Permission, Query, Role } from "node-appwrite";
 
 import { ADMIN_ROLE, OWNER_ROLE } from "@/constants/team.constants";
 import { Result } from "@/interfaces/result.interface";
 import { TeamData } from "@/interfaces/team.interface";
+import { UserData, UserMemberData } from "@/interfaces/user.interface";
 import { getCachedLoggedInUser } from "@/lib/auth";
-import { DATABASE_ID, TEAM_COLLECTION_ID } from "@/lib/constants";
+import {
+  DATABASE_ID,
+  HOSTNAME,
+  TEAM_COLLECTION_ID,
+  USER_COLLECTION_ID,
+} from "@/lib/constants";
 import { createSessionClient } from "@/lib/server/appwrite";
-import { AddTeamFormData } from "./schemas";
+import { createUserData } from "../db";
+import { AddTeamFormData, EditTeamFormData } from "./schemas";
 
 /**
  * Get a team by ID
@@ -39,20 +46,41 @@ export async function getTeamById(id: string): Promise<Result<TeamData>> {
 
         const memberships = await team.listMemberships(data.$id);
 
+        const userIds = memberships.memberships.map((member) => member.userId);
+        const uniqueUserIds = Array.from(new Set(userIds));
+
+        const users = await database.listDocuments<UserData>(
+          DATABASE_ID,
+          USER_COLLECTION_ID,
+          [
+            Query.equal("$id", uniqueUserIds),
+            Query.select(["$id", "name", "avatar"]),
+          ]
+        );
+
+        const usersMembershipData: UserMemberData[] = users.documents.map(
+          (user) => ({
+            ...user,
+            roles: memberships.memberships.filter(
+              (member) => member.userId === user.$id
+            )[0].roles,
+          })
+        );
+
         return {
           success: true,
           message: "Team successfully retrieved.",
           data: {
             ...data,
-            members: memberships.memberships,
+            members: usersMembershipData,
           },
         };
       } catch (err) {
         const error = err as Error;
 
-        // This is where you would look to something like Splunk, or LogRocket.
+        // This is where you would look to something like Splunk.
         console.error(error);
-        
+
         return {
           success: false,
           message: error.message,
@@ -99,9 +127,9 @@ export async function listTeams(): Promise<Result<TeamData[]>> {
       } catch (err) {
         const error = err as Error;
 
-        // This is where you would look to something like Splunk, or LogRocket.
+        // This is where you would look to something like Splunk.
         console.error(error);
-        
+
         return {
           success: false,
           message: error.message,
@@ -153,7 +181,7 @@ export async function createTeam({
   try {
     const teamResponse = await team.create(id, data.name, [
       ADMIN_ROLE,
-      OWNER_ROLE
+      OWNER_ROLE,
     ]);
 
     permissions = [
@@ -169,7 +197,6 @@ export async function createTeam({
       {
         name: data.name,
         about: data.about,
-        avatar: data.image,
       },
       permissions
     );
@@ -184,7 +211,7 @@ export async function createTeam({
   } catch (err) {
     const error = err as Error;
 
-    // This is where you would look to something like Splunk, or LogRocket.
+    // This is where you would look to something like Splunk.
     console.error(error);
 
     return {
@@ -198,7 +225,7 @@ export async function createTeam({
  * Update a team
  * @param {Object} params The parameters for creating a team
  * @param {string} [params.id] The ID of the team
- * @param {AddTeamFormData} params.data The team data
+ * @param {EditTeamFormData} params.data The team data
  * @param {string[]} [params.permissions] The permissions for the team (optional)
  * @returns {Promise<Result<TeamData>>} The updated team
  */
@@ -208,7 +235,7 @@ export async function updateTeam({
   permissions = undefined,
 }: {
   id: string;
-  data: AddTeamFormData;
+  data: EditTeamFormData;
   permissions?: string[];
 }): Promise<Result<TeamData>> {
   const user = await getCachedLoggedInUser();
@@ -223,6 +250,8 @@ export async function updateTeam({
   const { database, team } = await createSessionClient();
 
   try {
+    await checkUserRole(id, user.$id, [ADMIN_ROLE]);
+
     await team.updateName(id, data.name);
 
     const teamData = await database.updateDocument<TeamData>(
@@ -248,9 +277,9 @@ export async function updateTeam({
   } catch (err) {
     const error = err as Error;
 
-    // This is where you would look to something like Splunk, or LogRocket.
+    // This is where you would look to something like Splunk.
     console.error(error);
-    
+
     return {
       success: false,
       message: error.message,
@@ -276,6 +305,8 @@ export async function deleteTeam(id: string): Promise<Result<TeamData>> {
   const { database, team } = await createSessionClient();
 
   try {
+    await checkUserRole(id, user.$id, [ADMIN_ROLE]);
+
     await team.delete(id);
     await database.deleteDocument(DATABASE_ID, TEAM_COLLECTION_ID, id);
 
@@ -288,9 +319,9 @@ export async function deleteTeam(id: string): Promise<Result<TeamData>> {
   } catch (err) {
     const error = err as Error;
 
-    // This is where you would look to something like Splunk, or LogRocket.
+    // This is where you would look to something like Splunk.
     console.error(error);
-  
+
     return {
       success: false,
       message: error.message,
@@ -358,9 +389,9 @@ export async function leaveTeam(teamId: string): Promise<Result<string>> {
   } catch (err) {
     const error = err as Error;
 
-    // This is where you would look to something like Splunk, or LogRocket.
+    // This is where you would look to something like Splunk.
     console.error(error);
-    
+
     return {
       success: false,
       message: error.message,
@@ -368,7 +399,52 @@ export async function leaveTeam(teamId: string): Promise<Result<string>> {
   }
 }
 
-// Add Member
+export async function inviteMember(
+  teamId: string,
+  email: string
+): Promise<Result<void>> {
+  const user = await getCachedLoggedInUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in to perform this action.",
+    };
+  }
+
+  const { team } = await createSessionClient();
+
+  try {
+    const data = await team.createMembership(
+      teamId,
+      [],
+      email,
+      undefined,
+      undefined,
+      `http://${HOSTNAME}/accept/${teamId}`,
+      email.split("@")[0]
+    );
+
+    await createUserData(data.userId);
+
+    revalidateTag(`team-${teamId}`);
+
+    return {
+      success: true,
+      message: `Invitation sent to ${email}.`,
+    };
+  } catch (err) {
+    const error = err as Error;
+
+    // This is where you would look to something like Splunk.
+    console.error(error);
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+}
 
 /**
  *  Remove a member from the team
@@ -391,36 +467,44 @@ export async function removeMember(
   const { team } = await createSessionClient();
 
   try {
-    await checkUserRole(team, teamId, user.$id, [OWNER_ROLE, ADMIN_ROLE]);
+    const userMembership = await team.listMemberships(teamId, [
+      Query.equal("userId", user.$id),
+    ]);
+    const currentUserRole = userMembership.memberships[0]?.roles[0];
 
     const memberToRemove = await team.listMemberships(teamId, [
       Query.equal("userId", userId),
     ]);
-
     const membership = memberToRemove.memberships[0];
 
     if (!membership) {
       throw new Error("User is not a member of this team.");
     }
 
+    const memberRole = membership.roles[0];
+
     if (membership.roles.includes(OWNER_ROLE)) {
       throw new Error("You cannot remove the owner of the team.");
     }
 
-    await team.deleteMembership(teamId, membership.$id);
+    if (memberRole === ADMIN_ROLE && currentUserRole !== OWNER_ROLE) {
+      throw new Error("Only team owners can remove admin members.");
+    }
 
+    if (currentUserRole !== OWNER_ROLE && currentUserRole !== ADMIN_ROLE) {
+      throw new Error("You must be an admin or owner to remove team members.");
+    }
+
+    await team.deleteMembership(teamId, membership.$id);
     revalidateTag(`team-${teamId}`);
 
     return {
       success: true,
-      message: `${userId} has been removed from the team.`,
+      message: `${membership.userName} has been removed from the team.`,
     };
   } catch (err) {
     const error = err as Error;
-
-    // This is where you would look to something like Splunk, or LogRocket.
     console.error(error);
-    
     return {
       success: false,
       message: error.message,
@@ -431,54 +515,10 @@ export async function removeMember(
 /**
  * Promote a team member to admin
  * @param {string} teamId The team ID
- * @param {string} membershipId The membership ID to promote
- * @returns {Promise<Result<void>>}
- */
-export async function promoteToAdmin(
-  teamId: string,
-  membershipId: string
-): Promise<Result<void>> {
-  const user = await getCachedLoggedInUser();
-
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
-
-  const { team } = await createSessionClient();
-
-  try {
-    await checkUserRole(team, teamId, user.$id, [OWNER_ROLE, ADMIN_ROLE]);
-    await team.updateMembership(teamId, membershipId, [ADMIN_ROLE]);
-
-    revalidateTag(`team-${teamId}`);
-
-    return {
-      success: true,
-      message: "Member has been promoted to admin.",
-    };
-  } catch (err) {
-    const error = err as Error;
-
-    // This is where you would look to something like Splunk, or LogRocket.
-    console.error(error);
-    
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
-}
-
-/**
- * Promote a team member to owner
- * @param {string} teamId The team ID
  * @param {string} userId The membership ID to promote
  * @returns {Promise<Result<void>>}
  */
-export async function promoteToOwner(
+export async function promoteToAdmin(
   teamId: string,
   userId: string
 ): Promise<Result<void>> {
@@ -494,27 +534,26 @@ export async function promoteToOwner(
   const { team } = await createSessionClient();
 
   try {
-    const userMembership = await checkUserRole(team, teamId, user.$id, [
-      OWNER_ROLE,
-    ]);
+    await checkUserRole(teamId, user.$id, [OWNER_ROLE]);
 
-    await team.updateMembership(teamId, userMembership.memberships[0].$id, [
-      ADMIN_ROLE,
+    const userMembership = await team.listMemberships(teamId, [
+      Query.equal("userId", userId),
     ]);
-    await team.updateMembership(teamId, userId, [OWNER_ROLE]);
+    const membership = userMembership.memberships[0];
+    await team.updateMembership(teamId, membership.$id, [ADMIN_ROLE]);
 
     revalidateTag(`team-${teamId}`);
 
     return {
       success: true,
-      message: "Ownership has been transferred successfully.",
+      message: "Member has been promoted to admin.",
     };
   } catch (err) {
     const error = err as Error;
 
-    // This is where you would look to something like Splunk, or LogRocket.
+    // This is where you would look to something like Splunk.
     console.error(error);
-    
+
     return {
       success: false,
       message: error.message,
@@ -525,12 +564,12 @@ export async function promoteToOwner(
 /**
  * Remove admin role from a team member
  * @param {string} teamId The team ID
- * @param {string} membershipId The membership ID to demote
+ * @param {string} userId The membership ID to demote
  * @returns {Promise<Result<void>>}
  */
 export async function removeAdminRole(
   teamId: string,
-  membershipId: string
+  userId: string
 ): Promise<Result<void>> {
   const user = await getCachedLoggedInUser();
 
@@ -544,8 +583,13 @@ export async function removeAdminRole(
   const { team } = await createSessionClient();
 
   try {
-    await checkUserRole(team, teamId, user.$id, [OWNER_ROLE, ADMIN_ROLE]);
-    await team.updateMembership(teamId, membershipId, []);
+    await checkUserRole(teamId, user.$id, [OWNER_ROLE]);
+
+    const userMembership = await team.listMemberships(teamId, [
+      Query.equal("userId", userId),
+    ]);
+    const membership = userMembership.memberships[0];
+    await team.updateMembership(teamId, membership.$id, []);
 
     revalidateTag(`team-${teamId}`);
 
@@ -556,9 +600,46 @@ export async function removeAdminRole(
   } catch (err) {
     const error = err as Error;
 
-    // This is where you would look to something like Splunk, or LogRocket.
+    // This is where you would look to something like Splunk.
     console.error(error);
-    
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+}
+
+export async function getCurrentUserRoles(
+  teamId: string
+): Promise<Result<string[]>> {
+  const user = await getCachedLoggedInUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in to perform this action.",
+    };
+  }
+
+  const { team } = await createSessionClient();
+
+  try {
+    const userMembership = await team.listMemberships(teamId, [
+      Query.equal("userId", user.$id),
+    ]);
+
+    return {
+      success: true,
+      message: "User roles successfully retrieved.",
+      data: userMembership.memberships[0]?.roles || [],
+    };
+  } catch (err) {
+    const error = err as Error;
+
+    // This is where you would look to something like Splunk.
+    console.error(error);
+
     return {
       success: false,
       message: error.message,
@@ -574,19 +655,23 @@ export async function removeAdminRole(
  * @param requiredRoles Array of allowed roles
  * @returns Role if authorized, throws error if not
  */
-async function checkUserRole(
-  team: Teams,
+export async function checkUserRole(
   teamId: string,
   userId: string,
   requiredRoles: string[]
 ): Promise<Models.MembershipList> {
+  const { team } = await createSessionClient();
+
   const userMembership = await team.listMemberships(teamId, [
     Query.equal("userId", userId),
   ]);
 
-  const currentUserRole = userMembership.memberships[0]?.roles[0];
+  const currentUserRoles = userMembership.memberships[0]?.roles;
 
-  if (!currentUserRole || !requiredRoles.includes(currentUserRole)) {
+  if (
+    !currentUserRoles ||
+    !currentUserRoles.some((role) => requiredRoles.includes(role))
+  ) {
     throw new Error(
       `You must be ${requiredRoles.join(" or ")} to perform this action.`
     );

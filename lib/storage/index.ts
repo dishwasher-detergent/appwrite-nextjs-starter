@@ -187,6 +187,8 @@ export async function deleteAvatarImage(
   } catch (err) {
     const error = err as Error;
 
+    console.log(error);
+
     return {
       success: false,
       message: error.message,

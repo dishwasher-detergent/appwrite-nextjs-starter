@@ -6,9 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Permission, Role } from "node-appwrite";
 
-import { ADMIN_ROLE } from "@/constants/team.constants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DyanmicDrawer } from "@/components/ui/dynamic-drawer";
@@ -23,15 +21,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-    TEAM_ABOUT_MAX_LENGTH,
-    TEAM_NAME_MAX_LENGTH,
-  } from "@/constants/team.constants";
-import { SAMPLE_BUCKET_ID } from "@/lib/constants";
+  TEAM_ABOUT_MAX_LENGTH,
+  TEAM_NAME_MAX_LENGTH,
+} from "@/constants/team.constants";
 import { createTeam } from "@/lib/team";
 import { AddTeamFormData, addTeamSchema } from "@/lib/team/schemas";
-import { uploadAvatarImage } from "@/lib/storage";
 import { cn } from "@/lib/utils";
-import { ImageInput } from "@/components/ui/image-input";
 
 export function CreateTeam() {
   const [open, setOpen] = useState(false);
@@ -67,7 +62,6 @@ function CreateForm({ className, setOpen }: FormProps) {
     defaultValues: {
       name: "",
       about: "",
-      image: null,
     },
   });
 
@@ -75,31 +69,8 @@ function CreateForm({ className, setOpen }: FormProps) {
     setLoading(true);
 
     const data = await createTeam({
-        data: values,
+      data: values,
     });
-
-    if(!data.data || !data.success) {
-      // Show toast or something
-      return;
-    }
-
-    if (values.image instanceof File) {
-        const image = await uploadAvatarImage({
-            data: values.image,
-            permissions: [
-                Permission.read(Role.team(data.data.$id)),
-                Permission.write(Role.team(data.data.$id, ADMIN_ROLE)),
-            ]
-        });
-
-        if (!image.success) {
-            toast.error(image.message);
-            setLoading(false);
-            return;
-        }
-
-        values.image = image.data?.$id;
-    }
 
     if (data.success) {
       toast.success(data.message);
@@ -170,19 +141,6 @@ function CreateForm({ className, setOpen }: FormProps) {
                       {field?.value?.length ?? 0}/{TEAM_ABOUT_MAX_LENGTH}
                     </Badge>
                   </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="image"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Picture</FormLabel>
-                <FormControl>
-                  <ImageInput bucketId={SAMPLE_BUCKET_ID} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

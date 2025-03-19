@@ -544,6 +544,7 @@ export async function createUserData(id: string): Promise<Result<UserData>> {
       USER_COLLECTION_ID,
       id,
       {
+        name: user.name,
         avatar: null,
       }
     );

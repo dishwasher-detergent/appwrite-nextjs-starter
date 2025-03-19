@@ -9,6 +9,10 @@ import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+} from "@/components/ui/dropdown-menu";
 import { DyanmicDrawer } from "@/components/ui/dynamic-drawer";
 import {
   Form,
@@ -22,9 +26,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { TEAM_NAME_MAX_LENGTH } from "@/constants/team.constants";
 import { TeamData } from "@/interfaces/team.interface";
+import { deleteAvatarImage } from "@/lib/storage";
 import { deleteTeam } from "@/lib/team";
 import { DeleteTeamFormData, deleteTeamSchema } from "@/lib/team/schemas";
-import { deleteAvatarImage } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 
 export function DeleteTeam({ team }: { team: TeamData }) {
@@ -37,10 +41,17 @@ export function DeleteTeam({ team }: { team: TeamData }) {
       open={open}
       setOpen={setOpen}
       button={
-        <Button size="sm" variant="destructive">
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.preventDefault();
+            setOpen(!open);
+          }}
+        >
           Delete
-          <LucideTrash2 className="size-3.5" />
-        </Button>
+          <DropdownMenuShortcut>
+            <LucideTrash2 className="size-3.5" />
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
       }
     >
       <DeleteForm setOpen={setOpen} team={team} />
