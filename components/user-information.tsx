@@ -1,6 +1,6 @@
 "use client";
 
-import { LucideLogOut, LucideUser } from "lucide-react";
+import { LucideLogOut, LucideUser, LucideUsers } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 
@@ -43,6 +43,14 @@ export function UserInformation({ user }: { user: User }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem asChild>
+          <Link href="/app/teams">
+            Teams
+            <DropdownMenuShortcut>
+              <LucideUsers className="size-3" />
+            </DropdownMenuShortcut>
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/app/profile">
             Profile

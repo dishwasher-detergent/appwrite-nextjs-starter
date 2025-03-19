@@ -1,6 +1,6 @@
 import { AddSample } from "@/components/create-sample";
 import { Samples } from "@/components/realtime/samples";
-import { getSamples } from "@/lib/db";
+import { listSamples } from "@/lib/db";
 import { getTeamById } from "@/lib/team";
 import { Query } from "node-appwrite";
 
@@ -11,7 +11,7 @@ export default async function SamplesPage({
 }) {
   const { teamId } = await params;
   const teams = [];
-  const { data } = await getSamples([
+  const { data } = await listSamples([
     Query.orderDesc("$createdAt"),
     Query.equal("teamId", teamId),
   ]);

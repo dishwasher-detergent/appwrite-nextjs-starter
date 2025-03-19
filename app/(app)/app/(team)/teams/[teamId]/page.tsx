@@ -28,6 +28,7 @@ import {
 import { ADMIN_ROLE, OWNER_ROLE } from "@/constants/team.constants";
 import { AVATAR_BUCKET_ID, ENDPOINT, PROJECT_ID } from "@/lib/constants";
 import { getCurrentUserRoles, getTeamById } from "@/lib/team";
+import Link from "next/link";
 
 export default async function TeamPage({
   params,
@@ -75,6 +76,9 @@ export default async function TeamPage({
             </AspectRatio>
           </figure>
           <div className="pt-32 flex flex-row gap-1">
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/app/teams/${teamId}/samples`}>Samples</Link>
+            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size="icon" variant="outline" className="size-8">

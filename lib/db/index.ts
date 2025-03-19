@@ -205,7 +205,7 @@ export async function getUserLogs(): Promise<Result<Models.LogList>> {
  * @param {string[]} queries The queries to filter the samples
  * @returns {Promise<Result<Models.DocumentList<Sample>>} The list of samples
  */
-export async function getSamples(
+export async function listSamples(
   queries: string[] = []
 ): Promise<Result<Models.DocumentList<Sample>>> {
   const user = await getCachedLoggedInUser();
