@@ -30,9 +30,9 @@ import {
   PROFILE_NAME_MAX_LENGTH,
 } from "@/constants/profile.constants";
 import { User } from "@/interfaces/user.interface";
+import { updateProfile } from "@/lib/auth";
+import { UpdateProfileFormData, updateProfileSchema } from "@/lib/auth/schemas";
 import { AVATAR_BUCKET_ID } from "@/lib/constants";
-import { updateProfile } from "@/lib/db";
-import { UpdateProfileFormData, updateProfileSchema } from "@/lib/db/schemas";
 import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 

@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 
 import { useSession } from "@/hooks/userSession";
 import { Sample } from "@/interfaces/sample.interface";
+import { getUserById } from "@/lib/auth";
 import { DATABASE_ID, SAMPLE_COLLECTION_ID } from "@/lib/constants";
-import { getUserById } from "@/lib/db";
 import { getTeamById } from "@/lib/team";
 
 interface Props {

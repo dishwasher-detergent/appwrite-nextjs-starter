@@ -3,10 +3,10 @@
 import { revalidateTag, unstable_cache } from "next/cache";
 import { ID, Models, Permission, Query, Role } from "node-appwrite";
 
-import { AuthResponse, Result } from "@/interfaces/result.interface";
+import { Result } from "@/interfaces/result.interface";
 import { Sample } from "@/interfaces/sample.interface";
 import { TeamData } from "@/interfaces/team.interface";
-import { User, UserData } from "@/interfaces/user.interface";
+import { UserData } from "@/interfaces/user.interface";
 import { getCachedLoggedInUser } from "@/lib/auth";
 import {
   DATABASE_ID,
@@ -15,195 +15,12 @@ import {
   USER_COLLECTION_ID,
 } from "@/lib/constants";
 import { createSessionClient } from "@/lib/server/appwrite";
-import {
-  AddSampleFormData,
-  EditSampleFormData,
-  UpdateProfileFormData,
-} from "./schemas";
-
-/**
- * Get the current user
- * @returns {Promise<Result<User>} The current user
- */
-export async function getUser(): Promise<Result<User>> {
-  const user = await getCachedLoggedInUser();
-
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
-
-  const { database } = await createSessionClient();
-
-  return unstable_cache(
-    async () => {
-      try {
-        const data = await database.getDocument<UserData>(
-          DATABASE_ID,
-          USER_COLLECTION_ID,
-          user.$id
-        );
-
-        return {
-          success: true,
-          message: "User successfully retrieved.",
-          data: {
-            ...user,
-            ...data,
-          },
-        };
-      } catch (err) {
-        const error = err as Error;
-
-        return {
-          success: false,
-          message: error.message,
-        };
-      }
-    },
-    ["user"],
-    {
-      tags: ["user"],
-      revalidate: 600,
-    }
-  )();
-}
-
-/**
- * Get the current user by ID
- * @param {string} id The user ID
- * @returns {Promise<Result<UserData>} The current user
- */
-export async function getUserById(id: string): Promise<Result<UserData>> {
-  const user = await getCachedLoggedInUser();
-
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
-
-  const { database } = await createSessionClient();
-
-  return unstable_cache(
-    async () => {
-      try {
-        const data = await database.getDocument<UserData>(
-          DATABASE_ID,
-          USER_COLLECTION_ID,
-          id
-        );
-
-        return {
-          success: true,
-          message: "User successfully retrieved.",
-          data,
-        };
-      } catch (err) {
-        const error = err as Error;
-
-        return {
-          success: false,
-          message: error.message,
-        };
-      }
-    },
-    ["user", id],
-    {
-      tags: ["user", `user-${id}`],
-      revalidate: 600,
-    }
-  )();
-}
-
-/**
- * Updates the user's profile.
- * @param {Object} data The parameters for updating a user
- * @param {string} [data.name] The users name
- * @returns {Promise<AuthResponse>} A promise that resolves to an authentication response.
- */
-export async function updateProfile({
-  id,
-  data,
-}: {
-  id: string;
-  data: UpdateProfileFormData;
-}): Promise<AuthResponse> {
-  const { account, database } = await createSessionClient();
-
-  try {
-    await account.updateName(data.name);
-    await database.updateDocument(DATABASE_ID, USER_COLLECTION_ID, id, {
-      avatar: data.image,
-      about: data.about,
-    });
-
-    revalidateTag("user");
-    revalidateTag("user-logs");
-
-    return {
-      success: true,
-      message: "Profile updated successfully",
-    };
-  } catch (err) {
-    const error = err as Error;
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
-}
-
-/**
- * Get a list of logs
- * @returns {Promise<Result<Models.LogList>>} The list of logs
- */
-export async function getUserLogs(): Promise<Result<Models.LogList>> {
-  const user = await getCachedLoggedInUser();
-
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
-
-  const { account } = await createSessionClient();
-
-  return unstable_cache(
-    async () => {
-      try {
-        const logs = await account.listLogs();
-
-        return {
-          success: true,
-          message: "Samples successfully retrieved.",
-          data: logs,
-        };
-      } catch (err) {
-        const error = err as Error;
-
-        return {
-          success: false,
-          message: error.message,
-        };
-      }
-    },
-    ["user-logs"],
-    {
-      tags: ["user-logs"],
-      revalidate: 600,
-    }
-  )();
-}
+import { AddSampleFormData, EditSampleFormData } from "./schemas";
 
 /**
  * Get a list of samples
  * @param {string[]} queries The queries to filter the samples
- * @returns {Promise<Result<Models.DocumentList<Sample>>} The list of samples
+ * @returns {Promise<Result<Models.DocumentList<Sample>>>} The list of samples
  */
 export async function listSamples(
   queries: string[] = []

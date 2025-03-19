@@ -1,3 +1,4 @@
+import { LucideEllipsisVertical } from "lucide-react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
@@ -17,12 +18,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getUserData, getUserLogs } from "@/lib/auth";
 import { AVATAR_BUCKET_ID, ENDPOINT, PROJECT_ID } from "@/lib/constants";
-import { getUser, getUserLogs } from "@/lib/db";
-import { LucideEllipsisVertical } from "lucide-react";
 
 export default async function ProfilePage() {
-  const { data } = await getUser();
+  const { data } = await getUserData();
   const { data: logs } = await getUserLogs();
 
   if (!data) {
