@@ -13,6 +13,7 @@ import {
   HOSTNAME,
   TEAM_COLLECTION_ID,
   USER_COLLECTION_ID,
+  MAX_TEAM_LIMIT
 } from "@/lib/constants";
 import { createSessionClient } from "@/lib/server/appwrite";
 import { createUserData } from "../db";
@@ -179,6 +180,16 @@ export async function createTeam({
   ];
 
   try {
+    const existingTeams = await database.listDocuments<TeamData>(
+      DATABASE_ID,
+      TEAM_COLLECTION_ID,
+      [Query.select(["$id"])]
+    );
+
+    if(existingTeams.total >= MAX_TEAM_LIMIT) {
+      throw new Error(`You have reached the maximum amount of teams allowed. (${MAX_TEAM_LIMIT}).`);
+    }
+
     const teamResponse = await team.create(id, data.name, [
       ADMIN_ROLE,
       OWNER_ROLE,

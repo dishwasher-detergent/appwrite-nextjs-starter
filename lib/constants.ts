@@ -22,3 +22,6 @@ export const AVATAR_BUCKET_ID = process.env
 
 // Cookie
 export const COOKIE_KEY = `a_session_${PROJECT_ID}`;
+
+// Additional
+export const MAX_TEAM_LIMIT = process.env.NEXT_PUBLIC_MAX_TEAM_LIMIT || 3;
