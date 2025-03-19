@@ -187,7 +187,7 @@ export async function createTeam({
     );
 
     if(existingTeams.total >= MAX_TEAM_LIMIT) {
-      throw new Error(`You have reached the maximum amount of teams allowed. (${MAX_TEAM_LIMIT}).`);
+      throw new Error(`You have reached the maximum amount of teams allowed. (${MAX_TEAM_LIMIT})`);
     }
 
     const teamResponse = await team.create(id, data.name, [
