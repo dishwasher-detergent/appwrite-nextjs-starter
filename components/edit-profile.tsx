@@ -29,14 +29,14 @@ import {
   PROFILE_ABOUT_MAX_LENGTH,
   PROFILE_NAME_MAX_LENGTH,
 } from "@/constants/profile.constants";
-import { User } from "@/interfaces/user.interface";
+import { UserData } from "@/interfaces/user.interface";
 import { updateProfile } from "@/lib/auth";
 import { UpdateProfileFormData, updateProfileSchema } from "@/lib/auth/schemas";
 import { AVATAR_BUCKET_ID } from "@/lib/constants";
 import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 
-export function EditProfile({ user }: { user: User }) {
+export function EditProfile({ user }: { user: UserData }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -66,7 +66,7 @@ export function EditProfile({ user }: { user: User }) {
 
 interface FormProps extends React.ComponentProps<"form"> {
   setOpen: (e: boolean) => void;
-  user: User;
+  user: UserData;
 }
 
 function EditForm({ className, setOpen, user }: FormProps) {
