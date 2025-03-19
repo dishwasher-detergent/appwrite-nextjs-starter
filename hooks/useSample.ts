@@ -7,6 +7,7 @@ import { useSession } from "@/hooks/userSession";
 import { Sample } from "@/interfaces/sample.interface";
 import { getUserById } from "@/lib/auth";
 import { DATABASE_ID, SAMPLE_COLLECTION_ID } from "@/lib/constants";
+import { getTeamById } from "@/lib/team";
 
 interface Props {
   initialSample: Sample;
@@ -36,9 +37,13 @@ export const useSample = ({ initialSample }: Props) => {
             )
           ) {
             const { data } = await getUserById(response.payload.userId);
+            const { data: teamData } = await getTeamById(
+              response.payload.teamId
+            );
 
             setSample({
               user: data,
+              team: teamData,
               ...response.payload,
             });
           }

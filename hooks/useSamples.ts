@@ -6,12 +6,15 @@ import { useSession } from "@/hooks/userSession";
 import { Sample } from "@/interfaces/sample.interface";
 import { getUserById } from "@/lib/auth";
 import { DATABASE_ID, SAMPLE_COLLECTION_ID } from "@/lib/constants";
+import { getTeamById } from "@/lib/team";
 
 interface Props {
   initialSamples?: Sample[];
+  teamId?: string;
+  userId?: string;
 }
 
-export const useSamples = ({ initialSamples }: Props) => {
+export const useSamples = ({ initialSamples, teamId, userId }: Props) => {
   const [samples, setSamples] = useState<Sample[]>(initialSamples ?? []);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -28,17 +31,24 @@ export const useSamples = ({ initialSamples }: Props) => {
       unsubscribe = client.subscribe<Sample>(
         `databases.${DATABASE_ID}.collections.${SAMPLE_COLLECTION_ID}.documents`,
         async (response) => {
+          if (teamId && response.payload.teamId !== teamId) return;
+          if (userId && response.payload.userId !== userId) return;
+
           if (
             response.events.includes(
               "databases.*.collections.*.documents.*.create"
             )
           ) {
             const { data } = await getUserById(response.payload.userId);
+            const { data: teamData } = await getTeamById(
+              response.payload.teamId
+            );
 
             setSamples((prev) => [
               {
                 ...response.payload,
                 user: data,
+                team: teamData,
               },
               ...prev,
             ]);
@@ -50,11 +60,14 @@ export const useSamples = ({ initialSamples }: Props) => {
             )
           ) {
             const { data } = await getUserById(response.payload.userId);
+            const { data: teamData } = await getTeamById(
+              response.payload.teamId
+            );
 
             setSamples((prev) =>
               prev.map((x) =>
                 x.$id === response.payload.$id
-                  ? { user: data, ...response.payload }
+                  ? { user: data, ...response.payload, team: teamData }
                   : x
               )
             );

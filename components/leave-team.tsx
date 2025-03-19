@@ -1,14 +1,17 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LucideLoader2, LucideTrash2 } from "lucide-react";
+import { LucideDoorOpen, LucideLoader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+} from "@/components/ui/dropdown-menu";
 import { DyanmicDrawer } from "@/components/ui/dynamic-drawer";
 import {
   Form,
@@ -20,73 +23,69 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { NAME_MAX_LENGTH } from "@/constants/sample.constants";
-import { Sample } from "@/interfaces/sample.interface";
-import { deleteSample } from "@/lib/db";
-import { DeleteSampleFormData, deleteSampleSchema } from "@/lib/db/schemas";
-import { deleteSampleImage } from "@/lib/storage";
+import { TeamData } from "@/interfaces/team.interface";
+import { leaveTeam } from "@/lib/team";
+import { LeaveTeamFormData, leaveTeamSchema } from "@/lib/team/schemas";
 import { cn } from "@/lib/utils";
 
-export function DeleteSample({ sample }: { sample: Sample }) {
+export function LeaveTeam({ team }: { team: TeamData }) {
   const [open, setOpen] = useState(false);
 
   return (
     <DyanmicDrawer
-      title={`Delete ${sample.name}`}
+      title={`Leave ${team.name}`}
       description="This is permanent and cannot be undone."
       open={open}
       setOpen={setOpen}
       button={
-        <Button size="icon" variant="destructive">
-          <LucideTrash2 className="size-3.5" />
-        </Button>
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.preventDefault();
+            setOpen(!open);
+          }}
+        >
+          Leave
+          <DropdownMenuShortcut>
+            <LucideDoorOpen className="size-3.5" />
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
       }
     >
-      <DeleteForm setOpen={setOpen} sample={sample} />
+      <LeaveForm setOpen={setOpen} team={team} />
     </DyanmicDrawer>
   );
 }
 
 interface FormProps extends React.ComponentProps<"form"> {
   setOpen: (e: boolean) => void;
-  sample: Sample;
+  team: TeamData;
 }
 
-function DeleteForm({ className, setOpen, sample }: FormProps) {
+function LeaveForm({ className, setOpen, team }: FormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const form = useForm<DeleteSampleFormData>({
-    resolver: zodResolver(deleteSampleSchema),
+  const form = useForm<LeaveTeamFormData>({
+    resolver: zodResolver(leaveTeamSchema),
     defaultValues: {
       name: "",
     },
   });
 
-  async function onSubmit(values: DeleteSampleFormData) {
+  async function onSubmit(values: LeaveTeamFormData) {
     setLoading(true);
 
-    if (values.name !== sample.name) {
+    if (values.name !== team.name) {
       form.setError("name", {
-        message: "Name does not match.",
+        message: "Team name does not match.",
       });
 
-      toast.error("Name does not match.");
+      toast.error("Team name does not match.");
       setLoading(false);
       return;
     }
 
-    if (sample.image) {
-      const image = await deleteSampleImage(sample.image);
-
-      if (!image.success) {
-        toast.error(image.message);
-        setLoading(false);
-        return;
-      }
-    }
-
-    const data = await deleteSample(sample.$id);
+    const data = await leaveTeam(team.$id);
 
     if (data.success) {
       toast.success(data.message);
@@ -115,26 +114,15 @@ function DeleteForm({ className, setOpen, sample }: FormProps) {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Sample Name</FormLabel>
+                <FormLabel>Leave</FormLabel>
                 <FormControl>
-                  <div className="relative">
-                    <Input
-                      {...field}
-                      placeholder={sample.name}
-                      className="truncate pr-20"
-                      maxLength={NAME_MAX_LENGTH}
-                    />
-                    <Badge
-                      className="absolute right-1.5 top-1/2 -translate-y-1/2"
-                      variant="secondary"
-                    >
-                      {field?.value?.length}/{NAME_MAX_LENGTH}
-                    </Badge>
-                  </div>
+                  <Input
+                    {...field}
+                    placeholder={team.name}
+                    className="truncate pr-20"
+                  />
                 </FormControl>
-                <FormDescription>
-                  Enter the sample name to confirm deletion.
-                </FormDescription>
+                <FormDescription>Type the team name to leave.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -145,11 +133,11 @@ function DeleteForm({ className, setOpen, sample }: FormProps) {
           variant="destructive"
           disabled={loading || !form.formState.isValid}
         >
-          Delete
+          Leave
           {loading ? (
             <LucideLoader2 className="mr-2 size-3.5 animate-spin" />
           ) : (
-            <LucideTrash2 className="mr-2 size-3.5" />
+            <LucideDoorOpen className="mr-2 size-3.5" />
           )}
         </Button>
       </form>

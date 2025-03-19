@@ -9,6 +9,7 @@ export const addSampleSchema = z.object({
   name: z.string().min(1).max(NAME_MAX_LENGTH),
   description: z.string().max(DESCRIPTION_MAX_LENGTH),
   image: z.union([z.string(), z.instanceof(File), z.null()]).optional(),
+  teamId: z.string().min(1),
 });
 
 export type AddSampleFormData = z.infer<typeof addSampleSchema>;

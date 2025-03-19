@@ -24,14 +24,27 @@ import {
   DESCRIPTION_MAX_LENGTH,
   NAME_MAX_LENGTH,
 } from "@/constants/sample.constants";
+import { TeamData } from "@/interfaces/team.interface";
 import { SAMPLE_BUCKET_ID } from "@/lib/constants";
 import { createSample } from "@/lib/db";
 import { AddSampleFormData, addSampleSchema } from "@/lib/db/schemas";
 import { uploadSampleImage } from "@/lib/storage";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ImageInput } from "./ui/image-input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
-export function AddSample() {
+interface AddSampleProps {
+  teams: TeamData[];
+}
+
+export function AddSample({ teams }: AddSampleProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -47,18 +60,21 @@ export function AddSample() {
         </Button>
       }
     >
-      <CreateForm setOpen={setOpen} />
+      <CreateForm setOpen={setOpen} teams={teams} />
     </DyanmicDrawer>
   );
 }
 
 interface FormProps extends React.ComponentProps<"form"> {
   setOpen: (e: boolean) => void;
+  teams: TeamData[];
 }
 
-function CreateForm({ className, setOpen }: FormProps) {
+function CreateForm({ className, setOpen, teams }: FormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
+
+  console.log(teams);
 
   const form = useForm<AddSampleFormData>({
     resolver: zodResolver(addSampleSchema),
@@ -66,6 +82,7 @@ function CreateForm({ className, setOpen }: FormProps) {
       name: "",
       description: "",
       image: null,
+      teamId: teams.length == 1 ? teams[0].$id : "",
     },
   });
 
@@ -112,6 +129,44 @@ function CreateForm({ className, setOpen }: FormProps) {
         )}
       >
         <div className="h-full space-y-4 overflow-auto p-1">
+          <FormField
+            control={form.control}
+            name="teamId"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Team</FormLabel>
+                <Select
+                  disabled={teams.length == 1}
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a team" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {teams.map((team) => (
+                      <SelectItem key={team.$id} value={team.$id}>
+                        <Avatar className="mr-2 h-6 w-6">
+                          <AvatarImage
+                            src={team.avatar}
+                            alt={team.name}
+                            className="object-cover"
+                          />
+                          <AvatarFallback>
+                            {getInitials(team.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        {team.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="name"

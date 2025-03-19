@@ -9,6 +9,10 @@ import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+} from "@/components/ui/dropdown-menu";
 import { DyanmicDrawer } from "@/components/ui/dynamic-drawer";
 import {
   Form,
@@ -25,27 +29,34 @@ import {
   PROFILE_ABOUT_MAX_LENGTH,
   PROFILE_NAME_MAX_LENGTH,
 } from "@/constants/profile.constants";
-import { User } from "@/interfaces/user.interface";
+import { UserData } from "@/interfaces/user.interface";
 import { updateProfile } from "@/lib/auth";
 import { UpdateProfileFormData, updateProfileSchema } from "@/lib/auth/schemas";
 import { AVATAR_BUCKET_ID } from "@/lib/constants";
 import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 
-export function EditProfile({ user }: { user: User }) {
+export function EditProfile({ user }: { user: UserData }) {
   const [open, setOpen] = useState(false);
 
   return (
     <DyanmicDrawer
       title="Edit Profile"
-      description="Edit your profile."
+      description="Make your profile special."
       open={open}
       setOpen={setOpen}
       button={
-        <Button size="sm" variant="secondary">
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.preventDefault();
+            setOpen(!open);
+          }}
+        >
           Edit
-          <LucidePencil className="size-3.5" />
-        </Button>
+          <DropdownMenuShortcut>
+            <LucidePencil className="size-3.5" />
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
       }
     >
       <EditForm setOpen={setOpen} user={user} />
@@ -55,7 +66,7 @@ export function EditProfile({ user }: { user: User }) {
 
 interface FormProps extends React.ComponentProps<"form"> {
   setOpen: (e: boolean) => void;
-  user: User;
+  user: UserData;
 }
 
 function EditForm({ className, setOpen, user }: FormProps) {

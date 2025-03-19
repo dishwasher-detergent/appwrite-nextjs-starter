@@ -130,6 +130,7 @@ export async function uploadAvatarImage({
 
   permissions = [
     ...permissions,
+    Permission.read(Role.users()),
     Permission.read(Role.user(user.$id)),
     Permission.write(Role.user(user.$id)),
   ];
@@ -185,6 +186,8 @@ export async function deleteAvatarImage(
     };
   } catch (err) {
     const error = err as Error;
+
+    console.log(error);
 
     return {
       success: false,

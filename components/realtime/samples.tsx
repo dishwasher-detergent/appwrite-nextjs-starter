@@ -6,8 +6,14 @@ import { SampleCard } from "@/components/sample-card";
 import { useSamples } from "@/hooks/useSamples";
 import { Sample } from "@/interfaces/sample.interface";
 
-export function Samples({ initialSamples }: { initialSamples?: Sample[] }) {
-  const { loading, samples } = useSamples({ initialSamples });
+interface SamplesProps {
+  initialSamples?: Sample[];
+  teamId?: string;
+  userId?: string;
+}
+
+export function Samples({ initialSamples, teamId, userId }: SamplesProps) {
+  const { loading, samples } = useSamples({ initialSamples, teamId, userId });
 
   if (loading)
     return (

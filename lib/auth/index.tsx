@@ -123,7 +123,7 @@ export async function getUserById(id: string): Promise<Result<UserData>> {
   const { database } = await createSessionClient();
 
   return unstable_cache(
-    async () => {
+    async (id) => {
       try {
         const data = await database.getDocument<UserData>(
           DATABASE_ID,
@@ -150,7 +150,7 @@ export async function getUserById(id: string): Promise<Result<UserData>> {
       tags: ["user", `user-${id}`],
       revalidate: 600,
     }
-  )();
+  )(id);
 }
 
 /**
@@ -239,14 +239,18 @@ export async function getUserLogs(): Promise<Result<Models.LogList>> {
  * @returns {Promise<boolean>} A promise that resolves to true if the user is logged in, false otherwise.
  */
 export async function logOut(): Promise<boolean> {
+  await deleteSession();
+
+  return redirect("/signin");
+}
+
+export async function deleteSession(): Promise<void> {
   const { account } = await createSessionClient();
 
   account.deleteSession("current");
   (await cookies()).delete(COOKIE_KEY);
 
   revalidateTag("logged_in_user");
-
-  return redirect("/signin");
 }
 
 /**
