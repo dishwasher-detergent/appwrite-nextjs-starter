@@ -5,11 +5,13 @@ import { ID, Models, Permission, Query, Role } from "node-appwrite";
 
 import { AuthResponse, Result } from "@/interfaces/result.interface";
 import { Sample } from "@/interfaces/sample.interface";
+import { TeamData } from "@/interfaces/team.interface";
 import { User, UserData } from "@/interfaces/user.interface";
 import { getCachedLoggedInUser } from "@/lib/auth";
 import {
   DATABASE_ID,
   SAMPLE_COLLECTION_ID,
+  TEAM_COLLECTION_ID,
   USER_COLLECTION_ID,
 } from "@/lib/constants";
 import { createSessionClient } from "@/lib/server/appwrite";
@@ -229,11 +231,23 @@ export async function getSamples(
         const userIds = samples.documents.map((sample) => sample.userId);
         const uniqueUserIds = Array.from(new Set(userIds));
 
+        const teamIds = samples.documents.map((sample) => sample.teamId);
+        const uniqueTeamIds = Array.from(new Set(teamIds));
+
         const users = await database.listDocuments<UserData>(
           DATABASE_ID,
           USER_COLLECTION_ID,
           [
             Query.equal("$id", uniqueUserIds),
+            Query.select(["$id", "name", "avatar"]),
+          ]
+        );
+
+        const teams = await database.listDocuments<UserData>(
+          DATABASE_ID,
+          TEAM_COLLECTION_ID,
+          [
+            Query.equal("$id", uniqueTeamIds),
             Query.select(["$id", "name", "avatar"]),
           ]
         );
@@ -248,9 +262,20 @@ export async function getSamples(
           {}
         );
 
+        const teamMap = teams.documents.reduce<Record<string, TeamData>>(
+          (acc, team) => {
+            if (team) {
+              acc[team.$id] = team;
+            }
+            return acc;
+          },
+          {}
+        );
+
         const newSamples = samples.documents.map((sample) => ({
           ...sample,
           user: userMap[sample.userId],
+          team: teamMap[sample.teamId],
         }));
 
         samples.documents = newSamples;
@@ -315,12 +340,20 @@ export async function getSampleById(
           [Query.select(["$id", "name", "avatar"])]
         );
 
+        const teamRes = await database.getDocument<TeamData>(
+          DATABASE_ID,
+          TEAM_COLLECTION_ID,
+          sample.teamId,
+          [Query.select(["$id", "name", "avatar"])]
+        );
+
         return {
           success: true,
           message: "Sample successfully retrieved.",
           data: {
             ...sample,
             user: userRes,
+            team: teamRes,
           },
         };
       } catch (err) {
@@ -393,7 +426,12 @@ export async function createSample({
       [Query.select(["$id", "name", "avatar"])]
     );
 
-    console.log(userRes);
+    const teamRes = await database.getDocument<TeamData>(
+      DATABASE_ID,
+      TEAM_COLLECTION_ID,
+      sample.teamId,
+      [Query.select(["$id", "name", "avatar"])]
+    );
 
     revalidateTag("samples");
 
@@ -403,6 +441,7 @@ export async function createSample({
       data: {
         ...sample,
         user: userRes,
+        team: teamRes,
       },
     };
   } catch (err) {
@@ -462,6 +501,13 @@ export async function updateSample({
       [Query.select(["$id", "name", "avatar"])]
     );
 
+    const teamRes = await database.getDocument<TeamData>(
+      DATABASE_ID,
+      TEAM_COLLECTION_ID,
+      sample.teamId,
+      [Query.select(["$id", "name", "avatar"])]
+    );
+
     revalidateTag("samples");
     revalidateTag(`sample-${id}`);
 
@@ -471,6 +517,7 @@ export async function updateSample({
       data: {
         ...sample,
         user: userRes,
+        team: teamRes,
       },
     };
   } catch (err) {

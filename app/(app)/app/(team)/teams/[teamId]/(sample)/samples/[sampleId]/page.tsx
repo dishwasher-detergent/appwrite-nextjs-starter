@@ -6,9 +6,9 @@ import { getSampleById } from "@/lib/db";
 export default async function SamplePage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ sampleId: string }>;
 }) {
-  const { id: sampleId } = await params;
+  const { sampleId } = await params;
   const { data, success } = await getSampleById(sampleId);
 
   if (!success || !data) {
