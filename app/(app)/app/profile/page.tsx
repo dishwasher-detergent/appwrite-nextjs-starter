@@ -2,6 +2,13 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import { EditProfile } from "@/components/edit-profile";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -12,6 +19,7 @@ import {
 } from "@/components/ui/table";
 import { AVATAR_BUCKET_ID, ENDPOINT, PROJECT_ID } from "@/lib/constants";
 import { getUser, getUserLogs } from "@/lib/db";
+import { LucideEllipsisVertical } from "lucide-react";
 
 export default async function ProfilePage() {
   const { data } = await getUser();
@@ -26,29 +34,41 @@ export default async function ProfilePage() {
       <header className="relative">
         <div
           role="img"
-          aria-label="Profile banner"
-          className="w-full bg-linear-to-r from-primary to-secondary rounded-xl h-32"
+          aria-label="Team banner"
+          className="w-full bg-linear-to-r from-primary to-secondary rounded-xl h-48"
         />
-        <div className="flex items-start justify-between px-4 -mt-16">
-          <figure className="relative flex-shrink-0">
-            {data?.avatar ? (
-              <Image
-                src={`${ENDPOINT}/storage/buckets/${AVATAR_BUCKET_ID}/files/${data.avatar}/view?project=${PROJECT_ID}`}
-                alt={`${data.name}'s profile picture`}
-                className="rounded-full border-4 border-background object-cover bg-primary aspect-square"
-                width={128}
-                height={128}
-                priority
-              />
-            ) : (
-              <div
-                aria-label="Default profile picture"
-                className="rounded-full border-4 border-background bg-muted aspect-square w-32 h-32"
-              />
-            )}
+        <div className="flex items-start justify-between px-4 -mt-30">
+          <figure className="relative flex-shrink-0 size-60">
+            <AspectRatio ratio={1}>
+              {data?.avatar ? (
+                <Image
+                  src={`${ENDPOINT}/storage/buckets/${AVATAR_BUCKET_ID}/files/${data.avatar}/view?project=${PROJECT_ID}`}
+                  alt={`${data.name}'s picture`}
+                  className="rounded-full border-4 border-background object-cover bg-primary size-full"
+                  fill
+                  priority
+                />
+              ) : (
+                <div
+                  aria-label="Default picture"
+                  className="rounded-full border-4 border-background object-cover bg-primary size-full text-primary-foreground grid place-items-center font-bold"
+                >
+                  No Image
+                </div>
+              )}
+            </AspectRatio>
           </figure>
-          <div className="pt-18">
-            <EditProfile user={data} />
+          <div className="pt-32 flex flex-row gap-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="outline" className="size-8">
+                  <LucideEllipsisVertical className="size-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <EditProfile user={data} />
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>

@@ -9,6 +9,10 @@ import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+} from "@/components/ui/dropdown-menu";
 import { DyanmicDrawer } from "@/components/ui/dynamic-drawer";
 import {
   Form,
@@ -42,10 +46,17 @@ export function EditProfile({ user }: { user: User }) {
       open={open}
       setOpen={setOpen}
       button={
-        <Button size="sm" variant="secondary">
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.preventDefault();
+            setOpen(!open);
+          }}
+        >
           Edit
-          <LucidePencil className="size-3.5" />
-        </Button>
+          <DropdownMenuShortcut>
+            <LucidePencil className="size-3.5" />
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
       }
     >
       <EditForm setOpen={setOpen} user={user} />

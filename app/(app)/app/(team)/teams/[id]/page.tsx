@@ -67,8 +67,10 @@ export default async function TeamPage({
               ) : (
                 <div
                   aria-label="Default picture"
-                  className="rounded-full border-4 border-background object-cover bg-primary size-full"
-                />
+                  className="rounded-full border-4 border-background object-cover bg-primary size-full text-primary-foreground grid place-items-center font-bold"
+                >
+                  No Image
+                </div>
               )}
             </AspectRatio>
           </figure>
