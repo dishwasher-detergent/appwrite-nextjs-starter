@@ -123,7 +123,7 @@ export async function getUserById(id: string): Promise<Result<UserData>> {
   const { database } = await createSessionClient();
 
   return unstable_cache(
-    async () => {
+    async (id) => {
       try {
         const data = await database.getDocument<UserData>(
           DATABASE_ID,
@@ -150,7 +150,7 @@ export async function getUserById(id: string): Promise<Result<UserData>> {
       tags: ["user", `user-${id}`],
       revalidate: 600,
     }
-  )();
+  )(id);
 }
 
 /**

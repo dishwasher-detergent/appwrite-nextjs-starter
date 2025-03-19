@@ -36,7 +36,7 @@ export async function getTeamById(id: string): Promise<Result<TeamData>> {
   const { database, team } = await createSessionClient();
 
   return unstable_cache(
-    async () => {
+    async (id) => {
       try {
         const data = await database.getDocument<TeamData>(
           DATABASE_ID,
@@ -92,7 +92,7 @@ export async function getTeamById(id: string): Promise<Result<TeamData>> {
       tags: ["team", `team-${id}`],
       revalidate: 600,
     }
-  )();
+  )(id);
 }
 
 /**
