@@ -38,6 +38,7 @@ export async function listSamples(
   const { database } = await createSessionClient();
 
   return unstable_cache(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async (queries, userId) => {
       try {
         const samples = await database.listDocuments<Sample>(

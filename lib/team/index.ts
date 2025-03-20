@@ -118,6 +118,7 @@ export async function listTeams(): Promise<Result<TeamData[]>> {
   const { database } = await createSessionClient();
 
   return unstable_cache(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async (userId) => {
       try {
         const data = await database.listDocuments<TeamData>(
