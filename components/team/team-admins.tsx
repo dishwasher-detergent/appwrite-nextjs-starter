@@ -1,8 +1,9 @@
 import { AvatarGroup } from "@/components/ui/avatar-group";
 import { ADMIN_ROLE } from "@/constants/team.constants";
+import { UserMemberData } from "@/interfaces/user.interface";
 
 interface TeamAdminsProps {
-  members: any[];
+  members: UserMemberData[];
 }
 
 export function TeamAdmins({ members }: TeamAdminsProps) {
