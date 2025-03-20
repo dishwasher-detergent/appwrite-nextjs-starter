@@ -1,9 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
 
 import { TeamActions } from "@/components/team/team-actions";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Button } from "@/components/ui/button";
 import { TeamData } from "@/interfaces/team.interface";
 import { AVATAR_BUCKET_ID, ENDPOINT, PROJECT_ID } from "@/lib/constants";
 
@@ -42,9 +40,6 @@ export function TeamHeader({ team, isAdmin }: TeamHeaderProps) {
           </AspectRatio>
         </figure>
         <div className="pt-32 flex flex-row gap-1">
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/app/teams/${team.$id}/samples`}>Samples</Link>
-          </Button>
           <TeamActions team={team} isAdmin={isAdmin} />
         </div>
       </div>
