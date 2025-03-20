@@ -1,8 +1,8 @@
-import { UserInformation } from "@/components/user-information";
-import { getUserData } from "@/lib/auth";
-
 import Link from "next/link";
-import { ModeToggle } from "../theme-toggle";
+
+import { ModeToggle } from "@/components/theme-toggle";
+import { UserInformation } from "@/components/user/user-information";
+import { getUserData } from "@/lib/auth";
 
 export async function Nav() {
   const { data } = await getUserData();

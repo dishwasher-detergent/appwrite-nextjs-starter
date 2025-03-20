@@ -30,15 +30,15 @@ import { createSample } from "@/lib/db";
 import { AddSampleFormData, addSampleSchema } from "@/lib/db/schemas";
 import { uploadSampleImage } from "@/lib/storage";
 import { cn, getInitials } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { ImageInput } from "./ui/image-input";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { ImageInput } from "../ui/image-input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "../ui/select";
 
 interface AddSampleProps {
   teams: TeamData[];

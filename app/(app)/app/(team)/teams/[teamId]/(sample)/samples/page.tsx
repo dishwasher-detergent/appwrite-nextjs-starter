@@ -1,7 +1,7 @@
 import { Query } from "node-appwrite";
 
-import { AddSample } from "@/components/create-sample";
 import { Samples } from "@/components/realtime/samples";
+import { AddSample } from "@/components/sample/create-sample";
 import { listSamples } from "@/lib/db";
 import { getTeamById } from "@/lib/team";
 

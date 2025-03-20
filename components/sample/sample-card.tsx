@@ -57,49 +57,51 @@ export function SampleCard(sample: Sample) {
             {sample?.description ?? "No description provided."}
           </CardDescription>
           <div className="flex flex-row gap-2 items-center mt-2">
-            <div className="flex items-center gap-2">
-              <Avatar className="h-6 w-6">
-                <AvatarImage
-                  src={
-                    sample?.team?.avatar
-                      ? `${ENDPOINT}/storage/buckets/${AVATAR_BUCKET_ID}/files/${sample.team.avatar}/view?project=${PROJECT_ID}`
-                      : undefined
-                  }
-                  alt={sample?.team?.name || "User"}
-                />
-                <AvatarFallback>
-                  {getInitials(sample?.team?.name)}
-                </AvatarFallback>
-              </Avatar>
-              <Link
-                className="text-sm text-primary-foreground"
-                href={`/app/teams/${sample.teamId}`}
-              >
+            <Button
+              variant="link"
+              asChild
+              className="text-sm text-primary-foreground p-0"
+            >
+              <Link href={`/app/teams/${sample.teamId}`}>
+                <Avatar className="h-6 w-6">
+                  <AvatarImage
+                    src={
+                      sample?.team?.avatar
+                        ? `${ENDPOINT}/storage/buckets/${AVATAR_BUCKET_ID}/files/${sample.team.avatar}/view?project=${PROJECT_ID}`
+                        : undefined
+                    }
+                    alt={sample?.team?.name || "User"}
+                  />
+                  <AvatarFallback>
+                    {getInitials(sample?.team?.name)}
+                  </AvatarFallback>
+                </Avatar>
                 {sample?.team?.name || "Unknown"}
               </Link>
-            </div>
+            </Button>
             <LucideSlash className="text-primary-foreground size-3" />
-            <div className="flex items-center gap-2">
-              <Avatar className="h-6 w-6">
-                <AvatarImage
-                  src={
-                    sample?.user?.avatar
-                      ? `${ENDPOINT}/storage/buckets/${AVATAR_BUCKET_ID}/files/${sample.user.avatar}/view?project=${PROJECT_ID}`
-                      : undefined
-                  }
-                  alt={sample?.user?.name || "User"}
-                />
-                <AvatarFallback>
-                  {getInitials(sample?.user?.name)}
-                </AvatarFallback>
-              </Avatar>
-              <Link
-                className="text-sm text-primary-foreground"
-                href={`/app/users/${sample.userId}`}
-              >
+            <Button
+              variant="link"
+              asChild
+              className="text-sm text-primary-foreground p-0"
+            >
+              <Link href={`/app/users/${sample.userId}`}>
+                <Avatar className="h-6 w-6">
+                  <AvatarImage
+                    src={
+                      sample?.user?.avatar
+                        ? `${ENDPOINT}/storage/buckets/${AVATAR_BUCKET_ID}/files/${sample.user.avatar}/view?project=${PROJECT_ID}`
+                        : undefined
+                    }
+                    alt={sample?.user?.name || "User"}
+                  />
+                  <AvatarFallback>
+                    {getInitials(sample?.user?.name)}
+                  </AvatarFallback>
+                </Avatar>
                 {sample?.user?.name || "Unknown"}
               </Link>
-            </div>
+            </Button>
           </div>
         </CardHeader>
       </CardContent>

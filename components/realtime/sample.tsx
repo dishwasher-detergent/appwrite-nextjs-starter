@@ -3,8 +3,8 @@
 import { LucideLoader2 } from "lucide-react";
 import Image from "next/image";
 
-import { DeleteSample } from "@/components/delete-sample";
-import { EditSample } from "@/components/edit-sample";
+import { DeleteSample } from "@/components/sample/delete-sample";
+import { EditSample } from "@/components/sample/edit-sample";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSample } from "@/hooks/useSample";
 import { Sample as SampleType } from "@/interfaces/sample.interface";
