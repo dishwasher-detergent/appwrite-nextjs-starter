@@ -7,7 +7,7 @@ import { ADMIN_ROLE, OWNER_ROLE } from "@/constants/team.constants";
 import { Result } from "@/interfaces/result.interface";
 import { TeamData } from "@/interfaces/team.interface";
 import { UserData, UserMemberData } from "@/interfaces/user.interface";
-import { getLoggedInUser } from "@/lib/auth";
+import { createUserData, getLoggedInUser } from "@/lib/auth";
 import {
   DATABASE_ID,
   HOSTNAME,
@@ -15,7 +15,6 @@ import {
   TEAM_COLLECTION_ID,
   USER_COLLECTION_ID,
 } from "@/lib/constants";
-import { createUserData } from "@/lib/db";
 import { createSessionClient } from "@/lib/server/appwrite";
 import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
 import { AddTeamFormData, EditTeamFormData } from "./schemas";
@@ -118,28 +117,37 @@ export async function listTeams(): Promise<Result<TeamData[]>> {
 
   const { database } = await createSessionClient();
 
-  try {
-    const data = await database.listDocuments<TeamData>(
-      DATABASE_ID,
-      TEAM_COLLECTION_ID
-    );
+  return unstable_cache(
+    async (userId) => {
+      try {
+        const data = await database.listDocuments<TeamData>(
+          DATABASE_ID,
+          TEAM_COLLECTION_ID
+        );
 
-    return {
-      success: true,
-      message: "Teams successfully retrieved.",
-      data: data.documents,
-    };
-  } catch (err) {
-    const error = err as Error;
+        return {
+          success: true,
+          message: "Teams successfully retrieved.",
+          data: data.documents,
+        };
+      } catch (err) {
+        const error = err as Error;
 
-    // This is where you would look to something like Splunk.
-    console.error(error);
+        // This is where you would look to something like Splunk.
+        console.error(error);
 
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
+    ["teams"],
+    {
+      tags: ["teams", `teams:user-${user.$id}`],
+      revalidate: 600,
+    }
+  )(user.$id);
 }
 
 /**

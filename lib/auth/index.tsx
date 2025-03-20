@@ -3,12 +3,11 @@
 import { revalidateTag, unstable_cache } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { ID, Models, OAuthProvider } from "node-appwrite";
+import { ID, Models, OAuthProvider, Permission, Role } from "node-appwrite";
 
 import { AuthResponse, Response, Result } from "@/interfaces/result.interface";
 import { User, UserData } from "@/interfaces/user.interface";
 import { COOKIE_KEY, DATABASE_ID, USER_COLLECTION_ID } from "@/lib/constants";
-import { createUserData } from "@/lib/db";
 import { createAdminClient, createSessionClient } from "@/lib/server/appwrite";
 import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
 import {
@@ -456,6 +455,61 @@ export async function resetPassword(
     return {
       success: false,
       message: error.message,
+    };
+  }
+}
+
+/**
+ * Creates user data in the database if it doesn't already exist.
+ * @param userId the user ID
+ * @param name the user's name
+ * @returns {Promise<Result<UserData>>} A promise that resolves to a result object indicating success or failure.
+ */
+export async function createUserData(
+  userId: string,
+  name: string
+): Promise<Result<UserData>> {
+  const user = await getLoggedInUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in to perform this action.",
+    };
+  }
+
+  const { database } = await createSessionClient();
+
+  try {
+    await database.getDocument<UserData>(
+      DATABASE_ID,
+      USER_COLLECTION_ID,
+      userId
+    );
+
+    return {
+      success: true,
+      message: "User data already exists.",
+    };
+  } catch {
+    await database.createDocument<UserData>(
+      DATABASE_ID,
+      USER_COLLECTION_ID,
+      userId,
+      {
+        name: name,
+        avatar: null,
+      },
+      [
+        Permission.read(Role.user(userId)),
+        Permission.write(Role.user(userId)),
+        Permission.read(Role.users()),
+      ]
+    );
+
+    return {
+      success: true,
+      message: "User data successfully created.",
     };
   }
 }

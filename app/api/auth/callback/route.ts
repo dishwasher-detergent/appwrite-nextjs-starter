@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
+import { createUserData } from "@/lib/auth";
 import { COOKIE_KEY } from "@/lib/constants";
-import { createUserData } from "@/lib/db";
 import { createAdminClient } from "@/lib/server/appwrite";
 
 export async function GET(request: NextRequest) {
