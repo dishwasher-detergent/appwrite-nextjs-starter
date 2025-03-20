@@ -29,9 +29,15 @@ interface TeamMembersProps {
   members: UserMemberData[];
   teamId: string;
   isOwner: boolean;
+  isAdmin: boolean;
 }
 
-export function TeamMembers({ members, teamId, isOwner }: TeamMembersProps) {
+export function TeamMembers({
+  members,
+  teamId,
+  isOwner,
+  isAdmin,
+}: TeamMembersProps) {
   return (
     <section>
       <h3 className="font-semibold text-lg mb-2">Members</h3>
@@ -71,7 +77,7 @@ export function TeamMembers({ members, teamId, isOwner }: TeamMembersProps) {
                     : "N/A"}
                 </TableCell>
                 <TableCell>
-                  {!member.roles.includes(OWNER_ROLE) && (
+                  {!member.roles.includes(OWNER_ROLE) && isAdmin && (
                     <MemberActions
                       member={member}
                       teamId={teamId}

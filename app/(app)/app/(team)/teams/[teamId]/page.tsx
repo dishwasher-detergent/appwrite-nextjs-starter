@@ -40,6 +40,7 @@ export default async function TeamPage({
           members={data.members ?? []}
           teamId={data.$id}
           isOwner={isOwner}
+          isAdmin={isAdmin}
         />
         <TeamContent products={productData?.documents ?? []} teamId={teamId} />
       </main>
