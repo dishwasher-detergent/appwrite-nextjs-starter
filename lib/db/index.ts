@@ -37,78 +37,87 @@ export async function listSamples(
 
   const { database } = await createSessionClient();
 
-  try {
-    const samples = await database.listDocuments<Sample>(
-      DATABASE_ID,
-      SAMPLE_COLLECTION_ID,
-      queries
-    );
+  return unstable_cache(
+    async (queries) => {
+      try {
+        const samples = await database.listDocuments<Sample>(
+          DATABASE_ID,
+          SAMPLE_COLLECTION_ID,
+          queries
+        );
 
-    const userIds = samples.documents.map((sample) => sample.userId);
-    const uniqueUserIds = Array.from(new Set(userIds));
+        const userIds = samples.documents.map((sample) => sample.userId);
+        const uniqueUserIds = Array.from(new Set(userIds));
 
-    const teamIds = samples.documents.map((sample) => sample.teamId);
-    const uniqueTeamIds = Array.from(new Set(teamIds));
+        const teamIds = samples.documents.map((sample) => sample.teamId);
+        const uniqueTeamIds = Array.from(new Set(teamIds));
 
-    const users = await database.listDocuments<UserData>(
-      DATABASE_ID,
-      USER_COLLECTION_ID,
-      [
-        Query.equal("$id", uniqueUserIds),
-        Query.select(["$id", "name", "avatar"]),
-      ]
-    );
+        const users = await database.listDocuments<UserData>(
+          DATABASE_ID,
+          USER_COLLECTION_ID,
+          [
+            Query.equal("$id", uniqueUserIds),
+            Query.select(["$id", "name", "avatar"]),
+          ]
+        );
 
-    const teams = await database.listDocuments<UserData>(
-      DATABASE_ID,
-      TEAM_COLLECTION_ID,
-      [
-        Query.equal("$id", uniqueTeamIds),
-        Query.select(["$id", "name", "avatar"]),
-      ]
-    );
+        const teams = await database.listDocuments<UserData>(
+          DATABASE_ID,
+          TEAM_COLLECTION_ID,
+          [
+            Query.equal("$id", uniqueTeamIds),
+            Query.select(["$id", "name", "avatar"]),
+          ]
+        );
 
-    const userMap = users.documents.reduce<Record<string, UserData>>(
-      (acc, user) => {
-        if (user) {
-          acc[user.$id] = user;
-        }
-        return acc;
-      },
-      {}
-    );
+        const userMap = users.documents.reduce<Record<string, UserData>>(
+          (acc, user) => {
+            if (user) {
+              acc[user.$id] = user;
+            }
+            return acc;
+          },
+          {}
+        );
 
-    const teamMap = teams.documents.reduce<Record<string, TeamData>>(
-      (acc, team) => {
-        if (team) {
-          acc[team.$id] = team;
-        }
-        return acc;
-      },
-      {}
-    );
+        const teamMap = teams.documents.reduce<Record<string, TeamData>>(
+          (acc, team) => {
+            if (team) {
+              acc[team.$id] = team;
+            }
+            return acc;
+          },
+          {}
+        );
 
-    const newSamples = samples.documents.map((sample) => ({
-      ...sample,
-      user: userMap[sample.userId],
-      team: teamMap[sample.teamId],
-    }));
+        const newSamples = samples.documents.map((sample) => ({
+          ...sample,
+          user: userMap[sample.userId],
+          team: teamMap[sample.teamId],
+        }));
 
-    samples.documents = newSamples;
+        samples.documents = newSamples;
 
-    return {
-      success: true,
-      message: "Samples successfully retrieved.",
-      data: samples,
-    };
-  } catch (err) {
-    const error = err as Error;
+        return {
+          success: true,
+          message: "Samples successfully retrieved.",
+          data: samples,
+        };
+      } catch (err) {
+        const error = err as Error;
 
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
+    ["samples"],
+    {
+      tags: ["samples", `samples:${queries.join("-")}`],
+      revalidate: 600,
+    }
+  )(queries);
 }
 
 /**

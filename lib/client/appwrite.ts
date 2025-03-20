@@ -39,7 +39,7 @@ export async function createClient() {
   };
 }
 
-export const getLoggedInUser = unstable_cache(
+export const getCachedLoggedInUser = unstable_cache(
   async () => {
     try {
       const client = await createClient();

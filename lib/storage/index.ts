@@ -1,7 +1,7 @@
 "use server";
 
 import { Result } from "@/interfaces/result.interface";
-import { getLoggedInUser } from "@/lib/auth";
+import { getCachedLoggedInUser } from "@/lib/auth";
 import { AVATAR_BUCKET_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
 import { createSessionClient } from "@/lib/server/appwrite";
 
@@ -24,7 +24,7 @@ export async function uploadSampleImage({
   data: File;
   permissions?: string[];
 }): Promise<Result<Models.File>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -72,7 +72,7 @@ export async function uploadSampleImage({
 export async function deleteSampleImage(
   id: string
 ): Promise<Result<undefined>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -117,7 +117,7 @@ export async function uploadAvatarImage({
   data: File;
   permissions?: string[];
 }): Promise<Result<Models.File>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -166,7 +166,7 @@ export async function uploadAvatarImage({
 export async function deleteAvatarImage(
   id: string
 ): Promise<Result<undefined>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {

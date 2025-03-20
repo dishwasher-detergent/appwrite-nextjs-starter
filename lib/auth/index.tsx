@@ -34,11 +34,34 @@ export async function getLoggedInUser(): Promise<Models.User<Models.Preferences>
 }
 
 /**
+ * Retrieves the cached currently logged-in user.
+ *
+ * @returns {Promise<Models.User<Models.Preferences> | null>} A promise that resolves to the account information
+ * of the logged-in user, or null if no user is logged in.
+ */
+export async function getCachedLoggedInUser(): Promise<Models.User<Models.Preferences> | null> {
+  const { account } = await createSessionClient();
+
+  return unstable_cache(
+    async (): Promise<Models.User<Models.Preferences> | null> => {
+      try {
+        return await account.get();
+      } catch (err) {
+        console.log(err);
+        return null;
+      }
+    },
+    ["logged_in_user"],
+    { tags: ["logged_in_user"], revalidate: 600 }
+  )();
+}
+
+/**
  * Get the current user
  * @returns {Promise<Result<User>} The current user
  */
 export async function getUserData(): Promise<Result<User>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -92,7 +115,7 @@ export async function getUserData(): Promise<Result<User>> {
  * @returns {Promise<Result<UserData>} The current user
  */
 export async function getUserById(id: string): Promise<Result<UserData>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -150,7 +173,7 @@ export async function updateProfile({
   id: string;
   data: UpdateProfileFormData;
 }): Promise<Response> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
@@ -223,7 +246,7 @@ export async function updateProfile({
  * @returns {Promise<Result<Models.LogList>>} The list of logs
  */
 export async function getUserLogs(): Promise<Result<Models.LogList>> {
-  const user = await getLoggedInUser();
+  const user = await getCachedLoggedInUser();
 
   if (!user) {
     return {
