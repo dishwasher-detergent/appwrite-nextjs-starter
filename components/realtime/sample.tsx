@@ -3,12 +3,12 @@
 import { LucideLoader2 } from "lucide-react";
 import Image from "next/image";
 
+import { ProfileLink } from "@/components/profile-link";
 import { DeleteSample } from "@/components/sample/delete-sample";
 import { EditSample } from "@/components/sample/edit-sample";
 import { useSample } from "@/hooks/useSample";
 import { Sample as SampleType } from "@/interfaces/sample.interface";
 import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
-import { ProfileLink } from "../profile-link";
 
 interface SampleProps {
   initialSample: SampleType;

@@ -4,6 +4,7 @@ import { LucideSlash } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { ProfileLink } from "@/components/profile-link";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,7 +15,6 @@ import {
 } from "@/components/ui/card";
 import { Sample } from "@/interfaces/sample.interface";
 import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
-import { ProfileLink } from "../profile-link";
 
 export function SampleCard(sample: Sample) {
   return (
