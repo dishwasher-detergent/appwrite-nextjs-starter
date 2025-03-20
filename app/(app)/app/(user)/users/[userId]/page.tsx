@@ -5,7 +5,7 @@ import { UserContent } from "@/components/user/user-content";
 import { UserHeader } from "@/components/user/user-header";
 import { UserDescription } from "@/components/user/user-info";
 import { getLoggedInUser, getUserById } from "@/lib/auth";
-import { listSamples } from "@/lib/db";
+import { listProducts } from "@/lib/db";
 
 export default async function ProfilePage({
   params,
@@ -15,7 +15,7 @@ export default async function ProfilePage({
   const user = await getLoggedInUser();
   const { userId } = await params;
   const { data } = await getUserById(userId);
-  const { data: sampleData } = await listSamples([
+  const { data: productData } = await listProducts([
     Query.orderDesc("$createdAt"),
     Query.equal("userId", userId),
   ]);
@@ -31,7 +31,7 @@ export default async function ProfilePage({
       <UserHeader user={data} canEdit={isOwnProfile} />
       <main className="px-4 space-y-6">
         <UserDescription user={data} />
-        <UserContent samples={sampleData?.documents ?? []} userId={userId} />
+        <UserContent products={productData?.documents ?? []} userId={userId} />
       </main>
     </article>
   );

@@ -3,8 +3,8 @@
 import { revalidateTag, unstable_cache } from "next/cache";
 import { ID, Models, Permission, Query, Role } from "node-appwrite";
 
+import { Product } from "@/interfaces/product.interface";
 import { Result } from "@/interfaces/result.interface";
-import { Sample } from "@/interfaces/sample.interface";
 import { TeamData } from "@/interfaces/team.interface";
 import { UserData } from "@/interfaces/user.interface";
 import { getLoggedInUser } from "@/lib/auth";
@@ -15,17 +15,17 @@ import {
   USER_COLLECTION_ID,
 } from "@/lib/constants";
 import { createSessionClient } from "@/lib/server/appwrite";
-import { deleteSampleImage, uploadSampleImage } from "@/lib/storage";
-import { AddSampleFormData, EditSampleFormData } from "./schemas";
+import { deleteProductImage, uploadProductImage } from "@/lib/storage";
+import { AddProductFormData, EditProductFormData } from "./schemas";
 
 /**
- * Get a list of samples
- * @param {string[]} queries The queries to filter the samples
- * @returns {Promise<Result<Models.DocumentList<Sample>>>} The list of samples
+ * Get a list of products
+ * @param {string[]} queries The queries to filter the products
+ * @returns {Promise<Result<Models.DocumentList<Product>>>} The list of products
  */
-export async function listSamples(
+export async function listProducts(
   queries: string[] = []
-): Promise<Result<Models.DocumentList<Sample>>> {
+): Promise<Result<Models.DocumentList<Product>>> {
   const user = await getLoggedInUser();
 
   if (!user) {
@@ -41,16 +41,16 @@ export async function listSamples(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async (queries, userId) => {
       try {
-        const samples = await database.listDocuments<Sample>(
+        const products = await database.listDocuments<Product>(
           DATABASE_ID,
           SAMPLE_COLLECTION_ID,
           queries
         );
 
-        const userIds = samples.documents.map((sample) => sample.userId);
+        const userIds = products.documents.map((product) => product.userId);
         const uniqueUserIds = Array.from(new Set(userIds));
 
-        const teamIds = samples.documents.map((sample) => sample.teamId);
+        const teamIds = products.documents.map((product) => product.teamId);
         const uniqueTeamIds = Array.from(new Set(teamIds));
 
         const users = await database.listDocuments<UserData>(
@@ -91,18 +91,18 @@ export async function listSamples(
           {}
         );
 
-        const newSamples = samples.documents.map((sample) => ({
-          ...sample,
-          user: userMap[sample.userId],
-          team: teamMap[sample.teamId],
+        const newProducts = products.documents.map((product) => ({
+          ...product,
+          user: userMap[product.userId],
+          team: teamMap[product.teamId],
         }));
 
-        samples.documents = newSamples;
+        products.documents = newProducts;
 
         return {
           success: true,
-          message: "Samples successfully retrieved.",
-          data: samples,
+          message: "Products successfully retrieved.",
+          data: products,
         };
       } catch (err) {
         const error = err as Error;
@@ -113,12 +113,12 @@ export async function listSamples(
         };
       }
     },
-    ["samples"],
+    ["products"],
     {
       tags: [
-        "samples",
-        `samples:${queries.join("-")}`,
-        `samples:user-${user.$id}`,
+        "products",
+        `products:${queries.join("-")}`,
+        `products:user-${user.$id}`,
       ],
       revalidate: 600,
     }
@@ -126,15 +126,15 @@ export async function listSamples(
 }
 
 /**
- * Get a sample by ID
- * @param {string} sampleId The ID of the sample
- * @param {string[]} queries The queries to filter the sample
- * @returns {Promise<Result<Sample>>} The sample
+ * Get a product by ID
+ * @param {string} productId The ID of the product
+ * @param {string[]} queries The queries to filter the product
+ * @returns {Promise<Result<Product>>} The product
  */
-export async function getSampleById(
-  sampleId: string,
+export async function getProductById(
+  productId: string,
   queries: string[] = []
-): Promise<Result<Sample>> {
+): Promise<Result<Product>> {
   const user = await getLoggedInUser();
 
   if (!user) {
@@ -149,32 +149,32 @@ export async function getSampleById(
   return unstable_cache(
     async () => {
       try {
-        const sample = await database.getDocument<Sample>(
+        const product = await database.getDocument<Product>(
           DATABASE_ID,
           SAMPLE_COLLECTION_ID,
-          sampleId,
+          productId,
           queries
         );
 
         const userRes = await database.getDocument<UserData>(
           DATABASE_ID,
           USER_COLLECTION_ID,
-          sample.userId,
+          product.userId,
           [Query.select(["$id", "name", "avatar"])]
         );
 
         const teamRes = await database.getDocument<TeamData>(
           DATABASE_ID,
           TEAM_COLLECTION_ID,
-          sample.teamId,
+          product.teamId,
           [Query.select(["$id", "name", "avatar"])]
         );
 
         return {
           success: true,
-          message: "Sample successfully retrieved.",
+          message: "Product successfully retrieved.",
           data: {
-            ...sample,
+            ...product,
             user: userRes,
             team: teamRes,
           },
@@ -188,31 +188,31 @@ export async function getSampleById(
         };
       }
     },
-    ["sample", sampleId],
+    ["product", productId],
     {
-      tags: ["samples", `sample:${sampleId}`],
+      tags: ["products", `product:${productId}`],
       revalidate: 600,
     }
   )();
 }
 
 /**
- * Create a sample
- * @param {Object} params The parameters for creating a sample
- * @param {string} [params.id] The ID of the sample (optional)
- * @param {AddSampleFormData} params.data The sample data
- * @param {string[]} [params.permissions] The permissions for the sample (optional)
- * @returns {Promise<Result<Sample>>} The created sample
+ * Create a product
+ * @param {Object} params The parameters for creating a product
+ * @param {string} [params.id] The ID of the product (optional)
+ * @param {AddProductFormData} params.data The product data
+ * @param {string[]} [params.permissions] The permissions for the product (optional)
+ * @returns {Promise<Result<Product>>} The created product
  */
-export async function createSample({
+export async function createProduct({
   id = ID.unique(),
   data,
   permissions = [],
 }: {
   id?: string;
-  data: AddSampleFormData;
+  data: AddProductFormData;
   permissions?: string[];
-}): Promise<Result<Sample>> {
+}): Promise<Result<Product>> {
   const user = await getLoggedInUser();
 
   if (!user) {
@@ -233,7 +233,7 @@ export async function createSample({
 
   try {
     if (data.image instanceof File) {
-      const image = await uploadSampleImage({
+      const image = await uploadProductImage({
         data: data.image,
         permissions: [Permission.read(Role.team(data.teamId))],
       });
@@ -245,7 +245,7 @@ export async function createSample({
       data.image = image.data?.$id;
     }
 
-    const sample = await database.createDocument<Sample>(
+    const product = await database.createDocument<Product>(
       DATABASE_ID,
       SAMPLE_COLLECTION_ID,
       id,
@@ -259,24 +259,24 @@ export async function createSample({
     const userRes = await database.getDocument<UserData>(
       DATABASE_ID,
       USER_COLLECTION_ID,
-      sample.userId,
+      product.userId,
       [Query.select(["$id", "name", "avatar"])]
     );
 
     const teamRes = await database.getDocument<TeamData>(
       DATABASE_ID,
       TEAM_COLLECTION_ID,
-      sample.teamId,
+      product.teamId,
       [Query.select(["$id", "name", "avatar"])]
     );
 
-    revalidateTag("samples");
+    revalidateTag("products");
 
     return {
       success: true,
-      message: "Sample successfully created.",
+      message: "Product successfully created.",
       data: {
-        ...sample,
+        ...product,
         user: userRes,
         team: teamRes,
       },
@@ -292,22 +292,22 @@ export async function createSample({
 }
 
 /**
- * Update a sample
- * @param {Object} params The parameters for creating a sample
- * @param {string} [params.id] The ID of the sample
- * @param {EditSampleFormData} params.data The sample data
- * @param {string[]} [params.permissions] The permissions for the sample (optional)
- * @returns {Promise<Result<Sample>>} The updated sample
+ * Update a product
+ * @param {Object} params The parameters for creating a product
+ * @param {string} [params.id] The ID of the product
+ * @param {EditProductFormData} params.data The product data
+ * @param {string[]} [params.permissions] The permissions for the product (optional)
+ * @returns {Promise<Result<Product>>} The updated product
  */
-export async function updateSample({
+export async function updateProduct({
   id,
   data,
   permissions = undefined,
 }: {
   id: string;
-  data: EditSampleFormData;
+  data: EditProductFormData;
   permissions?: string[];
-}): Promise<Result<Sample>> {
+}): Promise<Result<Product>> {
   const user = await getLoggedInUser();
 
   if (!user) {
@@ -320,18 +320,18 @@ export async function updateSample({
   const { database } = await createSessionClient();
 
   try {
-    const existingSample = await database.getDocument<Sample>(
+    const existingProduct = await database.getDocument<Product>(
       DATABASE_ID,
       SAMPLE_COLLECTION_ID,
       id
     );
 
     if (data.image instanceof File) {
-      if (existingSample.image) {
-        await deleteSampleImage(existingSample.image);
+      if (existingProduct.image) {
+        await deleteProductImage(existingProduct.image);
       }
 
-      const image = await uploadSampleImage({
+      const image = await uploadProductImage({
         data: data.image,
       });
 
@@ -340,8 +340,8 @@ export async function updateSample({
       }
 
       data.image = image.data?.$id;
-    } else if (data.image === null && existingSample.image) {
-      const image = await deleteSampleImage(existingSample.image);
+    } else if (data.image === null && existingProduct.image) {
+      const image = await deleteProductImage(existingProduct.image);
 
       if (!image.success) {
         throw new Error(image.message);
@@ -350,7 +350,7 @@ export async function updateSample({
       data.image = null;
     }
 
-    const sample = await database.updateDocument<Sample>(
+    const product = await database.updateDocument<Product>(
       DATABASE_ID,
       SAMPLE_COLLECTION_ID,
       id,
@@ -364,25 +364,25 @@ export async function updateSample({
     const userRes = await database.getDocument<UserData>(
       DATABASE_ID,
       USER_COLLECTION_ID,
-      sample.userId,
+      product.userId,
       [Query.select(["$id", "name", "avatar"])]
     );
 
     const teamRes = await database.getDocument<TeamData>(
       DATABASE_ID,
       TEAM_COLLECTION_ID,
-      sample.teamId,
+      product.teamId,
       [Query.select(["$id", "name", "avatar"])]
     );
 
-    revalidateTag("samples");
-    revalidateTag(`sample:${id}`);
+    revalidateTag("products");
+    revalidateTag(`product:${id}`);
 
     return {
       success: true,
-      message: "Sample successfully updated.",
+      message: "Product successfully updated.",
       data: {
-        ...sample,
+        ...product,
         user: userRes,
         team: teamRes,
       },
@@ -398,11 +398,11 @@ export async function updateSample({
 }
 
 /**
- * Delete a sample
- * @param {string} id The ID of the sample
- * @returns {Promise<Result<Sample>>} The deleted sample
+ * Delete a product
+ * @param {string} id The ID of the product
+ * @returns {Promise<Result<Product>>} The deleted product
  */
-export async function deleteSample(id: string): Promise<Result<Sample>> {
+export async function deleteProduct(id: string): Promise<Result<Product>> {
   const user = await getLoggedInUser();
 
   if (!user) {
@@ -415,14 +415,14 @@ export async function deleteSample(id: string): Promise<Result<Sample>> {
   const { database } = await createSessionClient();
 
   try {
-    const sample = await database.getDocument<Sample>(
+    const product = await database.getDocument<Product>(
       DATABASE_ID,
       SAMPLE_COLLECTION_ID,
       id
     );
 
-    if (sample.image) {
-      const image = await deleteSampleImage(sample.image);
+    if (product.image) {
+      const image = await deleteProductImage(product.image);
 
       if (!image.success) {
         throw new Error(image.message);
@@ -431,11 +431,11 @@ export async function deleteSample(id: string): Promise<Result<Sample>> {
 
     await database.deleteDocument(DATABASE_ID, SAMPLE_COLLECTION_ID, id);
 
-    revalidateTag("samples");
+    revalidateTag("products");
 
     return {
       success: true,
-      message: "Sample successfully deleted.",
+      message: "Product successfully deleted.",
     };
   } catch (err) {
     const error = err as Error;

@@ -4,18 +4,18 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useSession } from "@/hooks/userSession";
-import { Sample } from "@/interfaces/sample.interface";
+import { Product } from "@/interfaces/product.interface";
 import { getUserById } from "@/lib/auth";
 import { DATABASE_ID, SAMPLE_COLLECTION_ID } from "@/lib/constants";
 import { getTeamById } from "@/lib/team";
 
 interface Props {
-  initialSample: Sample;
+  initialProduct: Product;
 }
 
-export const useSample = ({ initialSample }: Props) => {
+export const useProduct = ({ initialProduct }: Props) => {
   const router = useRouter();
-  const [sample, setSample] = useState<Sample>(initialSample);
+  const [product, setProduct] = useState<Product>(initialProduct);
   const [loading, setLoading] = useState<boolean>(true);
 
   const { client, loading: sessionLoading } = useSession();
@@ -28,8 +28,8 @@ export const useSample = ({ initialSample }: Props) => {
     let unsubscribe: (() => void) | undefined;
 
     if (client) {
-      unsubscribe = client.subscribe<Sample>(
-        `databases.${DATABASE_ID}.collections.${SAMPLE_COLLECTION_ID}.documents.${sample?.$id}`,
+      unsubscribe = client.subscribe<Product>(
+        `databases.${DATABASE_ID}.collections.${SAMPLE_COLLECTION_ID}.documents.${product?.$id}`,
         async (response) => {
           if (
             response.events.includes(
@@ -41,7 +41,7 @@ export const useSample = ({ initialSample }: Props) => {
               response.payload.teamId
             );
 
-            setSample({
+            setProduct({
               user: data,
               team: teamData,
               ...response.payload,
@@ -64,5 +64,5 @@ export const useSample = ({ initialSample }: Props) => {
     };
   }, [client]);
 
-  return { sample, loading };
+  return { product, loading };
 };

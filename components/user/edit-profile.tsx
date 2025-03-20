@@ -121,7 +121,7 @@ function EditForm({ className, setOpen, user }: FormProps) {
                   <div className="relative">
                     <Input
                       {...field}
-                      placeholder="Name your sample."
+                      placeholder="Name your product."
                       className="truncate pr-20"
                       maxLength={PROFILE_NAME_MAX_LENGTH}
                     />

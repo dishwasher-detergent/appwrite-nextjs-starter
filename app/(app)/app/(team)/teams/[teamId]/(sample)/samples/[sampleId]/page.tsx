@@ -1,22 +1,22 @@
 import { redirect } from "next/navigation";
 
-import { Sample } from "@/components/realtime/sample";
+import { Product } from "@/components/realtime/product";
 import { getLoggedInUser } from "@/lib/auth";
-import { getSampleById } from "@/lib/db";
+import { getProductById } from "@/lib/db";
 
-export default async function SamplePage({
+export default async function ProductPage({
   params,
 }: {
-  params: Promise<{ sampleId: string }>;
+  params: Promise<{ productId: string }>;
 }) {
-  const { sampleId } = await params;
-  const { data, success } = await getSampleById(sampleId);
+  const { productId } = await params;
+  const { data, success } = await getProductById(productId);
   const user = await getLoggedInUser();
-  const isOwnSample = user?.$id === data?.userId;
+  const isOwnProduct = user?.$id === data?.userId;
 
   if (!success || !data) {
     redirect("/app");
   }
 
-  return <Sample initialSample={data} canEdit={isOwnSample} />;
+  return <Product initialProduct={data} canEdit={isOwnProduct} />;
 }

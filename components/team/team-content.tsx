@@ -1,16 +1,16 @@
-import { Samples } from "@/components/realtime/samples";
-import { Sample } from "@/interfaces/sample.interface";
+import { Products } from "@/components/realtime/products";
+import { Product } from "@/interfaces/product.interface";
 
 interface TeamContentProps {
-  samples: Sample[];
+  products: Product[];
   teamId: string;
 }
 
-export function TeamContent({ samples, teamId }: TeamContentProps) {
+export function TeamContent({ products, teamId }: TeamContentProps) {
   return (
     <div>
-      <h3 className="font-semibold text-lg mb-2">Samples</h3>
-      <Samples initialSamples={samples} teamId={teamId} />
+      <h3 className="font-semibold text-lg mb-2">Products</h3>
+      <Products initialProducts={products} teamId={teamId} />
     </div>
   );
 }

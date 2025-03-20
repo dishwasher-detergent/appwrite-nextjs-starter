@@ -59,7 +59,7 @@ export async function getUserData(): Promise<Result<User>> {
 
         return {
           success: true,
-          message: "Samples successfully retrieved.",
+          message: "Products successfully retrieved.",
           data: {
             ...user,
             ...data,
@@ -113,7 +113,7 @@ export async function getUserById(id: string): Promise<Result<UserData>> {
 
         return {
           success: true,
-          message: "Samples successfully retrieved.",
+          message: "Products successfully retrieved.",
           data,
         };
       } catch (err) {
@@ -240,7 +240,7 @@ export async function getUserLogs(): Promise<Result<Models.LogList>> {
 
         return {
           success: true,
-          message: "Samples successfully retrieved.",
+          message: "Products successfully retrieved.",
           data: logs,
         };
       } catch (err) {

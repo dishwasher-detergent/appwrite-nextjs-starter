@@ -3,19 +3,19 @@
 import { useEffect, useState } from "react";
 
 import { useSession } from "@/hooks/userSession";
-import { Sample } from "@/interfaces/sample.interface";
+import { Product } from "@/interfaces/product.interface";
 import { getUserById } from "@/lib/auth";
 import { DATABASE_ID, SAMPLE_COLLECTION_ID } from "@/lib/constants";
 import { getTeamById } from "@/lib/team";
 
 interface Props {
-  initialSamples?: Sample[];
+  initialProducts?: Product[];
   teamId?: string;
   userId?: string;
 }
 
-export const useSamples = ({ initialSamples, teamId, userId }: Props) => {
-  const [samples, setSamples] = useState<Sample[]>(initialSamples ?? []);
+export const useProducts = ({ initialProducts, teamId, userId }: Props) => {
+  const [products, setProducts] = useState<Product[]>(initialProducts ?? []);
   const [loading, setLoading] = useState<boolean>(true);
 
   const { client, loading: sessionLoading } = useSession();
@@ -28,7 +28,7 @@ export const useSamples = ({ initialSamples, teamId, userId }: Props) => {
     let unsubscribe: (() => void) | undefined;
 
     if (client) {
-      unsubscribe = client.subscribe<Sample>(
+      unsubscribe = client.subscribe<Product>(
         `databases.${DATABASE_ID}.collections.${SAMPLE_COLLECTION_ID}.documents`,
         async (response) => {
           if (teamId && response.payload.teamId !== teamId) return;
@@ -44,7 +44,7 @@ export const useSamples = ({ initialSamples, teamId, userId }: Props) => {
               response.payload.teamId
             );
 
-            setSamples((prev) => [
+            setProducts((prev) => [
               {
                 ...response.payload,
                 user: data,
@@ -64,7 +64,7 @@ export const useSamples = ({ initialSamples, teamId, userId }: Props) => {
               response.payload.teamId
             );
 
-            setSamples((prev) =>
+            setProducts((prev) =>
               prev.map((x) =>
                 x.$id === response.payload.$id
                   ? { user: data, ...response.payload, team: teamData }
@@ -78,7 +78,7 @@ export const useSamples = ({ initialSamples, teamId, userId }: Props) => {
               "databases.*.collections.*.documents.*.delete"
             )
           ) {
-            setSamples((prev) =>
+            setProducts((prev) =>
               prev.filter((x) => x.$id !== response.payload.$id)
             );
           }
@@ -91,5 +91,5 @@ export const useSamples = ({ initialSamples, teamId, userId }: Props) => {
     };
   }, [client]);
 
-  return { samples, loading };
+  return { products, loading };
 };

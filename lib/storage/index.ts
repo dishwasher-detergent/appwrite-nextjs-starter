@@ -8,14 +8,14 @@ import { createSessionClient } from "@/lib/server/appwrite";
 import { ID, Models, Permission, Role } from "node-appwrite";
 
 /**
- * Uploads a sample image.
- * @param {Object} params The parameters for creating a sample image
- * @param {string} [params.id] The ID of the sample
+ * Uploads a product image.
+ * @param {Object} params The parameters for creating a product image
+ * @param {string} [params.id] The ID of the product
  * @param {File} params.data The image data
  * @param {string[]} [params.permissions] The permissions for the image (optional)
  * @returns {Promise<Result<Models.File>>} The file
  */
-export async function uploadSampleImage({
+export async function uploadProductImage({
   id = ID.unique(),
   data,
   permissions = [],
@@ -51,7 +51,7 @@ export async function uploadSampleImage({
 
     return {
       success: true,
-      message: "Sample image uploaded successfully.",
+      message: "Product image uploaded successfully.",
       data: response,
     };
   } catch (err) {
@@ -65,11 +65,11 @@ export async function uploadSampleImage({
 }
 
 /**
- * Deletes a sample image.
+ * Deletes a product image.
  * @param {string} id
  * @returns {Promise<Result<undefined>>} A promise that resolves to a result object.
  */
-export async function deleteSampleImage(
+export async function deleteProductImage(
   id: string
 ): Promise<Result<undefined>> {
   const user = await getLoggedInUser();
@@ -88,7 +88,7 @@ export async function deleteSampleImage(
 
     return {
       success: true,
-      message: "Sample image successfully deleted.",
+      message: "Product image successfully deleted.",
     };
   } catch (err) {
     const error = err as Error;

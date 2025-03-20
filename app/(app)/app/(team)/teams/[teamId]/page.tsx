@@ -7,7 +7,7 @@ import { TeamDescription } from "@/components/team/team-description";
 import { TeamHeader } from "@/components/team/team-header";
 import { TeamMembers } from "@/components/team/team-members";
 import { ADMIN_ROLE, OWNER_ROLE } from "@/constants/team.constants";
-import { listSamples } from "@/lib/db";
+import { listProducts } from "@/lib/db";
 import { getCurrentUserRoles, getTeamById } from "@/lib/team";
 
 export default async function TeamPage({
@@ -18,7 +18,7 @@ export default async function TeamPage({
   const { teamId } = await params;
   const { data, success } = await getTeamById(teamId);
   const { data: roles } = await getCurrentUserRoles(teamId);
-  const { data: sampleData } = await listSamples([
+  const { data: productData } = await listProducts([
     Query.orderDesc("$createdAt"),
     Query.equal("teamId", teamId),
   ]);
@@ -41,7 +41,7 @@ export default async function TeamPage({
           teamId={data.$id}
           isOwner={isOwner}
         />
-        <TeamContent samples={sampleData?.documents ?? []} teamId={teamId} />
+        <TeamContent products={productData?.documents ?? []} teamId={teamId} />
       </main>
     </article>
   );

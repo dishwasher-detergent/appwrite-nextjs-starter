@@ -20,18 +20,18 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { NAME_MAX_LENGTH } from "@/constants/sample.constants";
-import { Sample } from "@/interfaces/sample.interface";
-import { deleteSample } from "@/lib/db";
-import { DeleteSampleFormData, deleteSampleSchema } from "@/lib/db/schemas";
+import { NAME_MAX_LENGTH } from "@/constants/product.constants";
+import { Product } from "@/interfaces/product.interface";
+import { deleteProduct } from "@/lib/db";
+import { DeleteProductFormData, deleteProductSchema } from "@/lib/db/schemas";
 import { cn } from "@/lib/utils";
 
-export function DeleteSample({ sample }: { sample: Sample }) {
+export function DeleteProduct({ product }: { product: Product }) {
   const [open, setOpen] = useState(false);
 
   return (
     <DyanmicDrawer
-      title={`Delete ${sample.name}`}
+      title={`Delete ${product.name}`}
       description="This is permanent and cannot be undone."
       open={open}
       setOpen={setOpen}
@@ -41,31 +41,31 @@ export function DeleteSample({ sample }: { sample: Sample }) {
         </Button>
       }
     >
-      <DeleteForm setOpen={setOpen} sample={sample} />
+      <DeleteForm setOpen={setOpen} product={product} />
     </DyanmicDrawer>
   );
 }
 
 interface FormProps extends React.ComponentProps<"form"> {
   setOpen: (e: boolean) => void;
-  sample: Sample;
+  product: Product;
 }
 
-function DeleteForm({ className, setOpen, sample }: FormProps) {
+function DeleteForm({ className, setOpen, product }: FormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const form = useForm<DeleteSampleFormData>({
-    resolver: zodResolver(deleteSampleSchema),
+  const form = useForm<DeleteProductFormData>({
+    resolver: zodResolver(deleteProductSchema),
     defaultValues: {
       name: "",
     },
   });
 
-  async function onSubmit(values: DeleteSampleFormData) {
+  async function onSubmit(values: DeleteProductFormData) {
     setLoading(true);
 
-    if (values.name !== sample.name) {
+    if (values.name !== product.name) {
       form.setError("name", {
         message: "Name does not match.",
       });
@@ -75,7 +75,7 @@ function DeleteForm({ className, setOpen, sample }: FormProps) {
       return;
     }
 
-    const data = await deleteSample(sample.$id);
+    const data = await deleteProduct(product.$id);
 
     if (data.success) {
       toast.success(data.message);
@@ -104,12 +104,12 @@ function DeleteForm({ className, setOpen, sample }: FormProps) {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Sample Name</FormLabel>
+                <FormLabel>Product Name</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
                       {...field}
-                      placeholder={sample.name}
+                      placeholder={product.name}
                       className="truncate pr-20"
                       maxLength={NAME_MAX_LENGTH}
                     />
@@ -122,7 +122,7 @@ function DeleteForm({ className, setOpen, sample }: FormProps) {
                   </div>
                 </FormControl>
                 <FormDescription>
-                  Enter the sample name to confirm deletion.
+                  Enter the product name to confirm deletion.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
