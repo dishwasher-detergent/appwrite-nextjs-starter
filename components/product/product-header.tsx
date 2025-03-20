@@ -21,7 +21,7 @@ export function ProductHeader({ product, canEdit }: ProductHeaderProps) {
       <div className="flex items-start justify-between px-4 -mt-30">
         <figure className="relative flex-shrink-0 size-60">
           <AspectRatio ratio={1}>
-            {product?.avatar ? (
+            {product?.image ? (
               <Image
                 src={`${ENDPOINT}/storage/buckets/${SAMPLE_BUCKET_ID}/files/${product.image}/view?project=${PROJECT_ID}`}
                 alt={`${product.name}'s product image`}
