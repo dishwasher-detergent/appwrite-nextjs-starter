@@ -39,6 +39,7 @@ export async function uploadProductImage({
     ...permissions,
     Permission.read(Role.user(user.$id)),
     Permission.write(Role.user(user.$id)),
+    Permission.read(Role.any()),
   ];
 
   try {
@@ -133,6 +134,7 @@ export async function uploadAvatarImage({
     Permission.read(Role.users()),
     Permission.read(Role.user(user.$id)),
     Permission.write(Role.user(user.$id)),
+    Permission.read(Role.any()),
   ];
 
   try {

@@ -1,86 +1,65 @@
-"use client";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import Image from "next/image";
+import { redirect } from "next/navigation";
 
-import { LucideLoader2 } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
-
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useSession } from "@/hooks/userSession";
-import { createClient } from "@/lib/client/appwrite";
-import { toast } from "sonner";
+import { AVATAR_BUCKET_ID, ENDPOINT, PROJECT_ID } from "@/lib/constants";
+import { getTeamById } from "@/lib/team";
+import { AcceptForm } from "./form";
 
-export default function Invite() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const { user, refreshSession } = useSession();
-  const [loading, setLoading] = useState<boolean>(false);
+export default async function Invite({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{
+    teamId: string;
+    membershipId: string;
+    userId: string;
+    secret: string;
+  }>;
+}) {
+  const { id } = await params;
+  const { teamId, membershipId, userId, secret } = await searchParams;
 
-  const teamId = searchParams.get("teamId") as string;
-  const membershipId = searchParams.get("membershipId") as string;
-  const userId = searchParams.get("userId") as string;
-  const secret = searchParams.get("secret") as string;
+  const { data } = await getTeamById(id);
 
-  async function acceptTeamInvite() {
-    setLoading(true);
-
-    try {
-      const { team, account } = await createClient();
-      await team.updateMembershipStatus(teamId, membershipId, userId, secret);
-      await refreshSession();
-
-      if (user?.passwordUpdate == "") {
-        router.push("/password");
-      } else {
-        await account.deleteSessions();
-        router.push(`/login`);
-      }
-    } catch (err) {
-      console.error(err);
-
-      toast.error("Failed to accept invite");
-    }
-
-    setLoading(false);
+  if (!data) {
+    redirect("/app");
   }
 
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Accept Invite</CardTitle>
+        {data?.avatar && (
+          <AspectRatio ratio={1} className="w-full overflow-hidden rounded-lg">
+            <Image
+              src={`${ENDPOINT}/storage/buckets/${AVATAR_BUCKET_ID}/files/${data.avatar}/view?project=${PROJECT_ID}`}
+              alt={data?.name}
+              className="object-cover object-left-top bg-primary"
+              fill
+            />
+          </AspectRatio>
+        )}
+        <CardTitle className="text-2xl mt-2">Join {data?.name}</CardTitle>
+        <CardDescription>
+          Accept Invite to join the team {data?.name}
+        </CardDescription>
       </CardHeader>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          acceptTeamInvite();
-        }}
-      >
-        <CardContent className="grid gap-4">
-          <input name="teamId" value={teamId} readOnly className="hidden" />
-          <input
-            name="membershipId"
-            value={membershipId}
-            readOnly
-            className="hidden"
-          />
-          <input name="userId" value={userId} readOnly className="hidden" />
-          <input name="secret" value={secret} readOnly className="hidden" />
-        </CardContent>
-        <CardFooter>
-          <Button className="w-full" type="submit" disabled={loading}>
-            Accept Invite
-            {loading && (
-              <LucideLoader2 className="mr-2 size-3.5 animate-spin" />
-            )}
-          </Button>
-        </CardFooter>
-      </form>
+      <CardContent>
+        <AcceptForm
+          teamId={teamId}
+          membershipId={membershipId}
+          userId={userId}
+          secret={secret}
+        />
+      </CardContent>
     </Card>
   );
 }
