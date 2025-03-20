@@ -89,11 +89,11 @@ function CreateForm({ className, setOpen }: FormProps) {
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className={cn(
-          "grid flex-1 items-start gap-4 overflow-hidden",
+          "h-full flex flex-col gap-4 overflow-hidden p-4 md:p-0",
           className
         )}
       >
-        <div className="h-full space-y-4 overflow-auto p-1">
+        <div className="flex-1 space-y-4 overflow-auto p-1">
           <FormField
             control={form.control}
             name="name"

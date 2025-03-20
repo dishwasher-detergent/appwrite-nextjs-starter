@@ -44,7 +44,7 @@ export function DyanmicDrawer({
             <DialogTitle className="truncate pr-8">{title}</DialogTitle>
             <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
-          <div className="overflow-y-auto">{children}</div>
+          {children}
         </DialogContent>
       </Dialog>
     );
@@ -58,7 +58,7 @@ export function DyanmicDrawer({
           <DrawerTitle className="truncate">{title}</DrawerTitle>
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
-        <div className="p-4 overflow-y-auto">{children}</div>
+        {children}
       </DrawerContent>
     </Drawer>
   );
