@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
 
   const { account } = await createAdminClient();
   const session = await account.createSession(userId, secret);
+  const user = await account.get();
 
   (await cookies()).set(COOKIE_KEY, session.secret, {
     path: "/",
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
     secure: true,
   });
 
-  await createUserData(session.userId);
+  await createUserData(session.userId, user.name);
 
   return NextResponse.redirect(`${request.nextUrl.origin}/app`);
 }

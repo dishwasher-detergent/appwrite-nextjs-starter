@@ -7,7 +7,7 @@ import { Result } from "@/interfaces/result.interface";
 import { Sample } from "@/interfaces/sample.interface";
 import { TeamData } from "@/interfaces/team.interface";
 import { UserData } from "@/interfaces/user.interface";
-import { getCachedLoggedInUser } from "@/lib/auth";
+import { getLoggedInUser } from "@/lib/auth";
 import {
   DATABASE_ID,
   SAMPLE_COLLECTION_ID,
@@ -26,7 +26,7 @@ import { AddSampleFormData, EditSampleFormData } from "./schemas";
 export async function listSamples(
   queries: string[] = []
 ): Promise<Result<Models.DocumentList<Sample>>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -114,7 +114,7 @@ export async function listSamples(
     },
     ["samples"],
     {
-      tags: ["samples", `samples-${queries.join("-")}`],
+      tags: ["samples", `samples:${queries.join("-")}`],
       revalidate: 600,
     }
   )(queries);
@@ -130,7 +130,7 @@ export async function getSampleById(
   sampleId: string,
   queries: string[] = []
 ): Promise<Result<Sample>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -185,7 +185,7 @@ export async function getSampleById(
     },
     ["sample", sampleId],
     {
-      tags: ["samples", `sample-${sampleId}`],
+      tags: ["samples", `sample:${sampleId}`],
       revalidate: 600,
     }
   )();
@@ -208,7 +208,7 @@ export async function createSample({
   data: AddSampleFormData;
   permissions?: string[];
 }): Promise<Result<Sample>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -303,7 +303,7 @@ export async function updateSample({
   data: EditSampleFormData;
   permissions?: string[];
 }): Promise<Result<Sample>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -371,7 +371,7 @@ export async function updateSample({
     );
 
     revalidateTag("samples");
-    revalidateTag(`sample-${id}`);
+    revalidateTag(`sample:${id}`);
 
     return {
       success: true,
@@ -398,7 +398,7 @@ export async function updateSample({
  * @returns {Promise<Result<Sample>>} The deleted sample
  */
 export async function deleteSample(id: string): Promise<Result<Sample>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -442,8 +442,11 @@ export async function deleteSample(id: string): Promise<Result<Sample>> {
   }
 }
 
-export async function createUserData(id: string): Promise<Result<UserData>> {
-  const user = await getCachedLoggedInUser();
+export async function createUserData(
+  id: string,
+  name: string
+): Promise<Result<UserData>> {
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -467,9 +470,10 @@ export async function createUserData(id: string): Promise<Result<UserData>> {
       USER_COLLECTION_ID,
       id,
       {
-        name: user.name,
+        name: name,
         avatar: null,
-      }
+      },
+      [Permission.read(Role.user(id)), Permission.write(Role.user(id))]
     );
 
     return {

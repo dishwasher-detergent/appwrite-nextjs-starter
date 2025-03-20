@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { Sample } from "@/components/realtime/sample";
-import { getCachedLoggedInUser } from "@/lib/auth";
+import { getLoggedInUser } from "@/lib/auth";
 import { getSampleById } from "@/lib/db";
 
 export default async function SamplePage({
@@ -11,7 +11,7 @@ export default async function SamplePage({
 }) {
   const { sampleId } = await params;
   const { data, success } = await getSampleById(sampleId);
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
   const isOwnSample = user?.$id === data?.userId;
 
   if (!success || !data) {

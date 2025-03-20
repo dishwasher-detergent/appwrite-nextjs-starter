@@ -34,34 +34,11 @@ export async function getLoggedInUser(): Promise<Models.User<Models.Preferences>
 }
 
 /**
- * Retrieves the cached currently logged-in user.
- *
- * @returns {Promise<Models.User<Models.Preferences> | null>} A promise that resolves to the account information
- * of the logged-in user, or null if no user is logged in.
- */
-export async function getCachedLoggedInUser(): Promise<Models.User<Models.Preferences> | null> {
-  const { account } = await createSessionClient();
-
-  return unstable_cache(
-    async (): Promise<Models.User<Models.Preferences> | null> => {
-      try {
-        return await account.get();
-      } catch (err) {
-        console.log(err);
-        return null;
-      }
-    },
-    ["logged_in_user"],
-    { tags: ["logged_in_user"], revalidate: 600 }
-  )();
-}
-
-/**
  * Get the current user
  * @returns {Promise<Result<User>} The current user
  */
 export async function getUserData(): Promise<Result<User>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -70,15 +47,19 @@ export async function getUserData(): Promise<Result<User>> {
     };
   }
 
+  console.log(user.$id);
+
   const { database } = await createSessionClient();
 
   return unstable_cache(
-    async () => {
+    async (id) => {
       try {
+        console.log(id);
+
         const data = await database.getDocument<UserData>(
           DATABASE_ID,
           USER_COLLECTION_ID,
-          user.$id
+          id
         );
 
         return {
@@ -92,6 +73,9 @@ export async function getUserData(): Promise<Result<User>> {
       } catch (err) {
         const error = err as Error;
 
+        // This is where you would look to something like Splunk.
+        console.error(error);
+
         return {
           success: false,
           message: error.message,
@@ -100,10 +84,10 @@ export async function getUserData(): Promise<Result<User>> {
     },
     ["user"],
     {
-      tags: ["user"],
+      tags: ["user", `user:${user.$id}`],
       revalidate: 600,
     }
-  )();
+  )(user.$id);
 }
 
 /**
@@ -112,7 +96,7 @@ export async function getUserData(): Promise<Result<User>> {
  * @returns {Promise<Result<UserData>} The current user
  */
 export async function getUserById(id: string): Promise<Result<UserData>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -140,6 +124,9 @@ export async function getUserById(id: string): Promise<Result<UserData>> {
       } catch (err) {
         const error = err as Error;
 
+        // This is where you would look to something like Splunk.
+        console.error(error);
+
         return {
           success: false,
           message: error.message,
@@ -148,7 +135,7 @@ export async function getUserById(id: string): Promise<Result<UserData>> {
     },
     ["user", id],
     {
-      tags: ["user", `user-${id}`],
+      tags: ["user", `user:${id}`],
       revalidate: 600,
     }
   )(id);
@@ -167,7 +154,7 @@ export async function updateProfile({
   id: string;
   data: UpdateProfileFormData;
 }): Promise<Response> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -224,6 +211,10 @@ export async function updateProfile({
     };
   } catch (err) {
     const error = err as Error;
+
+    // This is where you would look to something like Splunk.
+    console.error(error);
+
     return {
       success: false,
       message: error.message,
@@ -236,7 +227,7 @@ export async function updateProfile({
  * @returns {Promise<Result<Models.LogList>>} The list of logs
  */
 export async function getUserLogs(): Promise<Result<Models.LogList>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -259,6 +250,9 @@ export async function getUserLogs(): Promise<Result<Models.LogList>> {
         };
       } catch (err) {
         const error = err as Error;
+
+        // This is where you would look to something like Splunk.
+        console.error(error);
 
         return {
           success: false,
@@ -325,6 +319,10 @@ export async function signInWithEmail(
     };
   } catch (err) {
     const error = err as Error;
+
+    // This is where you would look to something like Splunk.
+    console.error(error);
+
     return {
       success: false,
       message: error.message,
@@ -360,7 +358,7 @@ export async function signUpWithEmail(
       secure: true,
     });
 
-    await createUserData(session.userId);
+    await createUserData(session.userId, name);
 
     return {
       success: true,
@@ -369,6 +367,10 @@ export async function signUpWithEmail(
     };
   } catch (err) {
     const error = err as Error;
+
+    // This is where you would look to something like Splunk.
+    console.error(error);
+
     return {
       success: false,
       message: error.message,
@@ -416,6 +418,10 @@ export async function createPasswordRecovery(
     };
   } catch (err) {
     const error = err as Error;
+
+    // This is where you would look to something like Splunk.
+    console.error(error);
+
     return {
       success: false,
       message: error.message,
@@ -447,6 +453,10 @@ export async function resetPassword(
     };
   } catch (err) {
     const error = err as Error;
+
+    // This is where you would look to something like Splunk.
+    console.error(error);
+
     return {
       success: false,
       message: error.message,
