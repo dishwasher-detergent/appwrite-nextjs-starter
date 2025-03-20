@@ -35,10 +35,10 @@ export function AcceptForm({
       await refreshSession();
 
       if (user?.passwordUpdate == "") {
-        router.push("/password");
+        router.push("/recover");
       } else {
         await account.deleteSessions();
-        router.push(`/login`);
+        router.push(`/signin`);
       }
     } catch (err) {
       console.error(err);
