@@ -10,7 +10,7 @@ export function TeamDescription({ team }: TeamDescriptionProps) {
       <h1 className="text-2xl font-bold tracking-tight mb-1">{team.name}</h1>
       <section aria-label="About">
         <p className="text-muted-foreground leading-relaxed">
-          {team.about ?? "Add a description to your team."}
+          {team.about ?? "No description provided."}
         </p>
       </section>
     </div>

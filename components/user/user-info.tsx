@@ -10,7 +10,7 @@ export function UserDescription({ user }: UserDescriptionProps) {
       <h1 className="text-2xl font-bold tracking-tight mb-1">{user.name}</h1>
       <section aria-label="About">
         <p className="text-muted-foreground leading-relaxed">
-          {user.about ?? "Add a description to your profile."}
+          {user.about ?? "No description provided."}
         </p>
       </section>
     </div>
