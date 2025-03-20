@@ -5,18 +5,17 @@ import Image from "next/image";
 
 import { DeleteSample } from "@/components/sample/delete-sample";
 import { EditSample } from "@/components/sample/edit-sample";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSample } from "@/hooks/useSample";
 import { Sample as SampleType } from "@/interfaces/sample.interface";
-import {
-  AVATAR_BUCKET_ID,
-  ENDPOINT,
-  PROJECT_ID,
-  SAMPLE_BUCKET_ID,
-} from "@/lib/constants";
-import { getInitials } from "@/lib/utils";
+import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
+import { ProfileLink } from "../profile-link";
 
-export function Sample({ initialSample }: { initialSample: SampleType }) {
+interface SampleProps {
+  initialSample: SampleType;
+  canEdit: boolean;
+}
+
+export function Sample({ initialSample, canEdit }: SampleProps) {
   const { sample, loading } = useSample({ initialSample });
 
   if (loading)
@@ -31,31 +30,23 @@ export function Sample({ initialSample }: { initialSample: SampleType }) {
       <header className="mb-8">
         <div className="flex items-start justify-between">
           <h1 className="text-4xl font-bold tracking-tight">{sample.name}</h1>
-          <div
-            className="flex items-center gap-2"
-            role="toolbar"
-            aria-label="Sample actions"
-          >
-            <EditSample sample={sample} />
-            <DeleteSample sample={sample} />
-          </div>
+          {canEdit && (
+            <div
+              className="flex items-center gap-2"
+              role="toolbar"
+              aria-label="Sample actions"
+            >
+              <EditSample sample={sample} />
+              <DeleteSample sample={sample} />
+            </div>
+          )}
         </div>
-        <div className="flex items-center gap-2 mt-2">
-          <Avatar className="h-6 w-6">
-            <AvatarImage
-              src={
-                sample?.user?.avatar
-                  ? `${ENDPOINT}/storage/buckets/${AVATAR_BUCKET_ID}/files/${sample.user.avatar}/view?project=${PROJECT_ID}`
-                  : undefined
-              }
-              alt={sample?.user?.name || "User"}
-            />
-            <AvatarFallback>{getInitials(sample?.user?.name)}</AvatarFallback>
-          </Avatar>
-          <p className="text-sm text-foreground">
-            {sample?.user?.name || "Unknown"}
-          </p>
-        </div>
+        <ProfileLink
+          className="text-foreground"
+          avatar={sample?.user?.avatar}
+          name={sample?.user?.name}
+          href={`/app/users/${sample.userId}`}
+        />
       </header>
       <div className="grid gap-8 md:grid-cols-[256px,1fr]">
         <figure className="relative">

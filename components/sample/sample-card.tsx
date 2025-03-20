@@ -1,10 +1,9 @@
 "use client";
 
-import { LucideLink, LucideSlash } from "lucide-react";
+import { LucideSlash } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,13 +13,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Sample } from "@/interfaces/sample.interface";
-import {
-  AVATAR_BUCKET_ID,
-  ENDPOINT,
-  PROJECT_ID,
-  SAMPLE_BUCKET_ID,
-} from "@/lib/constants";
-import { getInitials } from "@/lib/utils";
+import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
+import { ProfileLink } from "../profile-link";
 
 export function SampleCard(sample: Sample) {
   return (
@@ -49,7 +43,6 @@ export function SampleCard(sample: Sample) {
             >
               <Link href={`/app/teams/${sample.teamId}/samples/${sample.$id}`}>
                 {sample.name}
-                <LucideLink />
               </Link>
             </Button>
           </CardTitle>
@@ -57,51 +50,17 @@ export function SampleCard(sample: Sample) {
             {sample?.description ?? "No description provided."}
           </CardDescription>
           <div className="flex flex-row gap-2 items-center mt-2">
-            <Button
-              variant="link"
-              asChild
-              className="text-sm text-primary-foreground p-0"
-            >
-              <Link href={`/app/teams/${sample.teamId}`}>
-                <Avatar className="h-6 w-6">
-                  <AvatarImage
-                    src={
-                      sample?.team?.avatar
-                        ? `${ENDPOINT}/storage/buckets/${AVATAR_BUCKET_ID}/files/${sample.team.avatar}/view?project=${PROJECT_ID}`
-                        : undefined
-                    }
-                    alt={sample?.team?.name || "User"}
-                  />
-                  <AvatarFallback>
-                    {getInitials(sample?.team?.name)}
-                  </AvatarFallback>
-                </Avatar>
-                {sample?.team?.name || "Unknown"}
-              </Link>
-            </Button>
+            <ProfileLink
+              avatar={sample?.team?.avatar}
+              name={sample?.team?.name}
+              href={`/app/teams/${sample.teamId}`}
+            />
             <LucideSlash className="text-primary-foreground size-3" />
-            <Button
-              variant="link"
-              asChild
-              className="text-sm text-primary-foreground p-0"
-            >
-              <Link href={`/app/users/${sample.userId}`}>
-                <Avatar className="h-6 w-6">
-                  <AvatarImage
-                    src={
-                      sample?.user?.avatar
-                        ? `${ENDPOINT}/storage/buckets/${AVATAR_BUCKET_ID}/files/${sample.user.avatar}/view?project=${PROJECT_ID}`
-                        : undefined
-                    }
-                    alt={sample?.user?.name || "User"}
-                  />
-                  <AvatarFallback>
-                    {getInitials(sample?.user?.name)}
-                  </AvatarFallback>
-                </Avatar>
-                {sample?.user?.name || "Unknown"}
-              </Link>
-            </Button>
+            <ProfileLink
+              avatar={sample?.user?.avatar}
+              name={sample?.user?.name}
+              href={`/app/users/${sample.userId}`}
+            />
           </div>
         </CardHeader>
       </CardContent>
