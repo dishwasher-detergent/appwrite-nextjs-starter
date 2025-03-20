@@ -9,17 +9,21 @@ export default async function AppPage() {
   const { data } = await listProducts([Query.orderDesc("$createdAt")]);
   const { data: teams } = await listTeams();
 
-  return (
+  return teams && teams?.length > 0 ? (
     <>
       <header className="flex flex-row justify-between items-center pb-4 w-full">
         <h2 className="font-bold">Products</h2>
-        {teams && teams?.length > 0 ? (
-          <AddProduct teams={teams} />
-        ) : (
-          <CreateTeam />
-        )}
+        <AddProduct teams={teams} />
       </header>
       <Products initialProducts={data?.documents} />
     </>
+  ) : (
+    <section className="grid place-items-center gap-4">
+      <p className="text-lg font-semibold text-center">
+        Looks like you're apart of no teams yet, <br />
+        join one or create one to get started!
+      </p>
+      <CreateTeam />
+    </section>
   );
 }

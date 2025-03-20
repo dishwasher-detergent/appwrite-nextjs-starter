@@ -15,6 +15,9 @@ export default async function TeamsPage() {
         {data?.map((team) => (
           <TeamCard key={team.$id} {...team} />
         ))}
+        {data?.length === 0 && (
+          <p className="font-semibold text-muted-foreground">No teams found</p>
+        )}
       </section>
     </>
   );

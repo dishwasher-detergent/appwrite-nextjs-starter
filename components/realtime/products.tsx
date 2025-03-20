@@ -21,7 +21,7 @@ export function Products({ initialProducts, teamId, userId }: ProductsProps) {
   if (loading) return <ProductCardLoading />;
 
   return (
-    <section className="min-h-full columns-xs items-start gap-4 space-y-4 w-full">
+    <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {products?.map((product) => (
         <ProductCard key={product.$id} {...product} />
       ))}

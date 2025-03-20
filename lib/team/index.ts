@@ -4,6 +4,7 @@ import { revalidateTag, unstable_cache } from "next/cache";
 import { ID, Models, Permission, Query, Role } from "node-appwrite";
 
 import { ADMIN_ROLE, OWNER_ROLE } from "@/constants/team.constants";
+import { Product } from "@/interfaces/product.interface";
 import { Result } from "@/interfaces/result.interface";
 import { TeamData } from "@/interfaces/team.interface";
 import { UserData, UserMemberData } from "@/interfaces/user.interface";
@@ -12,6 +13,7 @@ import {
   DATABASE_ID,
   HOSTNAME,
   MAX_TEAM_LIMIT,
+  SAMPLE_COLLECTION_ID,
   TEAM_COLLECTION_ID,
   USER_COLLECTION_ID,
 } from "@/lib/constants";
@@ -372,6 +374,27 @@ export async function deleteTeam(id: string): Promise<Result<TeamData>> {
 
     await team.delete(id);
     await database.deleteDocument(DATABASE_ID, TEAM_COLLECTION_ID, id);
+
+    let response;
+    const queries = [Query.limit(50), Query.equal("teamId", id)];
+
+    do {
+      response = await database.listDocuments<Product>(
+        DATABASE_ID,
+        SAMPLE_COLLECTION_ID,
+        queries
+      );
+
+      await Promise.all(
+        response.documents.map((document) =>
+          database.deleteDocument(
+            DATABASE_ID,
+            SAMPLE_COLLECTION_ID,
+            document.$id
+          )
+        )
+      );
+    } while (response.documents.length > 0);
 
     revalidateTag("teams");
 

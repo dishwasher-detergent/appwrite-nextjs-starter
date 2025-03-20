@@ -36,7 +36,7 @@ export function DeleteTeam({ team }: { team: TeamData }) {
   return (
     <DyanmicDrawer
       title={`Delete ${team.name}.`}
-      description="This is permanent and cannot be undone."
+      description="This is permanent and cannot be undone, it will delete all projects made under the team."
       open={open}
       setOpen={setOpen}
       button={
