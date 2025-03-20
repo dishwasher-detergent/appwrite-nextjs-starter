@@ -20,7 +20,7 @@ export default async function AppPage() {
   ) : (
     <section className="grid place-items-center gap-4">
       <p className="text-lg font-semibold text-center">
-        Looks like you're apart of no teams yet, <br />
+        Looks like you&apos;re apart of no teams yet, <br />
         join one or create one to get started!
       </p>
       <CreateTeam />
