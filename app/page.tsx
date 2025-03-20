@@ -2,10 +2,10 @@ import Link from "next/link";
 
 import { ModeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { getCachedLoggedInUser } from "@/lib/auth";
+import { getLoggedInUser } from "@/lib/auth";
 
 export default async function Home() {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   return (
     <>

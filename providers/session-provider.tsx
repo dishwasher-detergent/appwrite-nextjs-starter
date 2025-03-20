@@ -1,6 +1,6 @@
 "use client";
 
-import { getCachedLoggedInUser } from "@/lib/client/appwrite";
+import { getLoggedInUser } from "@/lib/client/appwrite";
 import { Client, Models } from "appwrite";
 import { createContext, ReactNode, useEffect, useState } from "react";
 
@@ -37,7 +37,7 @@ export function SessionProvider({
 
     const loadUser = async () => {
       try {
-        const response = await getCachedLoggedInUser();
+        const response = await getLoggedInUser();
         setUser(response.user);
         setClient(response.client);
       } catch (error) {
@@ -54,7 +54,7 @@ export function SessionProvider({
   const refreshUser = async () => {
     setLoading(true);
     try {
-      const response = await getCachedLoggedInUser();
+      const response = await getLoggedInUser();
       setUser(response.user);
       setClient(response.client);
     } catch (error) {
