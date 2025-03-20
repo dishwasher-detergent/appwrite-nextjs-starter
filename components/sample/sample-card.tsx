@@ -15,25 +15,26 @@ import {
 } from "@/components/ui/card";
 import { Sample } from "@/interfaces/sample.interface";
 import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
+import { AspectRatio } from "../ui/aspect-ratio";
 
 export function SampleCard(sample: Sample) {
   return (
     <Card className="break-inside-avoid-column rounded-lg overflow-hidden py-0 gap-0 ">
       <CardContent className="p-0 relative">
-        {sample.image ? (
-          <Image
-            src={`${ENDPOINT}/storage/buckets/${SAMPLE_BUCKET_ID}/files/${sample.image}/view?project=${PROJECT_ID}`}
-            alt={sample.name}
-            className="object-cover bg-primary"
-            width={500}
-            height={500}
-            sizes="(max-width: 500px)"
-          />
-        ) : (
-          <div className="w-full aspect-square bg-muted grid place-items-center">
-            <p className="text-muted-foreground font-semibold">No image</p>
-          </div>
-        )}
+        <AspectRatio ratio={1} className="w-full">
+          {sample.image ? (
+            <Image
+              src={`${ENDPOINT}/storage/buckets/${SAMPLE_BUCKET_ID}/files/${sample.image}/view?project=${PROJECT_ID}`}
+              alt={sample.name}
+              className="object-cover object-left-top bg-primary"
+              fill
+            />
+          ) : (
+            <div className="w-full aspect-square bg-muted grid place-items-center">
+              <p className="text-muted-foreground font-semibold">No image</p>
+            </div>
+          )}
+        </AspectRatio>
         <CardHeader className="flex flex-col justify-end bottom-0 absolute w-full p-4 h-full bg-linear-to-t from-primary to-primary/20">
           <CardTitle className="text-primary-foreground">
             <Button
