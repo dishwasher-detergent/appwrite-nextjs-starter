@@ -1,4 +1,8 @@
-import { LucideEllipsisVertical, LucideStar } from "lucide-react";
+import {
+  LucideEllipsisVertical,
+  LucideMailWarning,
+  LucideStar,
+} from "lucide-react";
 
 import { DemoteMemberAdmin } from "@/components/team/demote-admin";
 import { PromoteMemberAdmin } from "@/components/team/promote-admin";
@@ -38,6 +42,7 @@ export function TeamMembers({ members, teamId, isOwner }: TeamMembersProps) {
               <TableHead />
               <TableHead className="w-full">User</TableHead>
               <TableHead>Role</TableHead>
+              <TableHead>Joined</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -45,9 +50,14 @@ export function TeamMembers({ members, teamId, isOwner }: TeamMembersProps) {
             {members?.map((member) => (
               <TableRow key={member.$id}>
                 <TableCell>
-                  {member.roles.includes(ADMIN_ROLE) && (
-                    <LucideStar className="size-3.5 text-amber-600" />
-                  )}
+                  <div className="flex flex-row gap-2 items-center">
+                    {member.roles.includes(ADMIN_ROLE) && (
+                      <LucideStar className="size-3.5 text-amber-600" />
+                    )}
+                    {!member.confirmed && (
+                      <LucideMailWarning className="size-3.5" />
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <Button variant="link" asChild>
@@ -55,6 +65,11 @@ export function TeamMembers({ members, teamId, isOwner }: TeamMembersProps) {
                   </Button>
                 </TableCell>
                 <TableCell>{member.roles.join(", ")}</TableCell>
+                <TableCell>
+                  {member.joinedAt
+                    ? new Date(member.joinedAt).toLocaleDateString()
+                    : "N/A"}
+                </TableCell>
                 <TableCell>
                   {!member.roles.includes(OWNER_ROLE) && (
                     <MemberActions

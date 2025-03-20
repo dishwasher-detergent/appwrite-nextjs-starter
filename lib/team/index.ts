@@ -61,12 +61,17 @@ export async function getTeamById(id: string): Promise<Result<TeamData>> {
         );
 
         const usersMembershipData: UserMemberData[] = users.documents.map(
-          (user) => ({
-            ...user,
-            roles: memberships.memberships.filter(
+          (user) => {
+            const member = memberships.memberships.filter(
               (member) => member.userId === user.$id
-            )[0].roles,
-          })
+            )[0];
+            return {
+              ...user,
+              roles: member.roles,
+              confirmed: member.confirm,
+              joinedAt: member.joined,
+            };
+          }
         );
 
         return {

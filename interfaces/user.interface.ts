@@ -8,6 +8,8 @@ export interface UserData extends Models.Document {
 
 export interface UserMemberData extends UserData {
   roles: string[];
+  confirmed: boolean;
+  joinedAt: string;
 }
 
 export interface User extends Models.User<Models.Preferences>, UserData {}
