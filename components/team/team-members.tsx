@@ -56,7 +56,7 @@ export function TeamMembers({ members, teamId, isOwner }: TeamMembersProps) {
                 </TableCell>
                 <TableCell>{member.roles.join(", ")}</TableCell>
                 <TableCell>
-                  {!member.roles.includes(ADMIN_ROLE) && (
+                  {!member.roles.includes(OWNER_ROLE) && (
                     <MemberActions
                       member={member}
                       teamId={teamId}

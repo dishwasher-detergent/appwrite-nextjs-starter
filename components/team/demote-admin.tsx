@@ -10,6 +10,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
+  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -69,6 +70,9 @@ export function DemoteMemberAdmin({ userId, teamId }: DemoteMemberAdminProps) {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Demote Member From Admin?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to demote this member from admin?
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => setOpen(!open)}>

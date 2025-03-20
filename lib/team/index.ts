@@ -416,9 +416,7 @@ export async function leaveTeam(teamId: string): Promise<Result<string>> {
     }
 
     if (membership.roles.includes(OWNER_ROLE)) {
-      throw new Error(
-        "You cannot leave a team you own. Please transfer ownership first."
-      );
+      throw new Error("You cannot leave a team you own.");
     }
 
     await team.deleteMembership(teamId, membership.$id);
