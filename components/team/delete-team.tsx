@@ -26,7 +26,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { TEAM_NAME_MAX_LENGTH } from "@/constants/team.constants";
 import { TeamData } from "@/interfaces/team.interface";
-import { deleteAvatarImage } from "@/lib/storage";
 import { deleteTeam } from "@/lib/team";
 import { DeleteTeamFormData, deleteTeamSchema } from "@/lib/team/schemas";
 import { cn } from "@/lib/utils";
@@ -86,16 +85,6 @@ function DeleteForm({ className, setOpen, team }: FormProps) {
       toast.error("Name does not match.");
       setLoading(false);
       return;
-    }
-
-    if (team.avatar) {
-      const image = await deleteAvatarImage(team.avatar);
-
-      if (!image.success) {
-        toast.error(image.message);
-        setLoading(false);
-        return;
-      }
     }
 
     const data = await deleteTeam(team.$id);

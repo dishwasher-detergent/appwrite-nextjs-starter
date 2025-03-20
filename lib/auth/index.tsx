@@ -10,6 +10,7 @@ import { User, UserData } from "@/interfaces/user.interface";
 import { COOKIE_KEY, DATABASE_ID, USER_COLLECTION_ID } from "@/lib/constants";
 import { createUserData } from "@/lib/db";
 import { createAdminClient, createSessionClient } from "@/lib/server/appwrite";
+import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
 import {
   ResetPasswordFormData,
   SignInFormData,
@@ -166,9 +167,48 @@ export async function updateProfile({
   id: string;
   data: UpdateProfileFormData;
 }): Promise<Response> {
+  const user = await getCachedLoggedInUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "You must be logged in to perform this action.",
+    };
+  }
+
   const { account, database } = await createSessionClient();
 
   try {
+    const userData = await database.getDocument<UserData>(
+      DATABASE_ID,
+      USER_COLLECTION_ID,
+      user.$id
+    );
+
+    if (data.image instanceof File) {
+      if (userData.avatar) {
+        await deleteAvatarImage(userData.avatar);
+      }
+
+      const image = await uploadAvatarImage({
+        data: data.image,
+      });
+
+      if (!image.success) {
+        throw new Error(image.message);
+      }
+
+      data.image = image.data?.$id;
+    } else if (data.image === null && userData.avatar) {
+      const image = await deleteAvatarImage(userData.avatar);
+
+      if (!image.success) {
+        throw new Error(image.message);
+      }
+
+      data.image = null;
+    }
+
     await account.updateName(data.name);
     await database.updateDocument(DATABASE_ID, USER_COLLECTION_ID, id, {
       avatar: data.image,

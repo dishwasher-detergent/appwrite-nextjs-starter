@@ -29,7 +29,6 @@ import { Sample } from "@/interfaces/sample.interface";
 import { SAMPLE_BUCKET_ID } from "@/lib/constants";
 import { updateSample } from "@/lib/db";
 import { EditSampleFormData, editSampleSchema } from "@/lib/db/schemas";
-import { deleteSampleImage, uploadSampleImage } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 
 export function EditSample({ sample }: { sample: Sample }) {
@@ -72,34 +71,6 @@ function CreateForm({ className, setOpen, sample }: FormProps) {
 
   async function onSubmit(values: EditSampleFormData) {
     setLoading(true);
-
-    if (values.image instanceof File) {
-      if (sample.image) {
-        await deleteSampleImage(sample.image);
-      }
-
-      const image = await uploadSampleImage({
-        data: values.image,
-      });
-
-      if (!image.success) {
-        toast.error(image.message);
-        setLoading(false);
-        return;
-      }
-
-      values.image = image.data?.$id;
-    } else if (values.image === null && sample.image) {
-      const image = await deleteSampleImage(sample.image);
-
-      if (!image.success) {
-        toast.error(image.message);
-        setLoading(false);
-        return;
-      }
-
-      values.image = null;
-    }
 
     const data = await updateSample({
       id: sample.$id,

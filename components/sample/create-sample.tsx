@@ -28,7 +28,6 @@ import { TeamData } from "@/interfaces/team.interface";
 import { SAMPLE_BUCKET_ID } from "@/lib/constants";
 import { createSample } from "@/lib/db";
 import { AddSampleFormData, addSampleSchema } from "@/lib/db/schemas";
-import { uploadSampleImage } from "@/lib/storage";
 import { cn, getInitials } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { ImageInput } from "../ui/image-input";
@@ -88,20 +87,6 @@ function CreateForm({ className, setOpen, teams }: FormProps) {
 
   async function onSubmit(values: AddSampleFormData) {
     setLoading(true);
-
-    if (values.image instanceof File) {
-      const image = await uploadSampleImage({
-        data: values.image,
-      });
-
-      if (!image.success) {
-        toast.error(image.message);
-        setLoading(false);
-        return;
-      }
-
-      values.image = image.data?.$id;
-    }
 
     const data = await createSample({
       data: values,

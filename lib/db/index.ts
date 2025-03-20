@@ -15,6 +15,7 @@ import {
   USER_COLLECTION_ID,
 } from "@/lib/constants";
 import { createSessionClient } from "@/lib/server/appwrite";
+import { deleteSampleImage, uploadSampleImage } from "@/lib/storage";
 import { AddSampleFormData, EditSampleFormData } from "./schemas";
 
 /**
@@ -222,9 +223,23 @@ export async function createSample({
     ...permissions,
     Permission.read(Role.user(user.$id)),
     Permission.write(Role.user(user.$id)),
+    Permission.read(Role.team(data.teamId)),
   ];
 
   try {
+    if (data.image instanceof File) {
+      const image = await uploadSampleImage({
+        data: data.image,
+        permissions: [Permission.read(Role.team(data.teamId))],
+      });
+
+      if (!image.success) {
+        throw new Error(image.message);
+      }
+
+      data.image = image.data?.$id;
+    }
+
     const sample = await database.createDocument<Sample>(
       DATABASE_ID,
       SAMPLE_COLLECTION_ID,
@@ -300,6 +315,36 @@ export async function updateSample({
   const { database } = await createSessionClient();
 
   try {
+    const existingSample = await database.getDocument<Sample>(
+      DATABASE_ID,
+      SAMPLE_COLLECTION_ID,
+      id
+    );
+
+    if (data.image instanceof File) {
+      if (existingSample.image) {
+        await deleteSampleImage(existingSample.image);
+      }
+
+      const image = await uploadSampleImage({
+        data: data.image,
+      });
+
+      if (!image.success) {
+        throw new Error(image.message);
+      }
+
+      data.image = image.data?.$id;
+    } else if (data.image === null && existingSample.image) {
+      const image = await deleteSampleImage(existingSample.image);
+
+      if (!image.success) {
+        throw new Error(image.message);
+      }
+
+      data.image = null;
+    }
+
     const sample = await database.updateDocument<Sample>(
       DATABASE_ID,
       SAMPLE_COLLECTION_ID,
@@ -365,6 +410,20 @@ export async function deleteSample(id: string): Promise<Result<Sample>> {
   const { database } = await createSessionClient();
 
   try {
+    const sample = await database.getDocument<Sample>(
+      DATABASE_ID,
+      SAMPLE_COLLECTION_ID,
+      id
+    );
+
+    if (sample.image) {
+      const image = await deleteSampleImage(sample.image);
+
+      if (!image.success) {
+        throw new Error(image.message);
+      }
+    }
+
     await database.deleteDocument(DATABASE_ID, SAMPLE_COLLECTION_ID, id);
 
     revalidateTag("samples");

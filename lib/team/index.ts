@@ -11,12 +11,13 @@ import { getCachedLoggedInUser } from "@/lib/auth";
 import {
   DATABASE_ID,
   HOSTNAME,
+  MAX_TEAM_LIMIT,
   TEAM_COLLECTION_ID,
   USER_COLLECTION_ID,
-  MAX_TEAM_LIMIT
 } from "@/lib/constants";
+import { createUserData } from "@/lib/db";
 import { createSessionClient } from "@/lib/server/appwrite";
-import { createUserData } from "../db";
+import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
 import { AddTeamFormData, EditTeamFormData } from "./schemas";
 
 /**
@@ -186,8 +187,10 @@ export async function createTeam({
       [Query.select(["$id"])]
     );
 
-    if(existingTeams.total >= MAX_TEAM_LIMIT) {
-      throw new Error(`You have reached the maximum amount of teams allowed. (${MAX_TEAM_LIMIT})`);
+    if (existingTeams.total >= MAX_TEAM_LIMIT) {
+      throw new Error(
+        `You have reached the maximum amount of teams allowed. (${MAX_TEAM_LIMIT})`
+      );
     }
 
     const teamResponse = await team.create(id, data.name, [
@@ -263,6 +266,36 @@ export async function updateTeam({
   try {
     await checkUserRole(id, user.$id, [ADMIN_ROLE]);
 
+    const team = await database.getDocument<TeamData>(
+      DATABASE_ID,
+      TEAM_COLLECTION_ID,
+      id
+    );
+
+    if (data.image instanceof File) {
+      if (team.avatar) {
+        await deleteAvatarImage(team.avatar);
+      }
+
+      const image = await uploadAvatarImage({
+        data: data.image,
+      });
+
+      if (!image.success) {
+        throw new Error(image.message);
+      }
+
+      data.image = image.data?.$id;
+    } else if (data.image === null && team.avatar) {
+      const image = await deleteAvatarImage(team.avatar);
+
+      if (!image.success) {
+        throw new Error(image.message);
+      }
+
+      data.image = null;
+    }
+
     await team.updateName(id, data.name);
 
     const teamData = await database.updateDocument<TeamData>(
@@ -317,6 +350,20 @@ export async function deleteTeam(id: string): Promise<Result<TeamData>> {
 
   try {
     await checkUserRole(id, user.$id, [ADMIN_ROLE]);
+
+    const team = await database.getDocument<TeamData>(
+      DATABASE_ID,
+      TEAM_COLLECTION_ID,
+      id
+    );
+
+    if (team.avatar) {
+      const image = await deleteAvatarImage(team.avatar);
+
+      if (!image.success) {
+        throw new Error(image.message);
+      }
+    }
 
     await team.delete(id);
     await database.deleteDocument(DATABASE_ID, TEAM_COLLECTION_ID, id);

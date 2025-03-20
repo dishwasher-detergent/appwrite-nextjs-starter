@@ -31,7 +31,6 @@ import {
 } from "@/constants/team.constants";
 import { TeamData } from "@/interfaces/team.interface";
 import { AVATAR_BUCKET_ID } from "@/lib/constants";
-import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
 import { updateTeam } from "@/lib/team";
 import { EditTeamFormData, editTeamSchema } from "@/lib/team/schemas";
 import { cn } from "@/lib/utils";
@@ -84,34 +83,6 @@ function EditForm({ className, setOpen, team }: FormProps) {
 
   async function onSubmit(values: EditTeamFormData) {
     setLoading(true);
-
-    if (values.image instanceof File) {
-      if (team.avatar) {
-        await deleteAvatarImage(team.avatar);
-      }
-
-      const image = await uploadAvatarImage({
-        data: values.image,
-      });
-
-      if (!image.success) {
-        toast.error(image.message);
-        setLoading(false);
-        return;
-      }
-
-      values.image = image.data?.$id;
-    } else if (values.image === null && team.avatar) {
-      const image = await deleteAvatarImage(team.avatar);
-
-      if (!image.success) {
-        toast.error(image.message);
-        setLoading(false);
-        return;
-      }
-
-      values.image = null;
-    }
 
     const data = await updateTeam({
       id: team.$id,
