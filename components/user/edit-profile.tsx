@@ -33,7 +33,6 @@ import { UserData } from "@/interfaces/user.interface";
 import { updateProfile } from "@/lib/auth";
 import { UpdateProfileFormData, updateProfileSchema } from "@/lib/auth/schemas";
 import { AVATAR_BUCKET_ID } from "@/lib/constants";
-import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 
 export function EditProfile({ user }: { user: UserData }) {
@@ -84,34 +83,6 @@ function EditForm({ className, setOpen, user }: FormProps) {
 
   async function onSubmit(values: UpdateProfileFormData) {
     setLoading(true);
-
-    if (values.image instanceof File) {
-      if (user.avatar) {
-        await deleteAvatarImage(user.avatar);
-      }
-
-      const image = await uploadAvatarImage({
-        data: values.image,
-      });
-
-      if (!image.success) {
-        toast.error(image.message);
-        setLoading(false);
-        return;
-      }
-
-      values.image = image.data?.$id;
-    } else if (values.image === null && user.avatar) {
-      const image = await deleteAvatarImage(user.avatar);
-
-      if (!image.success) {
-        toast.error(image.message);
-        setLoading(false);
-        return;
-      }
-
-      values.image = null;
-    }
 
     const data = await updateProfile({
       id: user.$id,

@@ -1,6 +1,6 @@
-import { AddSample } from "@/components/create-sample";
-import { CreateTeam } from "@/components/create-team";
 import { Samples } from "@/components/realtime/samples";
+import { AddSample } from "@/components/sample/create-sample";
+import { CreateTeam } from "@/components/team/create-team";
 import { listSamples } from "@/lib/db";
 import { listTeams } from "@/lib/team";
 import { Query } from "node-appwrite";

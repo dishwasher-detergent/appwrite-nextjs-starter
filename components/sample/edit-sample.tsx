@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LucideLoader2, LucidePlus } from "lucide-react";
+import { LucideLoader2, LucidePencil } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -18,92 +18,62 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { ImageInput } from "@/components/ui/image-input";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   DESCRIPTION_MAX_LENGTH,
   NAME_MAX_LENGTH,
 } from "@/constants/sample.constants";
-import { TeamData } from "@/interfaces/team.interface";
+import { Sample } from "@/interfaces/sample.interface";
 import { SAMPLE_BUCKET_ID } from "@/lib/constants";
-import { createSample } from "@/lib/db";
-import { AddSampleFormData, addSampleSchema } from "@/lib/db/schemas";
-import { uploadSampleImage } from "@/lib/storage";
-import { cn, getInitials } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { ImageInput } from "./ui/image-input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
+import { updateSample } from "@/lib/db";
+import { EditSampleFormData, editSampleSchema } from "@/lib/db/schemas";
+import { cn } from "@/lib/utils";
 
-interface AddSampleProps {
-  teams: TeamData[];
-}
-
-export function AddSample({ teams }: AddSampleProps) {
+export function EditSample({ sample }: { sample: Sample }) {
   const [open, setOpen] = useState(false);
 
   return (
     <DyanmicDrawer
-      title="Sample"
-      description="Create a new Sample"
+      title={`Edit ${sample.name}`}
+      description="Make any changes to this sample."
       open={open}
       setOpen={setOpen}
       button={
-        <Button size="sm">
-          Add Sample
-          <LucidePlus className="ml-2 size-3.5" />
+        <Button variant="ghost" size="icon">
+          <LucidePencil className="size-3.5" />
         </Button>
       }
     >
-      <CreateForm setOpen={setOpen} teams={teams} />
+      <CreateForm setOpen={setOpen} sample={sample} />
     </DyanmicDrawer>
   );
 }
 
 interface FormProps extends React.ComponentProps<"form"> {
   setOpen: (e: boolean) => void;
-  teams: TeamData[];
+  sample: Sample;
 }
 
-function CreateForm({ className, setOpen, teams }: FormProps) {
+function CreateForm({ className, setOpen, sample }: FormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
 
-  console.log(teams);
-
-  const form = useForm<AddSampleFormData>({
-    resolver: zodResolver(addSampleSchema),
+  const form = useForm<EditSampleFormData>({
+    resolver: zodResolver(editSampleSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      image: null,
-      teamId: teams.length == 1 ? teams[0].$id : "",
+      name: sample.name,
+      description: sample.description,
+      image: sample.image,
     },
   });
 
-  async function onSubmit(values: AddSampleFormData) {
+  async function onSubmit(values: EditSampleFormData) {
     setLoading(true);
 
-    if (values.image instanceof File) {
-      const image = await uploadSampleImage({
-        data: values.image,
-      });
-
-      if (!image.success) {
-        toast.error(image.message);
-        setLoading(false);
-        return;
-      }
-
-      values.image = image.data?.$id;
-    }
-
-    const data = await createSample({
+    const data = await updateSample({
+      id: sample.$id,
       data: values,
     });
 
@@ -129,44 +99,6 @@ function CreateForm({ className, setOpen, teams }: FormProps) {
         )}
       >
         <div className="h-full space-y-4 overflow-auto p-1">
-          <FormField
-            control={form.control}
-            name="teamId"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Team</FormLabel>
-                <Select
-                  disabled={teams.length == 1}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a team" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {teams.map((team) => (
-                      <SelectItem key={team.$id} value={team.$id}>
-                        <Avatar className="mr-2 h-6 w-6">
-                          <AvatarImage
-                            src={team.avatar}
-                            alt={team.name}
-                            className="object-cover"
-                          />
-                          <AvatarFallback>
-                            {getInitials(team.name)}
-                          </AvatarFallback>
-                        </Avatar>
-                        {team.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <FormField
             control={form.control}
             name="name"
@@ -233,16 +165,12 @@ function CreateForm({ className, setOpen, teams }: FormProps) {
             )}
           />
         </div>
-        <Button
-          className="sticky bottom-0"
-          type="submit"
-          disabled={loading || !form.formState.isValid}
-        >
-          Create
+        <Button type="submit" disabled={loading || !form.formState.isValid}>
+          Save
           {loading ? (
             <LucideLoader2 className="mr-2 size-3.5 animate-spin" />
           ) : (
-            <LucidePlus className="mr-2 size-3.5" />
+            <LucidePencil className="mr-2 size-3.5" />
           )}
         </Button>
       </form>

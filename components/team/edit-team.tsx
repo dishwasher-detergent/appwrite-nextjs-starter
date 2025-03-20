@@ -9,6 +9,10 @@ import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+} from "@/components/ui/dropdown-menu";
 import { DyanmicDrawer } from "@/components/ui/dynamic-drawer";
 import {
   Form,
@@ -22,87 +26,66 @@ import { ImageInput } from "@/components/ui/image-input";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  DESCRIPTION_MAX_LENGTH,
-  NAME_MAX_LENGTH,
-} from "@/constants/sample.constants";
-import { Sample } from "@/interfaces/sample.interface";
-import { SAMPLE_BUCKET_ID } from "@/lib/constants";
-import { updateSample } from "@/lib/db";
-import { EditSampleFormData, editSampleSchema } from "@/lib/db/schemas";
-import { deleteSampleImage, uploadSampleImage } from "@/lib/storage";
+  TEAM_ABOUT_MAX_LENGTH,
+  TEAM_NAME_MAX_LENGTH,
+} from "@/constants/team.constants";
+import { TeamData } from "@/interfaces/team.interface";
+import { AVATAR_BUCKET_ID } from "@/lib/constants";
+import { updateTeam } from "@/lib/team";
+import { EditTeamFormData, editTeamSchema } from "@/lib/team/schemas";
 import { cn } from "@/lib/utils";
 
-export function EditSample({ sample }: { sample: Sample }) {
+export function EditTeam({ team }: { team: TeamData }) {
   const [open, setOpen] = useState(false);
 
   return (
     <DyanmicDrawer
-      title={`Edit ${sample.name}`}
-      description="Make any changes to this sample."
+      title={`Edit ${team.name}.`}
+      description="Make any changes to this team."
       open={open}
       setOpen={setOpen}
       button={
-        <Button variant="ghost" size="icon">
-          <LucidePencil className="size-3.5" />
-        </Button>
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.preventDefault();
+            setOpen(!open);
+          }}
+        >
+          Edit
+          <DropdownMenuShortcut>
+            <LucidePencil className="size-3.5" />
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
       }
     >
-      <CreateForm setOpen={setOpen} sample={sample} />
+      <EditForm setOpen={setOpen} team={team} />
     </DyanmicDrawer>
   );
 }
 
 interface FormProps extends React.ComponentProps<"form"> {
   setOpen: (e: boolean) => void;
-  sample: Sample;
+  team: TeamData;
 }
 
-function CreateForm({ className, setOpen, sample }: FormProps) {
+function EditForm({ className, setOpen, team }: FormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const form = useForm<EditSampleFormData>({
-    resolver: zodResolver(editSampleSchema),
+  const form = useForm<EditTeamFormData>({
+    resolver: zodResolver(editTeamSchema),
     defaultValues: {
-      name: sample.name,
-      description: sample.description,
-      image: sample.image,
+      name: team.name,
+      about: team.about ?? "",
+      image: team.avatar,
     },
   });
 
-  async function onSubmit(values: EditSampleFormData) {
+  async function onSubmit(values: EditTeamFormData) {
     setLoading(true);
 
-    if (values.image instanceof File) {
-      if (sample.image) {
-        await deleteSampleImage(sample.image);
-      }
-
-      const image = await uploadSampleImage({
-        data: values.image,
-      });
-
-      if (!image.success) {
-        toast.error(image.message);
-        setLoading(false);
-        return;
-      }
-
-      values.image = image.data?.$id;
-    } else if (values.image === null && sample.image) {
-      const image = await deleteSampleImage(sample.image);
-
-      if (!image.success) {
-        toast.error(image.message);
-        setLoading(false);
-        return;
-      }
-
-      values.image = null;
-    }
-
-    const data = await updateSample({
-      id: sample.$id,
+    const data = await updateTeam({
+      id: team.$id,
       data: values,
     });
 
@@ -133,20 +116,20 @@ function CreateForm({ className, setOpen, sample }: FormProps) {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Sample</FormLabel>
+                <FormLabel>Name</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
                       {...field}
                       placeholder="Name your sample."
                       className="truncate pr-20"
-                      maxLength={NAME_MAX_LENGTH}
+                      maxLength={TEAM_NAME_MAX_LENGTH}
                     />
                     <Badge
                       className="absolute right-1.5 top-1/2 -translate-y-1/2"
                       variant="secondary"
                     >
-                      {field?.value?.length}/{NAME_MAX_LENGTH}
+                      {field?.value?.length}/{TEAM_NAME_MAX_LENGTH}
                     </Badge>
                   </div>
                 </FormControl>
@@ -156,23 +139,23 @@ function CreateForm({ className, setOpen, sample }: FormProps) {
           />
           <FormField
             control={form.control}
-            name="description"
+            name="about"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Description</FormLabel>
+                <FormLabel>About</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Textarea
                       {...field}
-                      placeholder="Describe your sample."
+                      placeholder="Tell us about yourself."
                       className="pb-8"
-                      maxLength={DESCRIPTION_MAX_LENGTH}
+                      maxLength={TEAM_ABOUT_MAX_LENGTH}
                     />
                     <Badge
                       className="absolute bottom-2 left-2"
                       variant="secondary"
                     >
-                      {field?.value?.length ?? 0}/{DESCRIPTION_MAX_LENGTH}
+                      {field?.value?.length ?? 0}/{TEAM_ABOUT_MAX_LENGTH}
                     </Badge>
                   </div>
                 </FormControl>
@@ -185,9 +168,9 @@ function CreateForm({ className, setOpen, sample }: FormProps) {
             name="image"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Picture</FormLabel>
+                <FormLabel>Avatar</FormLabel>
                 <FormControl>
-                  <ImageInput bucketId={SAMPLE_BUCKET_ID} {...field} />
+                  <ImageInput bucketId={AVATAR_BUCKET_ID} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

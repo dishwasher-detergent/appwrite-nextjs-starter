@@ -1,6 +1,6 @@
 "use client";
 
-import { LucideLoader2, LucideShieldUser } from "lucide-react";
+import { LucideLoader2, LucideShieldBan } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -10,6 +10,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
+  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -19,25 +20,22 @@ import {
   DropdownMenuItem,
   DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu";
-import { promoteToAdmin } from "@/lib/team";
+import { removeAdminRole } from "@/lib/team";
 
-interface PromoteMemberAdminProps {
+interface DemoteMemberAdminProps {
   userId: string;
   teamId: string;
 }
 
-export function PromoteMemberAdmin({
-  userId,
-  teamId,
-}: PromoteMemberAdminProps) {
+export function DemoteMemberAdmin({ userId, teamId }: DemoteMemberAdminProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
-  async function handlePromote() {
+  async function handleDemote() {
     setLoading(true);
 
-    const data = await promoteToAdmin(teamId, userId);
+    const data = await removeAdminRole(teamId, userId);
 
     if (data.success) {
       toast.success(data.message);
@@ -59,27 +57,28 @@ export function PromoteMemberAdmin({
             setOpen(!open);
           }}
         >
-          Promote to Admin
+          Demote from Admin
           <DropdownMenuShortcut>
             {loading ? (
               <LucideLoader2 className="size-3.5 animate-spin" />
             ) : (
-              <LucideShieldUser className="size-3.5" />
+              <LucideShieldBan className="size-3.5" />
             )}
           </DropdownMenuShortcut>
         </DropdownMenuItem>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Promote Member To Admin?</AlertDialogTitle>
+          <AlertDialogTitle>Demote Member From Admin?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to demote this member from admin?
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => setOpen(!open)}>
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction onClick={handlePromote}>
-            Continue
-          </AlertDialogAction>
+          <AlertDialogAction onClick={handleDemote}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

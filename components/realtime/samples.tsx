@@ -2,7 +2,7 @@
 
 import { LucideLoader2 } from "lucide-react";
 
-import { SampleCard } from "@/components/sample-card";
+import { SampleCard } from "@/components/sample/sample-card";
 import { useSamples } from "@/hooks/useSamples";
 import { Sample } from "@/interfaces/sample.interface";
 
