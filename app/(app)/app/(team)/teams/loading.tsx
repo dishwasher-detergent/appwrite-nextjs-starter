@@ -1,9 +1,5 @@
-import { LucideLoader2 } from "lucide-react";
+import { TeamCardLoading } from "@/components/team/team-card-loading";
 
 export default function Loading() {
-  return (
-    <div className="w-full h-full grid place-items-center">
-      <LucideLoader2 className="size-8 animate-spin" />
-    </div>
-  );
+  return <TeamCardLoading />;
 }

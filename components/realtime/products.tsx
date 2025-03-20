@@ -1,8 +1,7 @@
 "use client";
 
-import { LucideLoader2 } from "lucide-react";
-
 import { ProductCard } from "@/components/product/product-card";
+import { ProductCardLoading } from "@/components/product/product-card-loading";
 import { useProducts } from "@/hooks/useProducts";
 import { Product } from "@/interfaces/product.interface";
 
@@ -19,12 +18,7 @@ export function Products({ initialProducts, teamId, userId }: ProductsProps) {
     userId,
   });
 
-  if (loading)
-    return (
-      <div className="w-full h-full grid place-items-center">
-        <LucideLoader2 className="size-8 animate-spin" />
-      </div>
-    );
+  if (loading) return <ProductCardLoading />;
 
   return (
     <section className="min-h-full columns-xs items-start gap-4 space-y-4 w-full">
