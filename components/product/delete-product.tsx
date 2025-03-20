@@ -9,6 +9,10 @@ import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+} from "@/components/ui/dropdown-menu";
 import { DyanmicDrawer } from "@/components/ui/dynamic-drawer";
 import {
   Form,
@@ -36,9 +40,17 @@ export function DeleteProduct({ product }: { product: Product }) {
       open={open}
       setOpen={setOpen}
       button={
-        <Button size="icon" variant="destructive">
-          <LucideTrash2 className="size-3.5" />
-        </Button>
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.preventDefault();
+            setOpen(!open);
+          }}
+        >
+          Delete
+          <DropdownMenuShortcut>
+            <LucideTrash2 className="size-3.5" />
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
       }
     >
       <DeleteForm setOpen={setOpen} product={product} />
