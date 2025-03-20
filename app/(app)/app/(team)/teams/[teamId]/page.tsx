@@ -17,6 +17,11 @@ export default async function TeamPage({
 }) {
   const { teamId } = await params;
   const { data, success } = await getTeamById(teamId);
+
+  if (!success || !data) {
+    redirect("/app");
+  }
+
   const { data: roles } = await getCurrentUserRoles(teamId);
   const { data: productData } = await listProducts([
     Query.orderDesc("$createdAt"),
@@ -25,10 +30,6 @@ export default async function TeamPage({
 
   const isOwner = roles!.includes(OWNER_ROLE);
   const isAdmin = roles!.includes(ADMIN_ROLE);
-
-  if (!success || !data) {
-    redirect("/app");
-  }
 
   return (
     <article className="space-y-6">

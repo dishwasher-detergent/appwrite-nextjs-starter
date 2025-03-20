@@ -11,12 +11,13 @@ export default async function ProductPage({
 }) {
   const { productId } = await params;
   const { data, success } = await getProductById(productId);
-  const user = await getLoggedInUser();
-  const isOwnProduct = user?.$id === data?.userId;
 
   if (!success || !data) {
     redirect("/app");
   }
+
+  const user = await getLoggedInUser();
+  const isOwnProduct = user?.$id === data?.userId;
 
   return <Product initialProduct={data} canEdit={isOwnProduct} />;
 }

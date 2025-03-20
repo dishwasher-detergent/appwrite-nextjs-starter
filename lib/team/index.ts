@@ -19,6 +19,7 @@ import {
 } from "@/lib/constants";
 import { createSessionClient } from "@/lib/server/appwrite";
 import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
+import { deleteProduct } from "../db";
 import { AddTeamFormData, EditTeamFormData } from "./schemas";
 
 /**
@@ -386,13 +387,7 @@ export async function deleteTeam(id: string): Promise<Result<TeamData>> {
       );
 
       await Promise.all(
-        response.documents.map((document) =>
-          database.deleteDocument(
-            DATABASE_ID,
-            SAMPLE_COLLECTION_ID,
-            document.$id
-          )
-        )
+        response.documents.map((document) => deleteProduct(document.$id))
       );
     } while (response.documents.length > 0);
 

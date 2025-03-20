@@ -15,16 +15,17 @@ export default async function ProfilePage({
   const user = await getLoggedInUser();
   const { userId } = await params;
   const { data } = await getUserById(userId);
+
+  if (!data) {
+    redirect("/app");
+  }
+
   const { data: productData } = await listProducts([
     Query.orderDesc("$createdAt"),
     Query.equal("userId", userId),
   ]);
 
   const isOwnProfile = user?.$id === userId;
-
-  if (!data) {
-    redirect("/app");
-  }
 
   return (
     <article className="space-y-6">

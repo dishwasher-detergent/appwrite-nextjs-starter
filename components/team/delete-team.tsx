@@ -91,7 +91,7 @@ function DeleteForm({ className, setOpen, team }: FormProps) {
 
     if (data.success) {
       toast.success(data.message);
-      router.refresh();
+      router.push("/app/teams");
       setOpen(false);
     } else {
       toast.error(data.message);
