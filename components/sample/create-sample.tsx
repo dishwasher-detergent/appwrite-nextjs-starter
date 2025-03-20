@@ -73,8 +73,6 @@ function CreateForm({ className, setOpen, teams }: FormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
 
-  console.log(teams);
-
   const form = useForm<AddSampleFormData>({
     resolver: zodResolver(addSampleSchema),
     defaultValues: {

@@ -118,37 +118,28 @@ export async function listTeams(): Promise<Result<TeamData[]>> {
 
   const { database } = await createSessionClient();
 
-  return unstable_cache(
-    async () => {
-      try {
-        const data = await database.listDocuments<TeamData>(
-          DATABASE_ID,
-          TEAM_COLLECTION_ID
-        );
+  try {
+    const data = await database.listDocuments<TeamData>(
+      DATABASE_ID,
+      TEAM_COLLECTION_ID
+    );
 
-        return {
-          success: true,
-          message: "Teams successfully retrieved.",
-          data: data.documents,
-        };
-      } catch (err) {
-        const error = err as Error;
+    return {
+      success: true,
+      message: "Teams successfully retrieved.",
+      data: data.documents,
+    };
+  } catch (err) {
+    const error = err as Error;
 
-        // This is where you would look to something like Splunk.
-        console.error(error);
+    // This is where you would look to something like Splunk.
+    console.error(error);
 
-        return {
-          success: false,
-          message: error.message,
-        };
-      }
-    },
-    ["teams"],
-    {
-      tags: ["teams"],
-      revalidate: 600,
-    }
-  )();
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
 }
 
 /**

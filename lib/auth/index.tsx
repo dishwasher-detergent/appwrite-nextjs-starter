@@ -47,15 +47,11 @@ export async function getUserData(): Promise<Result<User>> {
     };
   }
 
-  console.log(user.$id);
-
   const { database } = await createSessionClient();
 
   return unstable_cache(
     async (id) => {
       try {
-        console.log(id);
-
         const data = await database.getDocument<UserData>(
           DATABASE_ID,
           USER_COLLECTION_ID,
