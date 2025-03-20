@@ -130,6 +130,36 @@ export default async function Home() {
             </li>
             <li>
               <div className="flex items-start">
+                <span className="mr-2 text-xl">👥</span>
+                <div className="flex-1">
+                  <h3 className="font-bold">Team Management</h3>
+                  <ul className="mt-2 ml-6 space-y-2">
+                    <li className="flex items-center">
+                      <span className="mr-2">🏢</span>
+                      Create and Manage Teams
+                    </li>
+                    <li className="flex items-center">
+                      <span className="mr-2">👥</span>
+                      Invite Team Members
+                    </li>
+                    <li className="flex items-center">
+                      <span className="mr-2">👑</span>
+                      Role-based Permissions (Owner, Admin, Member)
+                    </li>
+                    <li className="flex items-center">
+                      <span className="mr-2">🚪</span>
+                      Join/Leave Teams
+                    </li>
+                    <li className="flex items-center">
+                      <span className="mr-2">🔒</span>
+                      Team-specific Content Access
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </li>
+            <li>
+              <div className="flex items-start">
                 <span className="mr-2 text-xl">📋</span>
                 <div className="flex-1">
                   <h3 className="font-bold">General</h3>

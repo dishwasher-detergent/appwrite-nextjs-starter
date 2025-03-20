@@ -23,8 +23,15 @@ spending time on repetitive setup tasks.
   - 📁 File Storage Implementations
   - ⚡ Realtime Updates
   - 🔄 Cache Invalidation
+- 👥 **Team Management**
+  - 🏢 Create and Manage Teams
+  - 👥 Invite Team Members
+  - 👑 Role-based Permissions (Owner, Admin, Member)
+  - 🚪 Join/Leave Teams
+  - 🔒 Team-specific Content Access
 - 👤 **User Management**
   - 👨‍💻 Profile Editing & Customization
+  - 🔗 Team Affiliations
 - 📋 **General**
   - 🛡️ Protected Routes
   - 🎨 TailwindCSS
