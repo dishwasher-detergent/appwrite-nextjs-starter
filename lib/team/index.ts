@@ -7,7 +7,7 @@ import { ADMIN_ROLE, OWNER_ROLE } from "@/constants/team.constants";
 import { Result } from "@/interfaces/result.interface";
 import { TeamData } from "@/interfaces/team.interface";
 import { UserData, UserMemberData } from "@/interfaces/user.interface";
-import { getCachedLoggedInUser } from "@/lib/auth";
+import { getLoggedInUser } from "@/lib/auth";
 import {
   DATABASE_ID,
   HOSTNAME,
@@ -26,7 +26,7 @@ import { AddTeamFormData, EditTeamFormData } from "./schemas";
  * @returns {Promise<Result<TeamData>} The team
  */
 export async function getTeamById(id: string): Promise<Result<TeamData>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -107,7 +107,7 @@ export async function getTeamById(id: string): Promise<Result<TeamData>> {
  * @returns {Promise<Result<TeamData[]>} The teams
  */
 export async function listTeams(): Promise<Result<TeamData[]>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -159,7 +159,7 @@ export async function createTeam({
   data: AddTeamFormData;
   permissions?: string[];
 }): Promise<Result<TeamData>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -248,7 +248,7 @@ export async function updateTeam({
   data: EditTeamFormData;
   permissions?: string[];
 }): Promise<Result<TeamData>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -333,7 +333,7 @@ export async function updateTeam({
  * @returns {Promise<Result<TeamData>>} The deleted team
  */
 export async function deleteTeam(id: string): Promise<Result<TeamData>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -389,7 +389,7 @@ export async function deleteTeam(id: string): Promise<Result<TeamData>> {
  * @returns {Promise<Result<string>>} The ID of another team the user is in.
  */
 export async function leaveTeam(teamId: string): Promise<Result<string>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -455,7 +455,7 @@ export async function inviteMember(
   teamId: string,
   email: string
 ): Promise<Result<void>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -507,7 +507,7 @@ export async function removeMember(
   teamId: string,
   userId: string
 ): Promise<Result<void>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -574,7 +574,7 @@ export async function promoteToAdmin(
   teamId: string,
   userId: string
 ): Promise<Result<void>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -623,7 +623,7 @@ export async function removeAdminRole(
   teamId: string,
   userId: string
 ): Promise<Result<void>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
@@ -665,7 +665,7 @@ export async function removeAdminRole(
 export async function getCurrentUserRoles(
   teamId: string
 ): Promise<Result<string[]>> {
-  const user = await getCachedLoggedInUser();
+  const user = await getLoggedInUser();
 
   if (!user) {
     return {
