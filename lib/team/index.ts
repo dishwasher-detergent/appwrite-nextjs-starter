@@ -261,7 +261,7 @@ export async function updateTeam({
     };
   }
 
-  const { database, team } = await createSessionClient();
+  const { database } = await createSessionClient();
 
   try {
     await checkUserRole(id, user.$id, [ADMIN_ROLE]);
@@ -346,7 +346,7 @@ export async function deleteTeam(id: string): Promise<Result<TeamData>> {
     };
   }
 
-  const { database, team } = await createSessionClient();
+  const { database } = await createSessionClient();
 
   try {
     await checkUserRole(id, user.$id, [ADMIN_ROLE]);
