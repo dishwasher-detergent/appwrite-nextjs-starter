@@ -464,7 +464,11 @@ export async function createUserData(
         name: name,
         avatar: null,
       },
-      [Permission.read(Role.user(id)), Permission.write(Role.user(id))]
+      [
+        Permission.read(Role.user(id)),
+        Permission.write(Role.user(id)),
+        Permission.read(Role.users()),
+      ]
     );
 
     return {

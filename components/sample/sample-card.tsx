@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { ProfileLink } from "@/components/profile-link";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,7 +16,6 @@ import {
 } from "@/components/ui/card";
 import { Sample } from "@/interfaces/sample.interface";
 import { ENDPOINT, PROJECT_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
-import { AspectRatio } from "../ui/aspect-ratio";
 
 export function SampleCard(sample: Sample) {
   return (
