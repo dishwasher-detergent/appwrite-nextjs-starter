@@ -257,20 +257,20 @@ export async function updateTeam({
     };
   }
 
-  const { database } = await createSessionClient();
+  const { database, team } = await createSessionClient();
 
   try {
     await checkUserRole(id, user.$id, [ADMIN_ROLE]);
 
-    const team = await database.getDocument<TeamData>(
+    const existingTeamData = await database.getDocument<TeamData>(
       DATABASE_ID,
       TEAM_COLLECTION_ID,
       id
     );
 
     if (data.image instanceof File) {
-      if (team.avatar) {
-        await deleteAvatarImage(team.avatar);
+      if (existingTeamData.avatar) {
+        await deleteAvatarImage(existingTeamData.avatar);
       }
 
       const image = await uploadAvatarImage({
@@ -282,8 +282,8 @@ export async function updateTeam({
       }
 
       data.image = image.data?.$id;
-    } else if (data.image === null && team.avatar) {
-      const image = await deleteAvatarImage(team.avatar);
+    } else if (data.image === null && existingTeamData.avatar) {
+      const image = await deleteAvatarImage(existingTeamData.avatar);
 
       if (!image.success) {
         throw new Error(image.message);
@@ -342,19 +342,19 @@ export async function deleteTeam(id: string): Promise<Result<TeamData>> {
     };
   }
 
-  const { database } = await createSessionClient();
+  const { database, team } = await createSessionClient();
 
   try {
     await checkUserRole(id, user.$id, [ADMIN_ROLE]);
 
-    const team = await database.getDocument<TeamData>(
+    const existingTeamData = await database.getDocument<TeamData>(
       DATABASE_ID,
       TEAM_COLLECTION_ID,
       id
     );
 
-    if (team.avatar) {
-      const image = await deleteAvatarImage(team.avatar);
+    if (existingTeamData.avatar) {
+      const image = await deleteAvatarImage(existingTeamData.avatar);
 
       if (!image.success) {
         throw new Error(image.message);
