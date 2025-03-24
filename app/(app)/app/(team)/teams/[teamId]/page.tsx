@@ -33,7 +33,7 @@ export default async function TeamPage({
 
   return (
     <article className="space-y-6">
-      <TeamHeader team={data} isAdmin={isAdmin} />
+      <TeamHeader team={data} isOwner={isOwner} />
       <main className="px-4 space-y-6">
         <TeamDescription team={data} />
         <TeamAdmins members={data.members ?? []} />

@@ -272,7 +272,7 @@ export async function updateTeam({
   const { database, team } = await createSessionClient();
 
   try {
-    await checkUserRole(id, user.$id, [ADMIN_ROLE]);
+    await checkUserRole(id, user.$id, [OWNER_ROLE]);
 
     const existingTeamData = await database.getDocument<TeamData>(
       DATABASE_ID,
@@ -357,7 +357,7 @@ export async function deleteTeam(id: string): Promise<Result<TeamData>> {
   const { database, team } = await createSessionClient();
 
   try {
-    await checkUserRole(id, user.$id, [ADMIN_ROLE]);
+    await checkUserRole(id, user.$id, [OWNER_ROLE]);
 
     const existingTeamData = await database.getDocument<TeamData>(
       DATABASE_ID,
@@ -494,6 +494,8 @@ export async function inviteMember(
   const { team } = await createSessionClient();
 
   try {
+    await checkUserRole(teamId, user.$id, [OWNER_ROLE]);
+
     const data = await team.createMembership(
       teamId,
       [],
