@@ -353,7 +353,7 @@ export async function signUpWithEmail(
       secure: true,
     });
 
-    await createUserData(session.userId, name);
+    await createUserData(session.userId);
 
     return {
       success: true,
@@ -466,8 +466,7 @@ export async function resetPassword(
  * @returns {Promise<Result<UserData>>} A promise that resolves to a result object indicating success or failure.
  */
 export async function createUserData(
-  userId: string,
-  name: string
+  userId: string
 ): Promise<Result<UserData>> {
   const user = await getLoggedInUser();
 
@@ -497,7 +496,7 @@ export async function createUserData(
       USER_COLLECTION_ID,
       userId,
       {
-        name: name,
+        name: user.name,
         avatar: null,
       },
       [

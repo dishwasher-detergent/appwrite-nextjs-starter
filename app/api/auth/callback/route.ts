@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     secure: true,
   });
 
-  await createUserData(session.userId, 'test');
+  await createUserData(session.userId);
 
   return NextResponse.redirect(`${request.nextUrl.origin}/app`);
 }

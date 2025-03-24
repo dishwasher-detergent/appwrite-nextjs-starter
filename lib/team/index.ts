@@ -507,7 +507,7 @@ export async function inviteMember(
       email.split("@")[0]
     );
 
-    await createUserData(data.userId, email.split("@")[0]);
+    await createUserData(data.userId);
 
     revalidateTag(`team:${teamId}`);
 
