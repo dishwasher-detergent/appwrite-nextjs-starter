@@ -52,5 +52,8 @@ export async function createAdminClient() {
     get account() {
       return new Account(client);
     },
+    get team() {
+      return new Teams(client);
+    },
   };
 }

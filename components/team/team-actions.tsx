@@ -27,9 +27,9 @@ export function TeamActions({ team, isOwner }: TeamActionsProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {!isOwner && <LeaveTeam team={team} />}
+        <InviteTeam team={team} />
         {isOwner && (
           <>
-            <InviteTeam team={team} />
             <EditTeam team={team} />
             <DeleteTeam team={team} />
           </>

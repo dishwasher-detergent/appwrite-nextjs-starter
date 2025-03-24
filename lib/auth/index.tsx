@@ -478,7 +478,7 @@ export async function createUserData(
     };
   }
 
-  const { database } = await createSessionClient();
+  const { database } = await createAdminClient();
 
   try {
     await database.getDocument<UserData>(

@@ -3,7 +3,7 @@
 import { revalidateTag, unstable_cache } from "next/cache";
 import { ID, Models, Permission, Query, Role } from "node-appwrite";
 
-import { ADMIN_ROLE, OWNER_ROLE } from "@/constants/team.constants";
+import { ADMIN_ROLE, OWNER_ROLE, MEMBER_ROLE } from "@/constants/team.constants";
 import { Product } from "@/interfaces/product.interface";
 import { Result } from "@/interfaces/result.interface";
 import { TeamData } from "@/interfaces/team.interface";
@@ -17,7 +17,7 @@ import {
   TEAM_COLLECTION_ID,
   USER_COLLECTION_ID,
 } from "@/lib/constants";
-import { createSessionClient } from "@/lib/server/appwrite";
+import { createSessionClient, createAdminClient } from "@/lib/server/appwrite";
 import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
 import { deleteProduct } from "../db";
 import { AddTeamFormData, EditTeamFormData } from "./schemas";
@@ -204,6 +204,7 @@ export async function createTeam({
     const teamResponse = await team.create(id, data.name, [
       ADMIN_ROLE,
       OWNER_ROLE,
+      MEMBER_ROLE
     ]);
 
     permissions = [
@@ -272,7 +273,7 @@ export async function updateTeam({
   const { database, team } = await createSessionClient();
 
   try {
-    await checkUserRole(id, user.$id, [OWNER_ROLE]);
+    await checkUserRole(id, user.$id, [ADMIN_ROLE]);
 
     const existingTeamData = await database.getDocument<TeamData>(
       DATABASE_ID,
@@ -491,14 +492,14 @@ export async function inviteMember(
     };
   }
 
-  const { team } = await createSessionClient();
+  const { team } = await createAdminClient();
 
   try {
-    await checkUserRole(teamId, user.$id, [OWNER_ROLE]);
+    await checkUserRole(teamId, user.$id, [MEMBER_ROLE]);
 
     const data = await team.createMembership(
       teamId,
-      [],
+      [MEMBER_ROLE],
       email,
       undefined,
       undefined,
