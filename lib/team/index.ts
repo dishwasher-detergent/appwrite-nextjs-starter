@@ -273,7 +273,7 @@ export async function updateTeam({
   const { database, team } = await createSessionClient();
 
   try {
-    await checkUserRole(id, user.$id, [ADMIN_ROLE]);
+    await checkUserRole(id, user.$id, [ADMIN_ROLE, OWNER_ROLE]);
 
     const existingTeamData = await database.getDocument<TeamData>(
       DATABASE_ID,
@@ -495,7 +495,7 @@ export async function inviteMember(
   const { team } = await createAdminClient();
 
   try {
-    await checkUserRole(teamId, user.$id, [MEMBER_ROLE]);
+    await checkUserRole(teamId, user.$id, [MEMBER_ROLE, ADMIN_ROLE, OWNER_ROLE]);
 
     const data = await team.createMembership(
       teamId,
