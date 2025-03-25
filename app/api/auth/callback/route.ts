@@ -16,14 +16,17 @@ export async function GET(request: NextRequest) {
   const { account } = await createAdminClient();
   const session = await account.createSession(userId, secret);
 
-  (await cookies()).set(COOKIE_KEY, session.secret, {
+  // Set the cookie in the response headers
+  const response = NextResponse.redirect(`${request.nextUrl.origin}/app`);
+  response.cookies.set(COOKIE_KEY, session.secret, {
     path: "/",
     httpOnly: true,
     sameSite: "strict",
     secure: true,
   });
 
+  // Create user data
   await createUserData(session.userId);
 
-  return NextResponse.redirect(`${request.nextUrl.origin}/app`);
+  return response;
 }
