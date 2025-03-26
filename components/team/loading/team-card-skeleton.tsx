@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function TeamCardLoading() {
+export function TeamCardSkeleton() {
   return (
     <section className="grid grid-cols-3 gap-4">
       {[...Array(3)].map((_, index) => (
