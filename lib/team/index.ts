@@ -417,14 +417,14 @@ export async function leaveTeam(teamId: string): Promise<Result<string>> {
       if (data.documents.length > 0) {
         return {
           success: true,
-          message: `You've left ${teamId}!`,
+          message: `You've left the team!`,
           data: data.documents[0].$id,
         };
       }
 
       return {
         success: true,
-        message: `You've left ${teamId}!`,
+        message: `You've left the team!`,
       };
     } catch (err) {
       const error = err as Error;
