@@ -1,7 +1,8 @@
 "use server";
 
 import { NextRequest, NextResponse } from "next/server";
-import { COOKIE_KEY } from "@/lib/constants"
+
+import { getLoggedInUser } from "@/lib/auth";
 
 const protectedRoutes = ["/app"];
 const publicRoutes = ["/signin", "/signup"];
@@ -11,13 +12,13 @@ export default async function middleware(req: NextRequest) {
   const isProtectedRoute = protectedRoutes.includes(path);
   const isPublicRoute = publicRoutes.includes(path);
 
-  const token = req.cookies.get(COOKIE_KEY);
+  const user = await getLoggedInUser();
 
-  if (isProtectedRoute && !token) {
+  if (isProtectedRoute && !user) {
     return NextResponse.redirect(new URL("/signin", req.nextUrl));
   }
 
-  if (isPublicRoute && token) {
+  if (isPublicRoute && user) {
     return NextResponse.redirect(new URL("/app", req.nextUrl));
   }
 
