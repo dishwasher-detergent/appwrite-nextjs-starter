@@ -1,7 +1,7 @@
 "use client";
 
+import { MultiCardSkeleton } from "@/components/loading/multi-card-skeleton";
 import { ProductCard } from "@/components/product/product-card";
-import { ProductCardLoading } from "@/components/product/product-card-loading";
 import { useProducts } from "@/hooks/useProducts";
 import { Product } from "@/interfaces/product.interface";
 
@@ -18,7 +18,7 @@ export function Products({ initialProducts, teamId, userId }: ProductsProps) {
     userId,
   });
 
-  if (loading) return <ProductCardLoading />;
+  if (loading) return <MultiCardSkeleton />;
 
   return (
     <section className="grid grid-cols-1 md:grid-cols-3 gap-4">

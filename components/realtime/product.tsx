@@ -1,10 +1,11 @@
 "use client";
 
-import { LucideLoader2 } from "lucide-react";
-
+import { CreatorSkeleton } from "@/components/loading/creator-skeleton";
+import { DescriptionSkeleton } from "@/components/loading/description-skeleton";
+import { HeaderSkeleton } from "@/components/loading/header-skeleton";
 import { ProductCreator } from "@/components/product/product-creator";
+import { ProductDescription } from "@/components/product/product-description";
 import { ProductHeader } from "@/components/product/product-header";
-import { ProductDescription } from "@/components/product/product-info";
 import { useProduct } from "@/hooks/useProduct";
 import { Product as ProductType } from "@/interfaces/product.interface";
 
@@ -18,9 +19,13 @@ export function Product({ initialProduct, canEdit }: ProductProps) {
 
   if (loading)
     return (
-      <div className="w-full h-full grid place-items-center">
-        <LucideLoader2 className="size-8 animate-spin" />
-      </div>
+      <article className="space-y-6">
+        <HeaderSkeleton />
+        <main className="px-4 space-y-6">
+          <CreatorSkeleton />
+          <DescriptionSkeleton />
+        </main>
+      </article>
     );
 
   return (

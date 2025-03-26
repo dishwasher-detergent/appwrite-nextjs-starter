@@ -1,9 +1,13 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function TeamAdminsSkeleton() {
+interface MultiUserSkeletonProps {
+  title: string;
+}
+
+export function MultiUserSkeleton({ title }: MultiUserSkeletonProps) {
   return (
     <section>
-      <h2 className="font-semibold text-lg mb-2">Admins</h2>
+      <h2 className="font-semibold text-lg mb-2">{title}</h2>
       <div className="flex -space-x-2">
         {[...Array(3)].map((_, i) => (
           <Skeleton

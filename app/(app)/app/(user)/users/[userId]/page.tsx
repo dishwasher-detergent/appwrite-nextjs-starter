@@ -2,8 +2,8 @@ import { redirect } from "next/navigation";
 import { Query } from "node-appwrite";
 
 import { UserContent } from "@/components/user/user-content";
+import { UserDescription } from "@/components/user/user-description";
 import { UserHeader } from "@/components/user/user-header";
-import { UserDescription } from "@/components/user/user-info";
 import { getLoggedInUser, getUserById } from "@/lib/auth";
 import { listProducts } from "@/lib/db";
 

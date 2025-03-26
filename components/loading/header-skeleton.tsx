@@ -1,7 +1,7 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function TeamHeaderSkeleton() {
+export function HeaderSkeleton() {
   return (
     <header className="relative">
       <Skeleton className="w-full rounded-xl h-48" />

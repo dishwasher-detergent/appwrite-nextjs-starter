@@ -1,4 +1,4 @@
-import { TeamCardSkeleton } from "@/components/team/loading/team-card-skeleton";
+import { MultiCardSkeleton } from "@/components/loading/multi-card-skeleton";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Loading() {
@@ -8,7 +8,7 @@ export default function Loading() {
         <h2 className="font-bold">Your Teams</h2>
         <Skeleton className="w-[120px] h-10" />
       </header>
-      <TeamCardSkeleton />
+      <MultiCardSkeleton />
     </>
   );
 }
