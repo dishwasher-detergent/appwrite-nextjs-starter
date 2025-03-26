@@ -1,9 +1,14 @@
-import { LucideLoader2 } from "lucide-react";
+import { MultiCardSkeleton } from "@/components/loading/multi-card-skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Loading() {
   return (
-    <div className="w-full h-full grid place-items-center">
-      <LucideLoader2 className="size-8 animate-spin" />
-    </div>
+    <>
+      <header className="flex flex-row justify-between items-center pb-4 w-full">
+        <h2 className="font-bold">Products</h2>
+        <Skeleton className="w-[120px] h-10" />
+      </header>
+      <MultiCardSkeleton />
+    </>
   );
 }
