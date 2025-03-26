@@ -8,9 +8,16 @@ import { AVATAR_BUCKET_ID, ENDPOINT, PROJECT_ID } from "@/lib/constants";
 interface TeamHeaderProps {
   team: TeamData;
   isOwner: boolean;
+  isAdmin: boolean;
+  isMember: boolean;
 }
 
-export function TeamHeader({ team, isOwner }: TeamHeaderProps) {
+export function TeamHeader({
+  team,
+  isOwner,
+  isAdmin,
+  isMember,
+}: TeamHeaderProps) {
   return (
     <header className="relative">
       <div
@@ -39,9 +46,11 @@ export function TeamHeader({ team, isOwner }: TeamHeaderProps) {
             )}
           </AspectRatio>
         </figure>
-        <div className="pt-32 flex flex-row gap-1">
-          <TeamActions team={team} isOwner={isOwner} />
-        </div>
+        {isMember && (
+          <div className="pt-32 flex flex-row gap-1">
+            <TeamActions team={team} isOwner={isOwner} isAdmin={isAdmin} />
+          </div>
+        )}
       </div>
     </header>
   );

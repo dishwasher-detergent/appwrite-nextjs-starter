@@ -9,6 +9,7 @@ import {
   Databases,
   Storage,
   Teams,
+  Users,
 } from "node-appwrite";
 
 export async function createSessionClient(setSession: boolean = true) {
@@ -60,6 +61,9 @@ export async function createAdminClient() {
     },
     get storage() {
       return new Storage(client);
+    },
+    get users() {
+      return new Users(client);
     },
   };
 }

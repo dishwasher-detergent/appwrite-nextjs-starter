@@ -15,9 +15,10 @@ import { TeamData } from "@/interfaces/team.interface";
 interface TeamActionsProps {
   team: TeamData;
   isOwner: boolean;
+  isAdmin: boolean;
 }
 
-export function TeamActions({ team, isOwner }: TeamActionsProps) {
+export function TeamActions({ team, isOwner, isAdmin }: TeamActionsProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -28,12 +29,8 @@ export function TeamActions({ team, isOwner }: TeamActionsProps) {
       <DropdownMenuContent align="end">
         {!isOwner && <LeaveTeam team={team} />}
         <InviteTeam team={team} />
-        {isOwner && (
-          <>
-            <EditTeam team={team} />
-            <DeleteTeam team={team} />
-          </>
-        )}
+        {(isOwner || isAdmin) && <EditTeam team={team} />}
+        {isOwner && <DeleteTeam team={team} />}
       </DropdownMenuContent>
     </DropdownMenu>
   );

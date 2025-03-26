@@ -451,7 +451,7 @@ export async function inviteMember(
   email: string
 ): Promise<Result<void>> {
   return withAuth(async (user) => {
-    const { team } = await createAdminClient();
+    const { team, users } = await createAdminClient();
 
     try {
       await checkUserRole(teamId, user.$id, [
@@ -459,6 +459,12 @@ export async function inviteMember(
         ADMIN_ROLE,
         OWNER_ROLE,
       ]);
+
+      const exists = await users.list([Query.equal("email", email)]);
+
+      if (exists.total == 0) {
+        throw new Error("User is not a current member of the platform.");
+      }
 
       const data = await team.createMembership(
         teamId,
@@ -502,9 +508,13 @@ export async function removeMember(
   userId: string
 ): Promise<Result<void>> {
   return withAuth(async (user) => {
-    const { team } = await createSessionClient();
+    const { team } = await createAdminClient();
 
     try {
+      if (userId === user.$id) {
+        throw new Error("You cannot remove yourself from the team.");
+      }
+
       const userMembership = await team.listMemberships(teamId, [
         Query.equal("userId", user.$id),
       ]);
@@ -572,8 +582,12 @@ export async function promoteToAdmin(
       const userMembership = await team.listMemberships(teamId, [
         Query.equal("userId", userId),
       ]);
+      const currentRoles = userMembership.memberships[0]?.roles;
       const membership = userMembership.memberships[0];
-      await team.updateMembership(teamId, membership.$id, [ADMIN_ROLE]);
+      await team.updateMembership(teamId, membership.$id, [
+        ...currentRoles,
+        ADMIN_ROLE,
+      ]);
 
       revalidateTag(`team:${teamId}`);
 
@@ -614,8 +628,11 @@ export async function removeAdminRole(
       const userMembership = await team.listMemberships(teamId, [
         Query.equal("userId", userId),
       ]);
+      const currentRoles = userMembership.memberships[0]?.roles;
       const membership = userMembership.memberships[0];
-      await team.updateMembership(teamId, membership.$id, []);
+      await team.updateMembership(teamId, membership.$id, [
+        ...currentRoles.filter((x) => x != ADMIN_ROLE),
+      ]);
 
       revalidateTag(`team:${teamId}`);
 
@@ -637,6 +654,11 @@ export async function removeAdminRole(
   });
 }
 
+/**
+ * Get the current user's roles in a team
+ * @param teamId The team ID
+ * @returns {Promise<Result<string[]>>} The user's roles in the team
+ */
 export async function getCurrentUserRoles(
   teamId: string
 ): Promise<Result<string[]>> {
