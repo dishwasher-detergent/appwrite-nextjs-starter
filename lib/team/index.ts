@@ -3,12 +3,16 @@
 import { revalidateTag, unstable_cache } from "next/cache";
 import { ID, Models, Permission, Query, Role } from "node-appwrite";
 
-import { ADMIN_ROLE, OWNER_ROLE, MEMBER_ROLE } from "@/constants/team.constants";
+import {
+  ADMIN_ROLE,
+  MEMBER_ROLE,
+  OWNER_ROLE,
+} from "@/constants/team.constants";
 import { Product } from "@/interfaces/product.interface";
 import { Result } from "@/interfaces/result.interface";
 import { TeamData } from "@/interfaces/team.interface";
 import { UserData, UserMemberData } from "@/interfaces/user.interface";
-import { createUserData, getLoggedInUser } from "@/lib/auth";
+import { createUserData, withAuth } from "@/lib/auth";
 import {
   DATABASE_ID,
   HOSTNAME,
@@ -17,9 +21,9 @@ import {
   TEAM_COLLECTION_ID,
   USER_COLLECTION_ID,
 } from "@/lib/constants";
-import { createSessionClient, createAdminClient } from "@/lib/server/appwrite";
+import { deleteProduct } from "@/lib/db";
+import { createAdminClient, createSessionClient } from "@/lib/server/appwrite";
 import { deleteAvatarImage, uploadAvatarImage } from "@/lib/storage";
-import { deleteProduct } from "../db";
 import { AddTeamFormData, EditTeamFormData } from "./schemas";
 
 /**
@@ -28,80 +32,75 @@ import { AddTeamFormData, EditTeamFormData } from "./schemas";
  * @returns {Promise<Result<TeamData>} The team
  */
 export async function getTeamById(id: string): Promise<Result<TeamData>> {
-  const user = await getLoggedInUser();
+  return withAuth(async () => {
+    const { database, team } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    return unstable_cache(
+      async (id) => {
+        try {
+          const data = await database.getDocument<TeamData>(
+            DATABASE_ID,
+            TEAM_COLLECTION_ID,
+            id
+          );
 
-  const { database, team } = await createSessionClient();
+          const memberships = await team.listMemberships(data.$id);
 
-  return unstable_cache(
-    async (id) => {
-      try {
-        const data = await database.getDocument<TeamData>(
-          DATABASE_ID,
-          TEAM_COLLECTION_ID,
-          id
-        );
+          const userIds = memberships.memberships.map(
+            (member) => member.userId
+          );
+          const uniqueUserIds = Array.from(new Set(userIds));
 
-        const memberships = await team.listMemberships(data.$id);
+          const users = await database.listDocuments<UserData>(
+            DATABASE_ID,
+            USER_COLLECTION_ID,
+            [
+              Query.equal("$id", uniqueUserIds),
+              Query.select(["$id", "name", "avatar"]),
+            ]
+          );
 
-        const userIds = memberships.memberships.map((member) => member.userId);
-        const uniqueUserIds = Array.from(new Set(userIds));
+          const usersMembershipData: UserMemberData[] = users.documents.map(
+            (user) => {
+              const member = memberships.memberships.filter(
+                (member) => member.userId === user.$id
+              )[0];
+              return {
+                ...user,
+                roles: member.roles,
+                confirmed: member.confirm,
+                joinedAt: member.joined,
+              };
+            }
+          );
 
-        const users = await database.listDocuments<UserData>(
-          DATABASE_ID,
-          USER_COLLECTION_ID,
-          [
-            Query.equal("$id", uniqueUserIds),
-            Query.select(["$id", "name", "avatar"]),
-          ]
-        );
+          return {
+            success: true,
+            message: "Team successfully retrieved.",
+            data: {
+              ...data,
+              members: usersMembershipData,
+            },
+          };
+        } catch (err) {
+          const error = err as Error;
 
-        const usersMembershipData: UserMemberData[] = users.documents.map(
-          (user) => {
-            const member = memberships.memberships.filter(
-              (member) => member.userId === user.$id
-            )[0];
-            return {
-              ...user,
-              roles: member.roles,
-              confirmed: member.confirm,
-              joinedAt: member.joined,
-            };
-          }
-        );
+          // This is where you would look to something like Splunk.
+          console.error(error);
 
-        return {
-          success: true,
-          message: "Team successfully retrieved.",
-          data: {
-            ...data,
-            members: usersMembershipData,
-          },
-        };
-      } catch (err) {
-        const error = err as Error;
-
-        // This is where you would look to something like Splunk.
-        console.error(error);
-
-        return {
-          success: false,
-          message: error.message,
-        };
+          return {
+            success: false,
+            message: error.message,
+          };
+        }
+      },
+      ["team", id],
+      {
+        tags: ["team", `team:${id}`],
+        revalidate: 600,
       }
-    },
-    ["team", id],
-    {
-      tags: ["team", `team:${id}`],
-      revalidate: 600,
-    }
-  )(id);
+    )(id);
+  });
 }
 
 /**
@@ -109,49 +108,42 @@ export async function getTeamById(id: string): Promise<Result<TeamData>> {
  * @returns {Promise<Result<TeamData[]>} The teams
  */
 export async function listTeams(): Promise<Result<TeamData[]>> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { database } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    return unstable_cache(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      async (userId) => {
+        try {
+          const data = await database.listDocuments<TeamData>(
+            DATABASE_ID,
+            TEAM_COLLECTION_ID
+          );
 
-  const { database } = await createSessionClient();
+          return {
+            success: true,
+            message: "Teams successfully retrieved.",
+            data: data.documents,
+          };
+        } catch (err) {
+          const error = err as Error;
 
-  return unstable_cache(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async (userId) => {
-      try {
-        const data = await database.listDocuments<TeamData>(
-          DATABASE_ID,
-          TEAM_COLLECTION_ID
-        );
+          // This is where you would look to something like Splunk.
+          console.error(error);
 
-        return {
-          success: true,
-          message: "Teams successfully retrieved.",
-          data: data.documents,
-        };
-      } catch (err) {
-        const error = err as Error;
-
-        // This is where you would look to something like Splunk.
-        console.error(error);
-
-        return {
-          success: false,
-          message: error.message,
-        };
+          return {
+            success: false,
+            message: error.message,
+          };
+        }
+      },
+      ["teams"],
+      {
+        tags: ["teams", `teams:user-${user.$id}`],
+        revalidate: 600,
       }
-    },
-    ["teams"],
-    {
-      tags: ["teams", `teams:user-${user.$id}`],
-      revalidate: 600,
-    }
-  )(user.$id);
+    )(user.$id);
+  });
 }
 
 /**
@@ -171,77 +163,70 @@ export async function createTeam({
   data: AddTeamFormData;
   permissions?: string[];
 }): Promise<Result<TeamData>> {
-  const user = await getLoggedInUser();
-
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
-
-  const { database, team } = await createSessionClient();
-
-  permissions = [
-    ...permissions,
-    Permission.read(Role.user(user.$id)),
-    Permission.write(Role.user(user.$id)),
-  ];
-
-  try {
-    const existingTeams = await database.listDocuments<TeamData>(
-      DATABASE_ID,
-      TEAM_COLLECTION_ID,
-      [Query.select(["$id"])]
-    );
-
-    if (existingTeams.total >= MAX_TEAM_LIMIT) {
-      throw new Error(
-        `You have reached the maximum amount of teams allowed. (${MAX_TEAM_LIMIT})`
-      );
-    }
-
-    const teamResponse = await team.create(id, data.name, [
-      ADMIN_ROLE,
-      OWNER_ROLE,
-      MEMBER_ROLE
-    ]);
+  return withAuth(async (user) => {
+    const { database, team } = await createSessionClient();
 
     permissions = [
       ...permissions,
-      Permission.read(Role.team(teamResponse.$id)),
-      Permission.write(Role.team(teamResponse.$id, ADMIN_ROLE)),
+      Permission.read(Role.user(user.$id)),
+      Permission.write(Role.user(user.$id)),
     ];
 
-    const teamData = await database.createDocument<TeamData>(
-      DATABASE_ID,
-      TEAM_COLLECTION_ID,
-      teamResponse.$id,
-      {
-        name: data.name,
-        about: data.about,
-      },
-      permissions
-    );
+    try {
+      const existingTeams = await database.listDocuments<TeamData>(
+        DATABASE_ID,
+        TEAM_COLLECTION_ID,
+        [Query.select(["$id"])]
+      );
 
-    revalidateTag("teams");
+      if (existingTeams.total >= MAX_TEAM_LIMIT) {
+        throw new Error(
+          `You have reached the maximum amount of teams allowed. (${MAX_TEAM_LIMIT})`
+        );
+      }
 
-    return {
-      success: true,
-      message: "Team successfully created.",
-      data: teamData,
-    };
-  } catch (err) {
-    const error = err as Error;
+      const teamResponse = await team.create(id, data.name, [
+        ADMIN_ROLE,
+        OWNER_ROLE,
+        MEMBER_ROLE,
+      ]);
 
-    // This is where you would look to something like Splunk.
-    console.error(error);
+      permissions = [
+        ...permissions,
+        Permission.read(Role.team(teamResponse.$id)),
+        Permission.write(Role.team(teamResponse.$id, ADMIN_ROLE)),
+      ];
 
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+      const teamData = await database.createDocument<TeamData>(
+        DATABASE_ID,
+        TEAM_COLLECTION_ID,
+        teamResponse.$id,
+        {
+          name: data.name,
+          about: data.about,
+        },
+        permissions
+      );
+
+      revalidateTag("teams");
+
+      return {
+        success: true,
+        message: "Team successfully created.",
+        data: teamData,
+      };
+    } catch (err) {
+      const error = err as Error;
+
+      // This is where you would look to something like Splunk.
+      console.error(error);
+
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  });
 }
 
 /**
@@ -261,83 +246,73 @@ export async function updateTeam({
   data: EditTeamFormData;
   permissions?: string[];
 }): Promise<Result<TeamData>> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { database, team } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    try {
+      await checkUserRole(id, user.$id, [ADMIN_ROLE, OWNER_ROLE]);
 
-  const { database, team } = await createSessionClient();
+      const existingTeamData = await database.getDocument<TeamData>(
+        DATABASE_ID,
+        TEAM_COLLECTION_ID,
+        id
+      );
 
-  try {
-    await checkUserRole(id, user.$id, [ADMIN_ROLE, OWNER_ROLE]);
+      if (data.image instanceof File) {
+        if (existingTeamData.avatar) {
+          await deleteAvatarImage(existingTeamData.avatar);
+        }
 
-    const existingTeamData = await database.getDocument<TeamData>(
-      DATABASE_ID,
-      TEAM_COLLECTION_ID,
-      id
-    );
+        const image = await uploadAvatarImage({
+          data: data.image,
+        });
 
-    if (data.image instanceof File) {
-      if (existingTeamData.avatar) {
-        await deleteAvatarImage(existingTeamData.avatar);
+        if (!image.success) {
+          throw new Error(image.message);
+        }
+
+        data.image = image.data?.$id;
+      } else if (data.image === null && existingTeamData.avatar) {
+        const image = await deleteAvatarImage(existingTeamData.avatar);
+
+        if (!image.success) {
+          throw new Error(image.message);
+        }
+
+        data.image = null;
       }
 
-      const image = await uploadAvatarImage({
-        data: data.image,
-      });
+      await team.updateName(id, data.name);
 
-      if (!image.success) {
-        throw new Error(image.message);
-      }
+      const teamData = await database.updateDocument<TeamData>(
+        DATABASE_ID,
+        TEAM_COLLECTION_ID,
+        id,
+        {
+          name: data.name,
+          about: data.about,
+          avatar: data.image,
+        },
+        permissions
+      );
 
-      data.image = image.data?.$id;
-    } else if (data.image === null && existingTeamData.avatar) {
-      const image = await deleteAvatarImage(existingTeamData.avatar);
+      revalidateTag("teams");
+      revalidateTag(`team:${id}`);
 
-      if (!image.success) {
-        throw new Error(image.message);
-      }
-
-      data.image = null;
+      return {
+        success: true,
+        message: "Team successfully updated.",
+        data: teamData,
+      };
+    } catch (err) {
+      const error = err as Error;
+      console.error(error);
+      return {
+        success: false,
+        message: error.message,
+      };
     }
-
-    await team.updateName(id, data.name);
-
-    const teamData = await database.updateDocument<TeamData>(
-      DATABASE_ID,
-      TEAM_COLLECTION_ID,
-      id,
-      {
-        name: data.name,
-        about: data.about,
-        avatar: data.image,
-      },
-      permissions
-    );
-
-    revalidateTag("teams");
-    revalidateTag(`team:${id}`);
-
-    return {
-      success: true,
-      message: "Team successfully updated.",
-      data: teamData,
-    };
-  } catch (err) {
-    const error = err as Error;
-
-    // This is where you would look to something like Splunk.
-    console.error(error);
-
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+  });
 }
 
 /**
@@ -346,69 +321,62 @@ export async function updateTeam({
  * @returns {Promise<Result<TeamData>>} The deleted team
  */
 export async function deleteTeam(id: string): Promise<Result<TeamData>> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { database, team } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    try {
+      await checkUserRole(id, user.$id, [OWNER_ROLE]);
 
-  const { database, team } = await createSessionClient();
-
-  try {
-    await checkUserRole(id, user.$id, [OWNER_ROLE]);
-
-    const existingTeamData = await database.getDocument<TeamData>(
-      DATABASE_ID,
-      TEAM_COLLECTION_ID,
-      id
-    );
-
-    if (existingTeamData.avatar) {
-      const image = await deleteAvatarImage(existingTeamData.avatar);
-
-      if (!image.success) {
-        throw new Error(image.message);
-      }
-    }
-
-    await team.delete(id);
-    await database.deleteDocument(DATABASE_ID, TEAM_COLLECTION_ID, id);
-
-    let response;
-    const queries = [Query.limit(50), Query.equal("teamId", id)];
-
-    do {
-      response = await database.listDocuments<Product>(
+      const existingTeamData = await database.getDocument<TeamData>(
         DATABASE_ID,
-        SAMPLE_COLLECTION_ID,
-        queries
+        TEAM_COLLECTION_ID,
+        id
       );
 
-      await Promise.all(
-        response.documents.map((document) => deleteProduct(document.$id))
-      );
-    } while (response.documents.length > 0);
+      if (existingTeamData.avatar) {
+        const image = await deleteAvatarImage(existingTeamData.avatar);
 
-    revalidateTag("teams");
+        if (!image.success) {
+          throw new Error(image.message);
+        }
+      }
 
-    return {
-      success: true,
-      message: "Team successfully deleted.",
-    };
-  } catch (err) {
-    const error = err as Error;
+      await team.delete(id);
+      await database.deleteDocument(DATABASE_ID, TEAM_COLLECTION_ID, id);
 
-    // This is where you would look to something like Splunk.
-    console.error(error);
+      let response;
+      const queries = [Query.limit(50), Query.equal("teamId", id)];
 
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+      do {
+        response = await database.listDocuments<Product>(
+          DATABASE_ID,
+          SAMPLE_COLLECTION_ID,
+          queries
+        );
+
+        await Promise.all(
+          response.documents.map((document) => deleteProduct(document.$id))
+        );
+      } while (response.documents.length > 0);
+
+      revalidateTag("teams");
+
+      return {
+        success: true,
+        message: "Team successfully deleted.",
+      };
+    } catch (err) {
+      const error = err as Error;
+
+      // This is where you would look to something like Splunk.
+      console.error(error);
+
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  });
 }
 
 /**
@@ -417,115 +385,111 @@ export async function deleteTeam(id: string): Promise<Result<TeamData>> {
  * @returns {Promise<Result<string>>} The ID of another team the user is in.
  */
 export async function leaveTeam(teamId: string): Promise<Result<string>> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { database, team } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    try {
+      const memberships = await team.listMemberships(teamId, [
+        Query.equal("userId", user.$id),
+      ]);
 
-  const { database, team } = await createSessionClient();
+      const membership = memberships.memberships[0];
 
-  try {
-    const memberships = await team.listMemberships(teamId, [
-      Query.equal("userId", user.$id),
-    ]);
+      if (!membership) {
+        throw new Error("You are not a member of this team.");
+      }
 
-    const membership = memberships.memberships[0];
+      if (membership.roles.includes(OWNER_ROLE)) {
+        throw new Error("You cannot leave a team you own.");
+      }
 
-    if (!membership) {
-      throw new Error("You are not a member of this team.");
-    }
+      await team.deleteMembership(teamId, membership.$id);
 
-    if (membership.roles.includes(OWNER_ROLE)) {
-      throw new Error("You cannot leave a team you own.");
-    }
+      const data = await database.listDocuments<TeamData>(
+        DATABASE_ID,
+        TEAM_COLLECTION_ID,
+        [Query.orderDesc("$createdAt"), Query.limit(1)]
+      );
 
-    await team.deleteMembership(teamId, membership.$id);
+      revalidateTag("teams");
+      revalidateTag(`team:${teamId}`);
 
-    const data = await database.listDocuments<TeamData>(
-      DATABASE_ID,
-      TEAM_COLLECTION_ID,
-      [Query.orderDesc("$createdAt"), Query.limit(1)]
-    );
+      if (data.documents.length > 0) {
+        return {
+          success: true,
+          message: `You've left ${teamId}!`,
+          data: data.documents[0].$id,
+        };
+      }
 
-    revalidateTag("teams");
-    revalidateTag(`team:${teamId}`);
-
-    if (data.documents.length > 0) {
       return {
         success: true,
         message: `You've left ${teamId}!`,
-        data: data.documents[0].$id,
+      };
+    } catch (err) {
+      const error = err as Error;
+
+      // This is where you would look to something like Splunk.
+      console.error(error);
+
+      return {
+        success: false,
+        message: error.message,
       };
     }
-
-    return {
-      success: true,
-      message: `You've left ${teamId}!`,
-    };
-  } catch (err) {
-    const error = err as Error;
-
-    // This is where you would look to something like Splunk.
-    console.error(error);
-
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+  });
 }
 
+/**
+ * Invite a member to the team
+ * @param {string} teamId The team ID
+ * @param {string} email The email of the user to invite
+ * @returns {Promise<Result<void>>}
+ */
 export async function inviteMember(
   teamId: string,
   email: string
 ): Promise<Result<void>> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { team } = await createAdminClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    try {
+      await checkUserRole(teamId, user.$id, [
+        MEMBER_ROLE,
+        ADMIN_ROLE,
+        OWNER_ROLE,
+      ]);
 
-  const { team } = await createAdminClient();
+      const data = await team.createMembership(
+        teamId,
+        [MEMBER_ROLE],
+        email,
+        undefined,
+        undefined,
+        `http://${HOSTNAME}/accept/${teamId}`,
+        email.split("@")[0]
+      );
 
-  try {
-    await checkUserRole(teamId, user.$id, [MEMBER_ROLE, ADMIN_ROLE, OWNER_ROLE]);
+      await createUserData(data.userId);
 
-    const data = await team.createMembership(
-      teamId,
-      [MEMBER_ROLE],
-      email,
-      undefined,
-      undefined,
-      `http://${HOSTNAME}/accept/${teamId}`,
-      email.split("@")[0]
-    );
+      revalidateTag(`team:${teamId}`);
 
-    await createUserData(data.userId);
+      return {
+        success: true,
+        message: `Invitation sent to ${email}.`,
+      };
+    } catch (err) {
+      const error = err as Error;
 
-    revalidateTag(`team:${teamId}`);
+      // This is where you would look to something like Splunk.
+      console.error(error);
 
-    return {
-      success: true,
-      message: `Invitation sent to ${email}.`,
-    };
-  } catch (err) {
-    const error = err as Error;
-
-    // This is where you would look to something like Splunk.
-    console.error(error);
-
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  });
 }
 
 /**
@@ -537,61 +501,56 @@ export async function removeMember(
   teamId: string,
   userId: string
 ): Promise<Result<void>> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { team } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    try {
+      const userMembership = await team.listMemberships(teamId, [
+        Query.equal("userId", user.$id),
+      ]);
+      const currentUserRole = userMembership.memberships[0]?.roles[0];
 
-  const { team } = await createSessionClient();
+      const memberToRemove = await team.listMemberships(teamId, [
+        Query.equal("userId", userId),
+      ]);
+      const membership = memberToRemove.memberships[0];
 
-  try {
-    const userMembership = await team.listMemberships(teamId, [
-      Query.equal("userId", user.$id),
-    ]);
-    const currentUserRole = userMembership.memberships[0]?.roles[0];
+      if (!membership) {
+        throw new Error("User is not a member of this team.");
+      }
 
-    const memberToRemove = await team.listMemberships(teamId, [
-      Query.equal("userId", userId),
-    ]);
-    const membership = memberToRemove.memberships[0];
+      const memberRole = membership.roles[0];
 
-    if (!membership) {
-      throw new Error("User is not a member of this team.");
+      if (membership.roles.includes(OWNER_ROLE)) {
+        throw new Error("You cannot remove the owner of the team.");
+      }
+
+      if (memberRole === ADMIN_ROLE && currentUserRole !== OWNER_ROLE) {
+        throw new Error("Only team owners can remove admin members.");
+      }
+
+      if (currentUserRole !== OWNER_ROLE && currentUserRole !== ADMIN_ROLE) {
+        throw new Error(
+          "You must be an admin or owner to remove team members."
+        );
+      }
+
+      await team.deleteMembership(teamId, membership.$id);
+      revalidateTag(`team:${teamId}`);
+
+      return {
+        success: true,
+        message: `${membership.userName} has been removed from the team.`,
+      };
+    } catch (err) {
+      const error = err as Error;
+      console.error(error);
+      return {
+        success: false,
+        message: error.message,
+      };
     }
-
-    const memberRole = membership.roles[0];
-
-    if (membership.roles.includes(OWNER_ROLE)) {
-      throw new Error("You cannot remove the owner of the team.");
-    }
-
-    if (memberRole === ADMIN_ROLE && currentUserRole !== OWNER_ROLE) {
-      throw new Error("Only team owners can remove admin members.");
-    }
-
-    if (currentUserRole !== OWNER_ROLE && currentUserRole !== ADMIN_ROLE) {
-      throw new Error("You must be an admin or owner to remove team members.");
-    }
-
-    await team.deleteMembership(teamId, membership.$id);
-    revalidateTag(`team:${teamId}`);
-
-    return {
-      success: true,
-      message: `${membership.userName} has been removed from the team.`,
-    };
-  } catch (err) {
-    const error = err as Error;
-    console.error(error);
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+  });
 }
 
 /**
@@ -604,43 +563,36 @@ export async function promoteToAdmin(
   teamId: string,
   userId: string
 ): Promise<Result<void>> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { team } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    try {
+      await checkUserRole(teamId, user.$id, [OWNER_ROLE]);
 
-  const { team } = await createSessionClient();
+      const userMembership = await team.listMemberships(teamId, [
+        Query.equal("userId", userId),
+      ]);
+      const membership = userMembership.memberships[0];
+      await team.updateMembership(teamId, membership.$id, [ADMIN_ROLE]);
 
-  try {
-    await checkUserRole(teamId, user.$id, [OWNER_ROLE]);
+      revalidateTag(`team:${teamId}`);
 
-    const userMembership = await team.listMemberships(teamId, [
-      Query.equal("userId", userId),
-    ]);
-    const membership = userMembership.memberships[0];
-    await team.updateMembership(teamId, membership.$id, [ADMIN_ROLE]);
+      return {
+        success: true,
+        message: "Member has been promoted to admin.",
+      };
+    } catch (err) {
+      const error = err as Error;
 
-    revalidateTag(`team:${teamId}`);
+      // This is where you would look to something like Splunk.
+      console.error(error);
 
-    return {
-      success: true,
-      message: "Member has been promoted to admin.",
-    };
-  } catch (err) {
-    const error = err as Error;
-
-    // This is where you would look to something like Splunk.
-    console.error(error);
-
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  });
 }
 
 /**
@@ -653,80 +605,66 @@ export async function removeAdminRole(
   teamId: string,
   userId: string
 ): Promise<Result<void>> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { team } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    try {
+      await checkUserRole(teamId, user.$id, [OWNER_ROLE]);
 
-  const { team } = await createSessionClient();
+      const userMembership = await team.listMemberships(teamId, [
+        Query.equal("userId", userId),
+      ]);
+      const membership = userMembership.memberships[0];
+      await team.updateMembership(teamId, membership.$id, []);
 
-  try {
-    await checkUserRole(teamId, user.$id, [OWNER_ROLE]);
+      revalidateTag(`team:${teamId}`);
 
-    const userMembership = await team.listMemberships(teamId, [
-      Query.equal("userId", userId),
-    ]);
-    const membership = userMembership.memberships[0];
-    await team.updateMembership(teamId, membership.$id, []);
+      return {
+        success: true,
+        message: "Admin role has been removed.",
+      };
+    } catch (err) {
+      const error = err as Error;
 
-    revalidateTag(`team:${teamId}`);
+      // This is where you would look to something like Splunk.
+      console.error(error);
 
-    return {
-      success: true,
-      message: "Admin role has been removed.",
-    };
-  } catch (err) {
-    const error = err as Error;
-
-    // This is where you would look to something like Splunk.
-    console.error(error);
-
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  });
 }
 
 export async function getCurrentUserRoles(
   teamId: string
 ): Promise<Result<string[]>> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { team } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    try {
+      const userMembership = await team.listMemberships(teamId, [
+        Query.equal("userId", user.$id),
+      ]);
 
-  const { team } = await createSessionClient();
+      return {
+        success: true,
+        message: "User roles successfully retrieved.",
+        data: userMembership.memberships[0]?.roles || [],
+      };
+    } catch (err) {
+      const error = err as Error;
 
-  try {
-    const userMembership = await team.listMemberships(teamId, [
-      Query.equal("userId", user.$id),
-    ]);
+      // This is where you would look to something like Splunk.
+      console.error(error);
 
-    return {
-      success: true,
-      message: "User roles successfully retrieved.",
-      data: userMembership.memberships[0]?.roles || [],
-    };
-  } catch (err) {
-    const error = err as Error;
-
-    // This is where you would look to something like Splunk.
-    console.error(error);
-
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  });
 }
 
 /**

@@ -37,52 +37,45 @@ export async function getLoggedInUser(): Promise<Models.User<Models.Preferences>
  * @returns {Promise<Result<User>} The current user
  */
 export async function getUserData(): Promise<Result<User>> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { database } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    return unstable_cache(
+      async (id) => {
+        try {
+          const data = await database.getDocument<UserData>(
+            DATABASE_ID,
+            USER_COLLECTION_ID,
+            id
+          );
 
-  const { database } = await createSessionClient();
+          return {
+            success: true,
+            message: "Products successfully retrieved.",
+            data: {
+              ...user,
+              ...data,
+            },
+          };
+        } catch (err) {
+          const error = err as Error;
 
-  return unstable_cache(
-    async (id) => {
-      try {
-        const data = await database.getDocument<UserData>(
-          DATABASE_ID,
-          USER_COLLECTION_ID,
-          id
-        );
+          // This is where you would look to something like Splunk.
+          console.error(error);
 
-        return {
-          success: true,
-          message: "Products successfully retrieved.",
-          data: {
-            ...user,
-            ...data,
-          },
-        };
-      } catch (err) {
-        const error = err as Error;
-
-        // This is where you would look to something like Splunk.
-        console.error(error);
-
-        return {
-          success: false,
-          message: error.message,
-        };
+          return {
+            success: false,
+            message: error.message,
+          };
+        }
+      },
+      ["user"],
+      {
+        tags: ["user", `user:${user.$id}`],
+        revalidate: 600,
       }
-    },
-    ["user"],
-    {
-      tags: ["user", `user:${user.$id}`],
-      revalidate: 600,
-    }
-  )(user.$id);
+    )(user.$id);
+  });
 }
 
 /**
@@ -91,49 +84,42 @@ export async function getUserData(): Promise<Result<User>> {
  * @returns {Promise<Result<UserData>} The current user
  */
 export async function getUserById(id: string): Promise<Result<UserData>> {
-  const user = await getLoggedInUser();
+  return withAuth(async () => {
+    const { database } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    return unstable_cache(
+      async (id) => {
+        try {
+          const data = await database.getDocument<UserData>(
+            DATABASE_ID,
+            USER_COLLECTION_ID,
+            id
+          );
 
-  const { database } = await createSessionClient();
+          return {
+            success: true,
+            message: "Products successfully retrieved.",
+            data,
+          };
+        } catch (err) {
+          const error = err as Error;
 
-  return unstable_cache(
-    async (id) => {
-      try {
-        const data = await database.getDocument<UserData>(
-          DATABASE_ID,
-          USER_COLLECTION_ID,
-          id
-        );
+          // This is where you would look to something like Splunk.
+          console.error(error);
 
-        return {
-          success: true,
-          message: "Products successfully retrieved.",
-          data,
-        };
-      } catch (err) {
-        const error = err as Error;
-
-        // This is where you would look to something like Splunk.
-        console.error(error);
-
-        return {
-          success: false,
-          message: error.message,
-        };
+          return {
+            success: false,
+            message: error.message,
+          };
+        }
+      },
+      ["user", id],
+      {
+        tags: ["user", `user:${id}`],
+        revalidate: 600,
       }
-    },
-    ["user", id],
-    {
-      tags: ["user", `user:${id}`],
-      revalidate: 600,
-    }
-  )(id);
+    )(id);
+  });
 }
 
 /**
@@ -149,72 +135,65 @@ export async function updateProfile({
   id: string;
   data: UpdateProfileFormData;
 }): Promise<Response> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { account, database } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    try {
+      const userData = await database.getDocument<UserData>(
+        DATABASE_ID,
+        USER_COLLECTION_ID,
+        user.$id
+      );
 
-  const { account, database } = await createSessionClient();
+      if (data.image instanceof File) {
+        if (userData.avatar) {
+          await deleteAvatarImage(userData.avatar);
+        }
 
-  try {
-    const userData = await database.getDocument<UserData>(
-      DATABASE_ID,
-      USER_COLLECTION_ID,
-      user.$id
-    );
+        const image = await uploadAvatarImage({
+          data: data.image,
+        });
 
-    if (data.image instanceof File) {
-      if (userData.avatar) {
-        await deleteAvatarImage(userData.avatar);
+        if (!image.success) {
+          throw new Error(image.message);
+        }
+
+        data.image = image.data?.$id;
+      } else if (data.image === null && userData.avatar) {
+        const image = await deleteAvatarImage(userData.avatar);
+
+        if (!image.success) {
+          throw new Error(image.message);
+        }
+
+        data.image = null;
       }
 
-      const image = await uploadAvatarImage({
-        data: data.image,
+      await account.updateName(data.name);
+      await database.updateDocument(DATABASE_ID, USER_COLLECTION_ID, id, {
+        avatar: data.image,
+        about: data.about,
       });
 
-      if (!image.success) {
-        throw new Error(image.message);
-      }
+      revalidateTag("user");
+      revalidateTag("user-logs");
 
-      data.image = image.data?.$id;
-    } else if (data.image === null && userData.avatar) {
-      const image = await deleteAvatarImage(userData.avatar);
+      return {
+        success: true,
+        message: "Profile updated successfully",
+      };
+    } catch (err) {
+      const error = err as Error;
 
-      if (!image.success) {
-        throw new Error(image.message);
-      }
+      // This is where you would look to something like Splunk.
+      console.error(error);
 
-      data.image = null;
+      return {
+        success: false,
+        message: error.message,
+      };
     }
-
-    await account.updateName(data.name);
-    await database.updateDocument(DATABASE_ID, USER_COLLECTION_ID, id, {
-      avatar: data.image,
-      about: data.about,
-    });
-
-    revalidateTag("user");
-    revalidateTag("user-logs");
-
-    return {
-      success: true,
-      message: "Profile updated successfully",
-    };
-  } catch (err) {
-    const error = err as Error;
-
-    // This is where you would look to something like Splunk.
-    console.error(error);
-
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+  });
 }
 
 /**
@@ -222,45 +201,38 @@ export async function updateProfile({
  * @returns {Promise<Result<Models.LogList>>} The list of logs
  */
 export async function getUserLogs(): Promise<Result<Models.LogList>> {
-  const user = await getLoggedInUser();
+  return withAuth(async () => {
+    const { account } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    return unstable_cache(
+      async () => {
+        try {
+          const logs = await account.listLogs();
 
-  const { account } = await createSessionClient();
+          return {
+            success: true,
+            message: "Products successfully retrieved.",
+            data: logs,
+          };
+        } catch (err) {
+          const error = err as Error;
 
-  return unstable_cache(
-    async () => {
-      try {
-        const logs = await account.listLogs();
+          // This is where you would look to something like Splunk.
+          console.error(error);
 
-        return {
-          success: true,
-          message: "Products successfully retrieved.",
-          data: logs,
-        };
-      } catch (err) {
-        const error = err as Error;
-
-        // This is where you would look to something like Splunk.
-        console.error(error);
-
-        return {
-          success: false,
-          message: error.message,
-        };
+          return {
+            success: false,
+            message: error.message,
+          };
+        }
+      },
+      ["user-logs"],
+      {
+        tags: ["user-logs"],
+        revalidate: 600,
       }
-    },
-    ["user-logs"],
-    {
-      tags: ["user-logs"],
-      revalidate: 600,
-    }
-  )();
+    )();
+  });
 }
 
 /**
@@ -468,47 +440,61 @@ export async function resetPassword(
 export async function createUserData(
   userId: string
 ): Promise<Result<UserData>> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { database } = await createAdminClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    try {
+      await database.getDocument<UserData>(
+        DATABASE_ID,
+        USER_COLLECTION_ID,
+        userId
+      );
 
-  const { database } = await createAdminClient();
+      return {
+        success: true,
+        message: "User data already exists.",
+      };
+    } catch {
+      await database.createDocument<UserData>(
+        DATABASE_ID,
+        USER_COLLECTION_ID,
+        userId,
+        {
+          name: user.name,
+          avatar: null,
+        },
+        [
+          Permission.read(Role.user(userId)),
+          Permission.write(Role.user(userId)),
+          Permission.read(Role.users()),
+        ]
+      );
 
-  try {
-    await database.getDocument<UserData>(
-      DATABASE_ID,
-      USER_COLLECTION_ID,
-      userId
-    );
+      return {
+        success: true,
+        message: "User data successfully created.",
+      };
+    }
+  });
+}
 
-    return {
-      success: true,
-      message: "User data already exists.",
-    };
-  } catch {
-    await database.createDocument<UserData>(
-      DATABASE_ID,
-      USER_COLLECTION_ID,
-      userId,
-      {
-        name: user.name,
-        avatar: null,
-      },
-      [
-        Permission.read(Role.user(userId)),
-        Permission.write(Role.user(userId)),
-        Permission.read(Role.users()),
-      ]
-    );
+type AuthenticatedFunction<T> = (
+  user: Models.User<Models.Preferences>
+) => Promise<Result<T>>;
 
-    return {
-      success: true,
-      message: "User data successfully created.",
-    };
-  }
+export async function withAuth<T>(
+  fn: AuthenticatedFunction<T>
+): Promise<Result<T>> {
+  return (async () => {
+    const user = await getLoggedInUser();
+
+    if (!user) {
+      return {
+        success: false,
+        message: "You must be logged in to perform this action.",
+      };
+    }
+
+    return fn(user);
+  })();
 }

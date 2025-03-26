@@ -1,7 +1,7 @@
 "use server";
 
 import { Result } from "@/interfaces/result.interface";
-import { getLoggedInUser } from "@/lib/auth";
+import { withAuth } from "@/lib/auth";
 import { AVATAR_BUCKET_ID, SAMPLE_BUCKET_ID } from "@/lib/constants";
 import { createSessionClient } from "@/lib/server/appwrite";
 
@@ -24,45 +24,38 @@ export async function uploadProductImage({
   data: File;
   permissions?: string[];
 }): Promise<Result<Models.File>> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { storage } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    permissions = [
+      ...permissions,
+      Permission.read(Role.user(user.$id)),
+      Permission.write(Role.user(user.$id)),
+      Permission.read(Role.any()),
+    ];
 
-  const { storage } = await createSessionClient();
+    try {
+      const response = await storage.createFile(
+        SAMPLE_BUCKET_ID,
+        id,
+        data,
+        permissions
+      );
 
-  permissions = [
-    ...permissions,
-    Permission.read(Role.user(user.$id)),
-    Permission.write(Role.user(user.$id)),
-    Permission.read(Role.any()),
-  ];
+      return {
+        success: true,
+        message: "Product image uploaded successfully.",
+        data: response,
+      };
+    } catch (err) {
+      const error = err as Error;
 
-  try {
-    const response = await storage.createFile(
-      SAMPLE_BUCKET_ID,
-      id,
-      data,
-      permissions
-    );
-
-    return {
-      success: true,
-      message: "Product image uploaded successfully.",
-      data: response,
-    };
-  } catch (err) {
-    const error = err as Error;
-
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  });
 }
 
 /**
@@ -73,32 +66,25 @@ export async function uploadProductImage({
 export async function deleteProductImage(
   id: string
 ): Promise<Result<undefined>> {
-  const user = await getLoggedInUser();
+  return withAuth(async () => {
+    const { storage } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    try {
+      await storage.deleteFile(SAMPLE_BUCKET_ID, id);
 
-  const { storage } = await createSessionClient();
+      return {
+        success: true,
+        message: "Product image successfully deleted.",
+      };
+    } catch (err) {
+      const error = err as Error;
 
-  try {
-    await storage.deleteFile(SAMPLE_BUCKET_ID, id);
-
-    return {
-      success: true,
-      message: "Product image successfully deleted.",
-    };
-  } catch (err) {
-    const error = err as Error;
-
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  });
 }
 
 /**
@@ -118,46 +104,39 @@ export async function uploadAvatarImage({
   data: File;
   permissions?: string[];
 }): Promise<Result<Models.File>> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { storage } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    permissions = [
+      ...permissions,
+      Permission.read(Role.users()),
+      Permission.read(Role.user(user.$id)),
+      Permission.write(Role.user(user.$id)),
+      Permission.read(Role.any()),
+    ];
 
-  const { storage } = await createSessionClient();
+    try {
+      const response = await storage.createFile(
+        AVATAR_BUCKET_ID,
+        id,
+        data,
+        permissions
+      );
 
-  permissions = [
-    ...permissions,
-    Permission.read(Role.users()),
-    Permission.read(Role.user(user.$id)),
-    Permission.write(Role.user(user.$id)),
-    Permission.read(Role.any()),
-  ];
+      return {
+        success: true,
+        message: "Avatar image uploaded successfully.",
+        data: response,
+      };
+    } catch (err) {
+      const error = err as Error;
 
-  try {
-    const response = await storage.createFile(
-      AVATAR_BUCKET_ID,
-      id,
-      data,
-      permissions
-    );
-
-    return {
-      success: true,
-      message: "Avatar image uploaded successfully.",
-      data: response,
-    };
-  } catch (err) {
-    const error = err as Error;
-
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  });
 }
 
 /**
@@ -168,30 +147,23 @@ export async function uploadAvatarImage({
 export async function deleteAvatarImage(
   id: string
 ): Promise<Result<undefined>> {
-  const user = await getLoggedInUser();
+  return withAuth(async () => {
+    const { storage } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    try {
+      await storage.deleteFile(AVATAR_BUCKET_ID, id);
 
-  const { storage } = await createSessionClient();
+      return {
+        success: true,
+        message: "Avatar image successfully deleted.",
+      };
+    } catch (err) {
+      const error = err as Error;
 
-  try {
-    await storage.deleteFile(AVATAR_BUCKET_ID, id);
-
-    return {
-      success: true,
-      message: "Avatar image successfully deleted.",
-    };
-  } catch (err) {
-    const error = err as Error;
-
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  });
 }

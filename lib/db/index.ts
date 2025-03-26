@@ -7,7 +7,7 @@ import { Product } from "@/interfaces/product.interface";
 import { Result } from "@/interfaces/result.interface";
 import { TeamData } from "@/interfaces/team.interface";
 import { UserData } from "@/interfaces/user.interface";
-import { getLoggedInUser } from "@/lib/auth";
+import { withAuth } from "@/lib/auth";
 import {
   DATABASE_ID,
   SAMPLE_COLLECTION_ID,
@@ -26,103 +26,96 @@ import { AddProductFormData, EditProductFormData } from "./schemas";
 export async function listProducts(
   queries: string[] = []
 ): Promise<Result<Models.DocumentList<Product>>> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { database } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    return unstable_cache(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      async (queries, userId) => {
+        try {
+          const products = await database.listDocuments<Product>(
+            DATABASE_ID,
+            SAMPLE_COLLECTION_ID,
+            queries
+          );
 
-  const { database } = await createSessionClient();
+          const userIds = products.documents.map((product) => product.userId);
+          const uniqueUserIds = Array.from(new Set(userIds));
 
-  return unstable_cache(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async (queries, userId) => {
-      try {
-        const products = await database.listDocuments<Product>(
-          DATABASE_ID,
-          SAMPLE_COLLECTION_ID,
-          queries
-        );
+          const teamIds = products.documents.map((product) => product.teamId);
+          const uniqueTeamIds = Array.from(new Set(teamIds));
 
-        const userIds = products.documents.map((product) => product.userId);
-        const uniqueUserIds = Array.from(new Set(userIds));
+          const users = await database.listDocuments<UserData>(
+            DATABASE_ID,
+            USER_COLLECTION_ID,
+            [
+              Query.equal("$id", uniqueUserIds),
+              Query.select(["$id", "name", "avatar"]),
+            ]
+          );
 
-        const teamIds = products.documents.map((product) => product.teamId);
-        const uniqueTeamIds = Array.from(new Set(teamIds));
+          const teams = await database.listDocuments<UserData>(
+            DATABASE_ID,
+            TEAM_COLLECTION_ID,
+            [
+              Query.equal("$id", uniqueTeamIds),
+              Query.select(["$id", "name", "avatar"]),
+            ]
+          );
 
-        const users = await database.listDocuments<UserData>(
-          DATABASE_ID,
-          USER_COLLECTION_ID,
-          [
-            Query.equal("$id", uniqueUserIds),
-            Query.select(["$id", "name", "avatar"]),
-          ]
-        );
+          const userMap = users.documents.reduce<Record<string, UserData>>(
+            (acc, user) => {
+              if (user) {
+                acc[user.$id] = user;
+              }
+              return acc;
+            },
+            {}
+          );
 
-        const teams = await database.listDocuments<UserData>(
-          DATABASE_ID,
-          TEAM_COLLECTION_ID,
-          [
-            Query.equal("$id", uniqueTeamIds),
-            Query.select(["$id", "name", "avatar"]),
-          ]
-        );
+          const teamMap = teams.documents.reduce<Record<string, TeamData>>(
+            (acc, team) => {
+              if (team) {
+                acc[team.$id] = team;
+              }
+              return acc;
+            },
+            {}
+          );
 
-        const userMap = users.documents.reduce<Record<string, UserData>>(
-          (acc, user) => {
-            if (user) {
-              acc[user.$id] = user;
-            }
-            return acc;
-          },
-          {}
-        );
+          const newProducts = products.documents.map((product) => ({
+            ...product,
+            user: userMap[product.userId],
+            team: teamMap[product.teamId],
+          }));
 
-        const teamMap = teams.documents.reduce<Record<string, TeamData>>(
-          (acc, team) => {
-            if (team) {
-              acc[team.$id] = team;
-            }
-            return acc;
-          },
-          {}
-        );
+          products.documents = newProducts;
 
-        const newProducts = products.documents.map((product) => ({
-          ...product,
-          user: userMap[product.userId],
-          team: teamMap[product.teamId],
-        }));
+          return {
+            success: true,
+            message: "Products successfully retrieved.",
+            data: products,
+          };
+        } catch (err) {
+          const error = err as Error;
 
-        products.documents = newProducts;
-
-        return {
-          success: true,
-          message: "Products successfully retrieved.",
-          data: products,
-        };
-      } catch (err) {
-        const error = err as Error;
-
-        return {
-          success: false,
-          message: error.message,
-        };
+          return {
+            success: false,
+            message: error.message,
+          };
+        }
+      },
+      ["products"],
+      {
+        tags: [
+          "products",
+          `products:${queries.join("-")}`,
+          `products:user-${user.$id}`,
+        ],
+        revalidate: 600,
       }
-    },
-    ["products"],
-    {
-      tags: [
-        "products",
-        `products:${queries.join("-")}`,
-        `products:user-${user.$id}`,
-      ],
-      revalidate: 600,
-    }
-  )(queries, user.$id);
+    )(queries, user.$id);
+  });
 }
 
 /**
@@ -135,65 +128,58 @@ export async function getProductById(
   productId: string,
   queries: string[] = []
 ): Promise<Result<Product>> {
-  const user = await getLoggedInUser();
+  return withAuth(async () => {
+    const { database } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    return unstable_cache(
+      async () => {
+        try {
+          const product = await database.getDocument<Product>(
+            DATABASE_ID,
+            SAMPLE_COLLECTION_ID,
+            productId,
+            queries
+          );
 
-  const { database } = await createSessionClient();
+          const userRes = await database.getDocument<UserData>(
+            DATABASE_ID,
+            USER_COLLECTION_ID,
+            product.userId,
+            [Query.select(["$id", "name", "avatar"])]
+          );
 
-  return unstable_cache(
-    async () => {
-      try {
-        const product = await database.getDocument<Product>(
-          DATABASE_ID,
-          SAMPLE_COLLECTION_ID,
-          productId,
-          queries
-        );
+          const teamRes = await database.getDocument<TeamData>(
+            DATABASE_ID,
+            TEAM_COLLECTION_ID,
+            product.teamId,
+            [Query.select(["$id", "name", "avatar"])]
+          );
 
-        const userRes = await database.getDocument<UserData>(
-          DATABASE_ID,
-          USER_COLLECTION_ID,
-          product.userId,
-          [Query.select(["$id", "name", "avatar"])]
-        );
+          return {
+            success: true,
+            message: "Product successfully retrieved.",
+            data: {
+              ...product,
+              user: userRes,
+              team: teamRes,
+            },
+          };
+        } catch (err) {
+          const error = err as Error;
 
-        const teamRes = await database.getDocument<TeamData>(
-          DATABASE_ID,
-          TEAM_COLLECTION_ID,
-          product.teamId,
-          [Query.select(["$id", "name", "avatar"])]
-        );
-
-        return {
-          success: true,
-          message: "Product successfully retrieved.",
-          data: {
-            ...product,
-            user: userRes,
-            team: teamRes,
-          },
-        };
-      } catch (err) {
-        const error = err as Error;
-
-        return {
-          success: false,
-          message: error.message,
-        };
+          return {
+            success: false,
+            message: error.message,
+          };
+        }
+      },
+      ["product", productId],
+      {
+        tags: ["products", `product:${productId}`],
+        revalidate: 600,
       }
-    },
-    ["product", productId],
-    {
-      tags: ["products", `product:${productId}`],
-      revalidate: 600,
-    }
-  )();
+    )();
+  });
 }
 
 /**
@@ -213,82 +199,75 @@ export async function createProduct({
   data: AddProductFormData;
   permissions?: string[];
 }): Promise<Result<Product>> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { database } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    permissions = [
+      ...permissions,
+      Permission.read(Role.user(user.$id)),
+      Permission.write(Role.user(user.$id)),
+      Permission.read(Role.team(data.teamId)),
+    ];
 
-  const { database } = await createSessionClient();
+    try {
+      if (data.image instanceof File) {
+        const image = await uploadProductImage({
+          data: data.image,
+          permissions: [Permission.read(Role.team(data.teamId))],
+        });
 
-  permissions = [
-    ...permissions,
-    Permission.read(Role.user(user.$id)),
-    Permission.write(Role.user(user.$id)),
-    Permission.read(Role.team(data.teamId)),
-  ];
+        if (!image.success) {
+          throw new Error(image.message);
+        }
 
-  try {
-    if (data.image instanceof File) {
-      const image = await uploadProductImage({
-        data: data.image,
-        permissions: [Permission.read(Role.team(data.teamId))],
-      });
-
-      if (!image.success) {
-        throw new Error(image.message);
+        data.image = image.data?.$id;
       }
 
-      data.image = image.data?.$id;
+      const product = await database.createDocument<Product>(
+        DATABASE_ID,
+        SAMPLE_COLLECTION_ID,
+        id,
+        {
+          ...data,
+          userId: user.$id,
+        },
+        permissions
+      );
+
+      const userRes = await database.getDocument<UserData>(
+        DATABASE_ID,
+        USER_COLLECTION_ID,
+        product.userId,
+        [Query.select(["$id", "name", "avatar"])]
+      );
+
+      const teamRes = await database.getDocument<TeamData>(
+        DATABASE_ID,
+        TEAM_COLLECTION_ID,
+        product.teamId,
+        [Query.select(["$id", "name", "avatar"])]
+      );
+
+      revalidateTag("products");
+
+      return {
+        success: true,
+        message: "Product successfully created.",
+        data: {
+          ...product,
+          user: userRes,
+          team: teamRes,
+        },
+      };
+    } catch (err) {
+      const error = err as Error;
+
+      return {
+        success: false,
+        message: error.message,
+      };
     }
-
-    const product = await database.createDocument<Product>(
-      DATABASE_ID,
-      SAMPLE_COLLECTION_ID,
-      id,
-      {
-        ...data,
-        userId: user.$id,
-      },
-      permissions
-    );
-
-    const userRes = await database.getDocument<UserData>(
-      DATABASE_ID,
-      USER_COLLECTION_ID,
-      product.userId,
-      [Query.select(["$id", "name", "avatar"])]
-    );
-
-    const teamRes = await database.getDocument<TeamData>(
-      DATABASE_ID,
-      TEAM_COLLECTION_ID,
-      product.teamId,
-      [Query.select(["$id", "name", "avatar"])]
-    );
-
-    revalidateTag("products");
-
-    return {
-      success: true,
-      message: "Product successfully created.",
-      data: {
-        ...product,
-        user: userRes,
-        team: teamRes,
-      },
-    };
-  } catch (err) {
-    const error = err as Error;
-
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+  });
 }
 
 /**
@@ -308,93 +287,86 @@ export async function updateProduct({
   data: EditProductFormData;
   permissions?: string[];
 }): Promise<Result<Product>> {
-  const user = await getLoggedInUser();
+  return withAuth(async (user) => {
+    const { database } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    try {
+      const existingProduct = await database.getDocument<Product>(
+        DATABASE_ID,
+        SAMPLE_COLLECTION_ID,
+        id
+      );
 
-  const { database } = await createSessionClient();
+      if (data.image instanceof File) {
+        if (existingProduct.image) {
+          await deleteProductImage(existingProduct.image);
+        }
 
-  try {
-    const existingProduct = await database.getDocument<Product>(
-      DATABASE_ID,
-      SAMPLE_COLLECTION_ID,
-      id
-    );
+        const image = await uploadProductImage({
+          data: data.image,
+        });
 
-    if (data.image instanceof File) {
-      if (existingProduct.image) {
-        await deleteProductImage(existingProduct.image);
+        if (!image.success) {
+          throw new Error(image.message);
+        }
+
+        data.image = image.data?.$id;
+      } else if (data.image === null && existingProduct.image) {
+        const image = await deleteProductImage(existingProduct.image);
+
+        if (!image.success) {
+          throw new Error(image.message);
+        }
+
+        data.image = null;
       }
 
-      const image = await uploadProductImage({
-        data: data.image,
-      });
+      const product = await database.updateDocument<Product>(
+        DATABASE_ID,
+        SAMPLE_COLLECTION_ID,
+        id,
+        {
+          ...data,
+          userId: user.$id,
+        },
+        permissions
+      );
 
-      if (!image.success) {
-        throw new Error(image.message);
-      }
+      const userRes = await database.getDocument<UserData>(
+        DATABASE_ID,
+        USER_COLLECTION_ID,
+        product.userId,
+        [Query.select(["$id", "name", "avatar"])]
+      );
 
-      data.image = image.data?.$id;
-    } else if (data.image === null && existingProduct.image) {
-      const image = await deleteProductImage(existingProduct.image);
+      const teamRes = await database.getDocument<TeamData>(
+        DATABASE_ID,
+        TEAM_COLLECTION_ID,
+        product.teamId,
+        [Query.select(["$id", "name", "avatar"])]
+      );
 
-      if (!image.success) {
-        throw new Error(image.message);
-      }
+      revalidateTag("products");
+      revalidateTag(`product:${id}`);
 
-      data.image = null;
+      return {
+        success: true,
+        message: "Product successfully updated.",
+        data: {
+          ...product,
+          user: userRes,
+          team: teamRes,
+        },
+      };
+    } catch (err) {
+      const error = err as Error;
+
+      return {
+        success: false,
+        message: error.message,
+      };
     }
-
-    const product = await database.updateDocument<Product>(
-      DATABASE_ID,
-      SAMPLE_COLLECTION_ID,
-      id,
-      {
-        ...data,
-        userId: user.$id,
-      },
-      permissions
-    );
-
-    const userRes = await database.getDocument<UserData>(
-      DATABASE_ID,
-      USER_COLLECTION_ID,
-      product.userId,
-      [Query.select(["$id", "name", "avatar"])]
-    );
-
-    const teamRes = await database.getDocument<TeamData>(
-      DATABASE_ID,
-      TEAM_COLLECTION_ID,
-      product.teamId,
-      [Query.select(["$id", "name", "avatar"])]
-    );
-
-    revalidateTag("products");
-    revalidateTag(`product:${id}`);
-
-    return {
-      success: true,
-      message: "Product successfully updated.",
-      data: {
-        ...product,
-        user: userRes,
-        team: teamRes,
-      },
-    };
-  } catch (err) {
-    const error = err as Error;
-
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+  });
 }
 
 /**
@@ -403,46 +375,39 @@ export async function updateProduct({
  * @returns {Promise<Result<Product>>} The deleted product
  */
 export async function deleteProduct(id: string): Promise<Result<Product>> {
-  const user = await getLoggedInUser();
+  return withAuth(async () => {
+    const { database } = await createSessionClient();
 
-  if (!user) {
-    return {
-      success: false,
-      message: "You must be logged in to perform this action.",
-    };
-  }
+    try {
+      const product = await database.getDocument<Product>(
+        DATABASE_ID,
+        SAMPLE_COLLECTION_ID,
+        id
+      );
 
-  const { database } = await createSessionClient();
+      if (product.image) {
+        const image = await deleteProductImage(product.image);
 
-  try {
-    const product = await database.getDocument<Product>(
-      DATABASE_ID,
-      SAMPLE_COLLECTION_ID,
-      id
-    );
-
-    if (product.image) {
-      const image = await deleteProductImage(product.image);
-
-      if (!image.success) {
-        throw new Error(image.message);
+        if (!image.success) {
+          throw new Error(image.message);
+        }
       }
+
+      await database.deleteDocument(DATABASE_ID, SAMPLE_COLLECTION_ID, id);
+
+      revalidateTag("products");
+
+      return {
+        success: true,
+        message: "Product successfully deleted.",
+      };
+    } catch (err) {
+      const error = err as Error;
+
+      return {
+        success: false,
+        message: error.message,
+      };
     }
-
-    await database.deleteDocument(DATABASE_ID, SAMPLE_COLLECTION_ID, id);
-
-    revalidateTag("products");
-
-    return {
-      success: true,
-      message: "Product successfully deleted.",
-    };
-  } catch (err) {
-    const error = err as Error;
-
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
+  });
 }
