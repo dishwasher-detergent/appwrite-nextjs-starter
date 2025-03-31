@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { createSessionClient } from "@/lib/auth";
+import { createSessionClient } from "@/lib/server/appwrite";
 
 const protectedRoutes = ["/app"];
 const publicRoutes = ["/signin", "/signup"];
