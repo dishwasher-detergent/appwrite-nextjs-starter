@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { getLoggedInUser } from "@/lib/auth";
+import { createSessionClient } from "@/lib/auth";
 
 const protectedRoutes = ["/app"];
 const publicRoutes = ["/signin", "/signup"];
