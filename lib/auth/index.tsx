@@ -2,7 +2,7 @@
 
 import { revalidateTag, unstable_cache } from "next/cache";
 import { cookies, headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 import { ID, Models, OAuthProvider, Permission, Role } from "node-appwrite";
 
 import { AuthResponse, Response, Result } from "@/interfaces/result.interface";
@@ -278,12 +278,6 @@ export async function signInWithEmail(
       sameSite: "strict",
       secure: true,
     });
-
-    return {
-      success: true,
-      message: "Signed in successfully",
-      redirect: "/app",
-    };
   } catch (err) {
     const error = err as Error;
 
@@ -295,6 +289,8 @@ export async function signInWithEmail(
       message: error.message,
     };
   }
+
+  return redirect("/app", RedirectType.push);
 }
 
 /**
@@ -326,12 +322,6 @@ export async function signUpWithEmail(
     });
 
     await createUserData(session.userId);
-
-    return {
-      success: true,
-      message: "Account created successfully",
-      redirect: "/app",
-    };
   } catch (err) {
     const error = err as Error;
 
@@ -343,6 +333,8 @@ export async function signUpWithEmail(
       message: error.message,
     };
   }
+
+  return redirect("/app");
 }
 
 /**
@@ -377,12 +369,6 @@ export async function createPasswordRecovery(
 
   try {
     await account.createRecovery(email, `${origin}/reset`);
-
-    return {
-      success: true,
-      message: "A recovery email has been sent to your inbox",
-      redirect: "/reset",
-    };
   } catch (err) {
     const error = err as Error;
 
@@ -394,6 +380,8 @@ export async function createPasswordRecovery(
       message: error.message,
     };
   }
+
+  return redirect("/reset");
 }
 
 /**
@@ -412,12 +400,6 @@ export async function resetPassword(
 
   try {
     await account.updateRecovery(id, token, password);
-
-    return {
-      success: true,
-      message: "Password reset successfully",
-      redirect: "/signin",
-    };
   } catch (err) {
     const error = err as Error;
 
@@ -429,6 +411,8 @@ export async function resetPassword(
       message: error.message,
     };
   }
+
+  return redirect("/signin");
 }
 
 /**

@@ -34,21 +34,10 @@ export function SignInForm() {
   });
 
   async function onSubmit(values: SignInFormData) {
-    try {
-      setLoading(true);
-      const result = await signInWithEmail(values);
-
-      if (result.success) {
-        toast.success(result.message);
-        router.push(result.redirect!);
-      } else {
-        toast.error(result.message);
-      }
-    } catch {
-      toast.error("An unexpected error occurred");
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    const result = await signInWithEmail(values);
+    toast.error(result.message);
+    setLoading(false);
   }
 
   return (

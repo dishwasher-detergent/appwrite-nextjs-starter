@@ -35,21 +35,10 @@ export function SignUpForm() {
   });
 
   async function onSubmit(values: SignUpFormData) {
-    try {
-      setLoading(true);
-      const result = await signUpWithEmail(values);
-
-      if (result.success) {
-        toast.success(result.message);
-        router.push(result.redirect!);
-      } else {
-        toast.error(result.message);
-      }
-    } catch {
-      toast.error("An unexpected error occurred");
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    const result = await signUpWithEmail(values);
+    toast.error(result.message);
+    setLoading(false);
   }
 
   return (

@@ -35,22 +35,10 @@ export function RecoverForm() {
   });
 
   async function onSubmit(values: ResetPasswordFormData) {
-    try {
-      setLoading(true);
-
-      const result = await createPasswordRecovery(values);
-
-      if (result.success) {
-        toast.success(result.message);
-        router.push("/reset");
-      } else {
-        toast.error(result.message);
-      }
-    } catch {
-      toast.error("An unexpected error occurred");
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    const result = await createPasswordRecovery(values);
+    toast.error(result.message);
+    setLoading(false);
   }
 
   return (
