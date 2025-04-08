@@ -16,7 +16,7 @@ export async function createSessionClient(session?: string) {
   const client = new Client().setEndpoint(ENDPOINT).setProject(PROJECT_ID);
 
   if (!session) {
-    session = (await cookies()).get(COOKIE_KEY).value;
+    session = (await cookies()).get(COOKIE_KEY)?.value;
     if (!session) {
       throw new Error("No session");
     }
