@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { getLoggedInUser } from "@/lib/auth";
+import { createSessionClient } from "@/lib/server/appwrite";
 
 const protectedRoutes = ["/app"];
 const publicRoutes = ["/signin", "/signup"];
@@ -12,7 +12,14 @@ export default async function middleware(req: NextRequest) {
   const isProtectedRoute = protectedRoutes.includes(path);
   const isPublicRoute = publicRoutes.includes(path);
 
-  const user = await getLoggedInUser();
+  let user = null;
+  
+  try {
+    const { account } = await createSessionClient();
+    user = await account.get();
+  } catch {
+    user = null;
+  }
 
   if (isProtectedRoute && !user) {
     return NextResponse.redirect(new URL("/signin", req.nextUrl));
