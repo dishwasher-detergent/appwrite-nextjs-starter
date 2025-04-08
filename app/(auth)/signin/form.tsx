@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LucideGithub, LucideLoader2, LucideLogIn } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -22,7 +21,6 @@ import { signInWithEmail, signUpWithGithub } from "@/lib/auth";
 import { signInSchema, type SignInFormData } from "@/lib/auth/schemas";
 
 export function SignInForm() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<SignInFormData>({

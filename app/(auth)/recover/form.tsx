@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LucideLoader2, LucideMail } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -24,7 +23,6 @@ import {
 } from "@/lib/auth/schemas";
 
 export function RecoverForm() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<ResetPasswordFormData>({
