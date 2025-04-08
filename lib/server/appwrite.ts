@@ -12,11 +12,11 @@ import {
   Users,
 } from "node-appwrite";
 
-export async function createSessionClient(setSession: boolean = true) {
+export async function createSessionClient(session?: string) {
   const client = new Client().setEndpoint(ENDPOINT).setProject(PROJECT_ID);
 
-  if (setSession) {
-    const session = (await cookies()).get(COOKIE_KEY);
+  if (session) {
+    session = (await cookies()).get(COOKIE_KEY);
     if (!session || !session.value) {
       throw new Error("No session");
     }

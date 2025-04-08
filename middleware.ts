@@ -11,11 +11,12 @@ export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const isProtectedRoute = protectedRoutes.includes(path);
   const isPublicRoute = publicRoutes.includes(path);
+  const cookieSession = request.cookies.get(COOKIE_KEY)?.value;
 
   let user = null;
   
   try {
-    const { account } = await createSessionClient();
+    const { account } = await createSessionClient(cookieSession);
     user = await account.get();
   } catch {
     user = null;
