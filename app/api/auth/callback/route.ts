@@ -17,14 +17,14 @@ export async function GET(request: NextRequest) {
 
   // Set the cookie in the response headers
   const response = NextResponse.redirect(`${request.nextUrl.origin}/app`);
+
   response.cookies.set(COOKIE_KEY, session.secret, {
     path: "/",
     httpOnly: true,
-    sameSite: "strict",
+    sameSite: "lax",
     secure: true,
   });
 
-  // Create user data
   await createUserData(session.userId);
 
   return response;
