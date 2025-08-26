@@ -7,6 +7,7 @@ export interface TeamData extends Models.Document {
   about: string;
   name: string;
   members?: UserMemberData[];
+  description: string;
 }
 
 export interface Team extends Models.Team<Models.Preferences>, TeamData {}
