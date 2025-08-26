@@ -54,7 +54,7 @@ export async function listProducts(
             ]
           );
 
-          const teams = await database.listDocuments<UserData>(
+          const teams = await database.listDocuments<TeamData>(
             DATABASE_ID,
             TEAM_COLLECTION_ID,
             [

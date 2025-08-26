@@ -1,9 +1,9 @@
 import { Models } from "node-appwrite";
 
 export interface UserData extends Models.Document {
-  avatar: string;
-  about: string;
+  avatar: string | null;
   name: string;
+  about?: string;
 }
 
 export interface UserMemberData extends UserData {
