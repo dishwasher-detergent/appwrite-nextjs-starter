@@ -2,7 +2,7 @@ import { Models } from "node-appwrite";
 
 import { UserMemberData } from "@/interfaces/user.interface";
 
-export interface TeamData extends Models.Document {
+export interface TeamData extends Models.Row {
   avatar?: string | null;
   about: string;
   name: string;

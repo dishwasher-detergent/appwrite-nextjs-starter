@@ -29,14 +29,14 @@ export const useProducts = ({ initialProducts, teamId, userId }: Props) => {
 
     if (client) {
       unsubscribe = client.subscribe<Product>(
-        `databases.${DATABASE_ID}.collections.${SAMPLE_COLLECTION_ID}.documents`,
+        `databases.${DATABASE_ID}.tables.${SAMPLE_COLLECTION_ID}.rows`,
         async (response) => {
           if (teamId && response.payload.teamId !== teamId) return;
           if (userId && response.payload.userId !== userId) return;
 
           if (
             response.events.includes(
-              "databases.*.collections.*.documents.*.create"
+              "databases.*.tables.*.rows.*.create"
             )
           ) {
             const { data } = await getUserById(response.payload.userId);
@@ -56,7 +56,7 @@ export const useProducts = ({ initialProducts, teamId, userId }: Props) => {
 
           if (
             response.events.includes(
-              "databases.*.collections.*.documents.*.update"
+              "databases.*.tables.*.rows.*.update"
             )
           ) {
             const { data } = await getUserById(response.payload.userId);
@@ -75,7 +75,7 @@ export const useProducts = ({ initialProducts, teamId, userId }: Props) => {
 
           if (
             response.events.includes(
-              "databases.*.collections.*.documents.*.delete"
+              "databases.*.tables.*.rows.*.delete"
             )
           ) {
             setProducts((prev) =>

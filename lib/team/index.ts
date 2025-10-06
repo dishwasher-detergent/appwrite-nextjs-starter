@@ -38,11 +38,11 @@ export async function getTeamById(id: string): Promise<Result<TeamData>> {
     return unstable_cache(
       async (id) => {
         try {
-          const data = await database.getDocument<TeamData>(
-            DATABASE_ID,
-            TEAM_COLLECTION_ID,
-            id
-          );
+          const data = await database.getRow<TeamData>({
+            databaseId: DATABASE_ID,
+            tableId: TEAM_COLLECTION_ID,
+            rowId: id
+          });
 
           const memberships = await team.listMemberships(data.$id);
 
@@ -51,16 +51,16 @@ export async function getTeamById(id: string): Promise<Result<TeamData>> {
           );
           const uniqueUserIds = Array.from(new Set(userIds));
 
-          const users = await database.listDocuments<UserData>(
-            DATABASE_ID,
-            USER_COLLECTION_ID,
-            [
+          const users = await database.listRows<UserData>({
+            databaseId: DATABASE_ID,
+            tableId: USER_COLLECTION_ID,
+            queries: [
               Query.equal("$id", uniqueUserIds),
               Query.select(["$id", "name", "avatar"]),
             ]
-          );
+          });
 
-          const usersMembershipData: UserMemberData[] = users.documents.map(
+          const usersMembershipData: UserMemberData[] = users.rows.map(
             (user) => {
               const member = memberships.memberships.filter(
                 (member) => member.userId === user.$id
@@ -115,15 +115,15 @@ export async function listTeams(): Promise<Result<TeamData[]>> {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       async (userId) => {
         try {
-          const data = await database.listDocuments<TeamData>(
-            DATABASE_ID,
-            TEAM_COLLECTION_ID
-          );
+          const data = await database.listRows<TeamData>({
+            databaseId: DATABASE_ID,
+            tableId: TEAM_COLLECTION_ID
+          });
 
           return {
             success: true,
             message: "Teams successfully retrieved.",
-            data: data.documents,
+            data: data.rows,
           };
         } catch (err) {
           const error = err as Error;
@@ -173,11 +173,11 @@ export async function createTeam({
     ];
 
     try {
-      const existingTeams = await database.listDocuments<TeamData>(
-        DATABASE_ID,
-        TEAM_COLLECTION_ID,
-        [Query.select(["$id"])]
-      );
+      const existingTeams = await database.listRows<TeamData>({
+        databaseId: DATABASE_ID,
+        tableId: TEAM_COLLECTION_ID,
+        queries: [Query.select(["$id"])]
+      });
 
       if (existingTeams.total >= MAX_TEAM_LIMIT) {
         throw new Error(
@@ -197,16 +197,16 @@ export async function createTeam({
         Permission.write(Role.team(teamResponse.$id, ADMIN_ROLE)),
       ];
 
-      const teamData = await database.createDocument<TeamData>(
-        DATABASE_ID,
-        TEAM_COLLECTION_ID,
-        teamResponse.$id,
-        {
+      const teamData = await database.createRow<TeamData>({
+        databaseId: DATABASE_ID,
+        tableId: TEAM_COLLECTION_ID,
+        rowId: teamResponse.$id,
+        data: {
           name: data.name,
           about: data.about,
         },
-        permissions
-      );
+        permissions: permissions
+      });
 
       revalidateTag("teams");
 
@@ -252,11 +252,11 @@ export async function updateTeam({
     try {
       await checkUserRole(id, user.$id, [ADMIN_ROLE, OWNER_ROLE]);
 
-      const existingTeamData = await database.getDocument<TeamData>(
-        DATABASE_ID,
-        TEAM_COLLECTION_ID,
-        id
-      );
+      const existingTeamData = await database.getRow<TeamData>({
+        databaseId: DATABASE_ID,
+        tableId: TEAM_COLLECTION_ID,
+        rowId: id
+      });
 
       if (data.image instanceof File) {
         if (existingTeamData.avatar) {
@@ -284,17 +284,17 @@ export async function updateTeam({
 
       await team.updateName(id, data.name);
 
-      const teamData = await database.updateDocument<TeamData>(
-        DATABASE_ID,
-        TEAM_COLLECTION_ID,
-        id,
-        {
+      const teamData = await database.updateRow<TeamData>({
+        databaseId: DATABASE_ID,
+        tableId: TEAM_COLLECTION_ID,
+        rowId: id,
+        data: {
           name: data.name,
           about: data.about,
           avatar: data.image,
         },
-        permissions
-      );
+        permissions: permissions
+      });
 
       revalidateTag("teams");
       revalidateTag(`team:${id}`);
@@ -327,11 +327,11 @@ export async function deleteTeam(id: string): Promise<Result<TeamData>> {
     try {
       await checkUserRole(id, user.$id, [OWNER_ROLE]);
 
-      const existingTeamData = await database.getDocument<TeamData>(
-        DATABASE_ID,
-        TEAM_COLLECTION_ID,
-        id
-      );
+      const existingTeamData = await database.getRow<TeamData>({
+        databaseId: DATABASE_ID,
+        tableId: TEAM_COLLECTION_ID,
+        rowId: id
+      });
 
       if (existingTeamData.avatar) {
         const image = await deleteAvatarImage(existingTeamData.avatar);
@@ -341,23 +341,23 @@ export async function deleteTeam(id: string): Promise<Result<TeamData>> {
         }
       }
 
-      await team.delete(id);
-      await database.deleteDocument(DATABASE_ID, TEAM_COLLECTION_ID, id);
+      await team.delete({teamId: id});
+      await database.deleteRow({databaseId: DATABASE_ID, tableId: TEAM_COLLECTION_ID, rowId: id});
 
       let response;
       const queries = [Query.limit(50), Query.equal("teamId", id)];
 
       do {
-        response = await database.listDocuments<Product>(
-          DATABASE_ID,
-          SAMPLE_COLLECTION_ID,
-          queries
-        );
+        response = await database.listRows<Product>({
+          databaseId: DATABASE_ID,
+          tableId: SAMPLE_COLLECTION_ID,
+          queries: queries
+        });
 
         await Promise.all(
-          response.documents.map((document) => deleteProduct(document.$id))
+          response.rows.map((document) => deleteProduct(document.$id))
         );
-      } while (response.documents.length > 0);
+      } while (response.rows.length > 0);
 
       revalidateTag("teams");
 
@@ -403,22 +403,22 @@ export async function leaveTeam(teamId: string): Promise<Result<string>> {
         throw new Error("You cannot leave a team you own.");
       }
 
-      await team.deleteMembership(teamId, membership.$id);
+      await team.deleteMembership({teamId: teamId, membershipId: membership.$id});
 
-      const data = await database.listDocuments<TeamData>(
-        DATABASE_ID,
-        TEAM_COLLECTION_ID,
-        [Query.orderDesc("$createdAt"), Query.limit(1)]
-      );
+      const data = await database.listRows<TeamData>({
+        databaseId: DATABASE_ID,
+        tableId: TEAM_COLLECTION_ID,
+        queries: [Query.orderDesc("$createdAt"), Query.limit(1)]
+      });
 
       revalidateTag("teams");
       revalidateTag(`team:${teamId}`);
 
-      if (data.documents.length > 0) {
+      if (data.rows.length > 0) {
         return {
           success: true,
           message: `You've left the team!`,
-          data: data.documents[0].$id,
+          data: data.rows[0].$id,
         };
       }
 

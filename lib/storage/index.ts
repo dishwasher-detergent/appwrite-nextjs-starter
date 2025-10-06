@@ -35,12 +35,12 @@ export async function uploadProductImage({
     ];
 
     try {
-      const response = await storage.createFile(
-        SAMPLE_BUCKET_ID,
-        id,
-        data,
-        permissions
-      );
+      const response = await storage.createFile({
+        bucketId: SAMPLE_BUCKET_ID,
+        fileId: id,
+        file: data,
+        permissions: permissions
+      });
 
       return {
         success: true,
@@ -70,7 +70,7 @@ export async function deleteProductImage(
     const { storage } = await createSessionClient();
 
     try {
-      await storage.deleteFile(SAMPLE_BUCKET_ID, id);
+      await storage.deleteFile({bucketId: SAMPLE_BUCKET_ID, fileId: id});
 
       return {
         success: true,
@@ -116,12 +116,12 @@ export async function uploadAvatarImage({
     ];
 
     try {
-      const response = await storage.createFile(
-        AVATAR_BUCKET_ID,
-        id,
-        data,
-        permissions
-      );
+      const response = await storage.createFile({
+        bucketId: AVATAR_BUCKET_ID,
+        fileId: id,
+        file: data,
+        permissions: permissions
+      });
 
       return {
         success: true,
@@ -151,7 +151,7 @@ export async function deleteAvatarImage(
     const { storage } = await createSessionClient();
 
     try {
-      await storage.deleteFile(AVATAR_BUCKET_ID, id);
+      await storage.deleteFile({bucketId: AVATAR_BUCKET_ID, fileId: id});
 
       return {
         success: true,

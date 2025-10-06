@@ -42,8 +42,8 @@ dependencies:
     specifier: ^1.2.8
     version: 1.2.8(@types/react-dom@19.1.8)(@types/react@19.1.11)(react-dom@19.1.1)(react@19.1.1)
   appwrite:
-    specifier: ^17.0.2
-    version: 17.0.2
+    specifier: ^21.0.0
+    version: 21.0.0
   class-variance-authority:
     specifier: ^0.7.1
     version: 0.7.1
@@ -69,8 +69,8 @@ dependencies:
     specifier: ^0.4.6
     version: 0.4.6(react-dom@19.1.1)(react@19.1.1)
   node-appwrite:
-    specifier: ^17.2.0
-    version: 17.2.0
+    specifier: 20.0.0
+    version: 20.0.0
   react:
     specifier: ^19.1.1
     version: 19.1.1
@@ -1823,7 +1823,7 @@ packages:
 
   /@tailwindcss/oxide@4.1.12:
     resolution: {integrity: sha512-gM5EoKHW/ukmlEtphNwaGx45fGoEmP10v51t9unv55voWh6WrOL19hfuIdo2FjxIaZzw776/BUQg7Pck++cIVw==}
-    engines: {node: '>= 10'}
+    engines: {node: '>=14.0.0'}
     dependencies:
       detect-libc: 2.0.4
       tar: 7.4.3
@@ -1841,6 +1841,13 @@ packages:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.1.12
       '@tailwindcss/oxide-win32-x64-msvc': 4.1.12
     dev: true
+    bundledDependencies:
+      - '@napi-rs/wasm-runtime'
+      - '@emnapi/core'
+      - '@emnapi/runtime'
+      - '@tybys/wasm-util'
+      - '@emnapi/wasi-threads'
+      - tslib
 
   /@tailwindcss/postcss@4.1.12:
     resolution: {integrity: sha512-5PpLYhCAwf9SJEeIsSmCDLgyVfdBhdBpzX1OJ87anT9IVR0Z9pjM0FNixCAUAHGnMBGB8K99SwAheXrT0Kh6QQ==}
@@ -2220,8 +2227,8 @@ packages:
       color-convert: 2.0.1
     dev: true
 
-  /appwrite@17.0.2:
-    resolution: {integrity: sha512-h8frLDRYzFDLS9xA2s8ZSlH/prPFq/ma5477fgQHHLcE/t9RDxNImpq9AleRUb9Oh1YJiP49HCObxgSTGW5AQA==}
+  /appwrite@21.0.0:
+    resolution: {integrity: sha512-Ls0QD1i1dFx9Dzvg0Rgf+jWVSDsw9Qb02dr3EPAS0JVJT1AaShpuAYS36yJihuJqsgoqmPfqmLy/RHPVaUuZJQ==}
     dev: false
 
   /argparse@2.0.1:
@@ -2589,6 +2596,7 @@ packages:
   /detect-libc@2.0.4:
     resolution: {integrity: sha512-3UDv+G9CsCKO1WKMGw9fwq/SWJYbI0c5Y7LU1AXYoDdbhE2AHQ6N6Nb34sG8Fj7T5APy8qXDCKuuIHd1BR0tVA==}
     engines: {node: '>=8'}
+    requiresBuild: true
 
   /detect-node-es@1.1.0:
     resolution: {integrity: sha512-ypdmJU/TbBby2Dxibuv7ZLW3Bs1QEmM7nHjEANfohJLvE0XVujisn1qPJcZxg+qDucsr+bP6fLD1rPS3AhJ7EQ==}
@@ -3806,6 +3814,8 @@ packages:
       lightningcss-win32-arm64-msvc: 1.30.1
       lightningcss-win32-x64-msvc: 1.30.1
     dev: true
+    bundledDependencies:
+      - napi-wasm
 
   /locate-path@6.0.0:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
@@ -3966,8 +3976,8 @@ packages:
       - babel-plugin-macros
     dev: false
 
-  /node-appwrite@17.2.0:
-    resolution: {integrity: sha512-naYUsVZEdF6YKF/q/s0DBQkAHJj2RhEWwmcXrkbfAAPc3Bn+D3CCftBqyNWeo17JBCoYWqQEgT2Od9xOVQR26A==}
+  /node-appwrite@20.0.0:
+    resolution: {integrity: sha512-HFE+xFCJVB/0GflFHsvk/g+xKgqmEaFYFvR9FtylEq4zVYtvXW6UVLhOuKVqhfA6xhOfictdHk/7lAP8rul2ig==}
     dependencies:
       node-fetch-native-with-agent: 1.7.2
     dev: false
