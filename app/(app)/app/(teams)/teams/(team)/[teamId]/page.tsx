@@ -53,7 +53,7 @@ export default async function TeamPage({
           isOwner={isOwner}
           isAdmin={isAdmin}
         />
-        <TeamContent products={productData?.documents ?? []} teamId={teamId} />
+        <TeamContent products={productData?.rows ?? []} teamId={teamId} />
       </main>
     </article>
   );

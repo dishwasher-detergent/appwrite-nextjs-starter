@@ -43,11 +43,11 @@ export async function getUserData(): Promise<Result<User>> {
     return unstable_cache(
       async (id) => {
         try {
-          const data = await database.getDocument<UserData>(
-            DATABASE_ID,
-            USER_COLLECTION_ID,
-            id
-          );
+          const data = await database.getRow<UserData>({
+            databaseId: DATABASE_ID,
+            tableId: USER_COLLECTION_ID,
+            rowId: id
+          });
 
           return {
             success: true,
@@ -90,11 +90,11 @@ export async function getUserById(id: string): Promise<Result<UserData>> {
     return unstable_cache(
       async (id) => {
         try {
-          const data = await database.getDocument<UserData>(
-            DATABASE_ID,
-            USER_COLLECTION_ID,
-            id
-          );
+          const data = await database.getRow<UserData>({
+            databaseId: DATABASE_ID,
+            tableId: USER_COLLECTION_ID,
+            rowId: id
+          });
 
           return {
             success: true,
@@ -139,11 +139,11 @@ export async function updateProfile({
     const { account, database } = await createSessionClient();
 
     try {
-      const userData = await database.getDocument<UserData>(
-        DATABASE_ID,
-        USER_COLLECTION_ID,
-        user.$id
-      );
+      const userData = await database.getRow<UserData>({
+        databaseId: DATABASE_ID,
+        tableId: USER_COLLECTION_ID,
+        rowId: user.$id
+      });
 
       if (data.image instanceof File) {
         if (userData.avatar) {
@@ -169,10 +169,15 @@ export async function updateProfile({
         data.image = null;
       }
 
-      await account.updateName(data.name);
-      await database.updateDocument(DATABASE_ID, USER_COLLECTION_ID, id, {
-        avatar: data.image,
-        about: data.about,
+      await account.updateName({name: data.name});
+      await database.updateRow({
+        databaseId: DATABASE_ID, 
+        tableId: USER_COLLECTION_ID, 
+        rowId: id, 
+        data: {
+          avatar: data.image,
+          about: data.about,
+        }
       });
 
       revalidateTag("user");
@@ -248,7 +253,7 @@ export async function logOut(): Promise<boolean> {
 export async function deleteSession(): Promise<void> {
   const { account } = await createSessionClient();
 
-  account.deleteSession("current");
+  account.deleteSession({sessionId: "current"});
   (await cookies()).delete(COOKIE_KEY);
 
   revalidateTag("logged_in_user");
@@ -268,7 +273,7 @@ export async function signInWithEmail(
   const { account } = await createAdminClient();
 
   try {
-    const session = await account.createEmailPasswordSession(email, password);
+    const session = await account.createEmailPasswordSession({email: email, password: password});
 
     revalidateTag("logged_in_user");
 
@@ -312,7 +317,7 @@ export async function signUpWithEmail(
   try {
     const id = ID.unique();
     await account.create(id, email, password, name);
-    const session = await account.createEmailPasswordSession(email, password);
+    const session = await account.createEmailPasswordSession({email: email, password: password});
 
     (await cookies()).set(COOKIE_KEY, session.secret, {
       path: "/",
@@ -345,11 +350,11 @@ export async function signUpWithGithub(): Promise<void> {
   const { account } = await createAdminClient();
   const origin = (await headers()).get("origin");
 
-  const redirectUrl = await account.createOAuth2Token(
-    OAuthProvider.Github,
-    `${origin}/api/auth/callback`,
-    `${origin}/signup`
-  );
+  const redirectUrl = await account.createOAuth2Token({
+    provider: OAuthProvider.Github,
+    success: `${origin}/api/auth/callback`,
+    failure: `${origin}/signup`
+  });
 
   return redirect(redirectUrl);
 }
@@ -368,7 +373,7 @@ export async function createPasswordRecovery(
   const origin = (await headers()).get("origin");
 
   try {
-    await account.createRecovery(email, `${origin}/reset`);
+    await account.createRecovery({email: email, url: `${origin}/reset`});
   } catch (err) {
     const error = err as Error;
 
@@ -399,7 +404,7 @@ export async function resetPassword(
   const { account } = await createAdminClient();
 
   try {
-    await account.updateRecovery(id, token, password);
+    await account.updateRecovery({userId: id, secret: token, password: password});
   } catch (err) {
     const error = err as Error;
 
@@ -428,31 +433,31 @@ export async function createUserData(
     const { database } = await createAdminClient();
 
     try {
-      await database.getDocument<UserData>(
-        DATABASE_ID,
-        USER_COLLECTION_ID,
-        userId
-      );
+      await database.getRow<UserData>({
+        databaseId: DATABASE_ID,
+        tableId: USER_COLLECTION_ID,
+        rowId: userId
+      });
 
       return {
         success: true,
         message: "User data already exists.",
       };
     } catch {
-      await database.createDocument<UserData>(
-        DATABASE_ID,
-        USER_COLLECTION_ID,
-        userId,
-        {
+      await database.createRow<UserData>({
+        databaseId: DATABASE_ID,
+        tableId: USER_COLLECTION_ID,
+        rowId: userId,
+        data: {
           name: user.name,
           avatar: null,
         },
-        [
+        permissions: [
           Permission.read(Role.user(userId)),
           Permission.write(Role.user(userId)),
           Permission.read(Role.users()),
         ]
-      );
+      });
 
       return {
         success: true,

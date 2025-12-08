@@ -21,11 +21,11 @@ import { AddProductFormData, EditProductFormData } from "./schemas";
 /**
  * Get a list of products
  * @param {string[]} queries The queries to filter the products
- * @returns {Promise<Result<Models.DocumentList<Product>>>} The list of products
+ * @returns {Promise<Result<Models.RowList<Product>>>} The list of products
  */
 export async function listProducts(
   queries: string[] = []
-): Promise<Result<Models.DocumentList<Product>>> {
+): Promise<Result<Models.RowList<Product>>> {
   return withAuth(async (user) => {
     const { database } = await createSessionClient();
 
@@ -33,19 +33,19 @@ export async function listProducts(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       async (queries, userId) => {
         try {
-          const products = await database.listDocuments<Product>(
-            DATABASE_ID,
-            SAMPLE_COLLECTION_ID,
-            queries
-          );
+          const products = await database.listRows<Product>({
+            databaseId: DATABASE_ID,
+            tableId: SAMPLE_COLLECTION_ID,
+            queries: queries
+          });
 
-          const userIds = products.documents.map((product) => product.userId);
+          const userIds = products.rows.map((product) => product.userId);
           const uniqueUserIds = Array.from(new Set(userIds));
 
-          const teamIds = products.documents.map((product) => product.teamId);
+          const teamIds = products.rows.map((product) => product.teamId);
           const uniqueTeamIds = Array.from(new Set(teamIds));
 
-          const users = await database.listDocuments<UserData>(
+          const users = await database.listRows<UserData>(
             DATABASE_ID,
             USER_COLLECTION_ID,
             [
@@ -54,7 +54,7 @@ export async function listProducts(
             ]
           );
 
-          const teams = await database.listDocuments<UserData>(
+          const teams = await database.listRows<TeamData>(
             DATABASE_ID,
             TEAM_COLLECTION_ID,
             [
@@ -63,7 +63,7 @@ export async function listProducts(
             ]
           );
 
-          const userMap = users.documents.reduce<Record<string, UserData>>(
+          const userMap = users.rows.reduce<Record<string, UserData>>(
             (acc, user) => {
               if (user) {
                 acc[user.$id] = user;
@@ -73,7 +73,7 @@ export async function listProducts(
             {}
           );
 
-          const teamMap = teams.documents.reduce<Record<string, TeamData>>(
+          const teamMap = teams.rows.reduce<Record<string, TeamData>>(
             (acc, team) => {
               if (team) {
                 acc[team.$id] = team;
@@ -83,13 +83,13 @@ export async function listProducts(
             {}
           );
 
-          const newProducts = products.documents.map((product) => ({
+          const newProducts = products.rows.map((product) => ({
             ...product,
             user: userMap[product.userId],
             team: teamMap[product.teamId],
           }));
 
-          products.documents = newProducts;
+          products.rows = newProducts;
 
           return {
             success: true,
@@ -134,26 +134,26 @@ export async function getProductById(
     return unstable_cache(
       async () => {
         try {
-          const product = await database.getDocument<Product>(
-            DATABASE_ID,
-            SAMPLE_COLLECTION_ID,
-            productId,
-            queries
-          );
+          const product = await database.getRow<Product>({
+            databaseId: DATABASE_ID,
+            tableId: SAMPLE_COLLECTION_ID,
+            rowId: productId,
+            queries: queries
+          });
 
-          const userRes = await database.getDocument<UserData>(
-            DATABASE_ID,
-            USER_COLLECTION_ID,
-            product.userId,
-            [Query.select(["$id", "name", "avatar"])]
-          );
+          const userRes = await database.getRow<UserData>({
+            databaseId: DATABASE_ID,
+            tableId: USER_COLLECTION_ID,
+            rowId: product.userId,
+            queries: [Query.select(["$id", "name", "avatar"])]
+          });
 
-          const teamRes = await database.getDocument<TeamData>(
-            DATABASE_ID,
-            TEAM_COLLECTION_ID,
-            product.teamId,
-            [Query.select(["$id", "name", "avatar"])]
-          );
+          const teamRes = await database.getRow<TeamData>({
+            databaseId: DATABASE_ID,
+            tableId: TEAM_COLLECTION_ID,
+            rowId: product.teamId,
+            queries: [Query.select(["$id", "name", "avatar"])]
+          });
 
           return {
             success: true,
@@ -223,30 +223,30 @@ export async function createProduct({
         data.image = image.data?.$id;
       }
 
-      const product = await database.createDocument<Product>(
-        DATABASE_ID,
-        SAMPLE_COLLECTION_ID,
-        id,
-        {
+      const product = await database.createRow<Product>({
+        databaseId: DATABASE_ID,
+        tableId: SAMPLE_COLLECTION_ID,
+        rowId: id,
+        data: {
           ...data,
           userId: user.$id,
         },
-        permissions
-      );
+        permissions: permissions
+      });
 
-      const userRes = await database.getDocument<UserData>(
-        DATABASE_ID,
-        USER_COLLECTION_ID,
-        product.userId,
-        [Query.select(["$id", "name", "avatar"])]
-      );
+      const userRes = await database.getRow<UserData>({
+        databaseId: DATABASE_ID,
+        tableId: USER_COLLECTION_ID,
+        rowId: product.userId,
+        queries: [Query.select(["$id", "name", "avatar"])]
+      });
 
-      const teamRes = await database.getDocument<TeamData>(
-        DATABASE_ID,
-        TEAM_COLLECTION_ID,
-        product.teamId,
-        [Query.select(["$id", "name", "avatar"])]
-      );
+      const teamRes = await database.getRow<TeamData>({
+        databaseId: DATABASE_ID,
+        tableId: TEAM_COLLECTION_ID,
+        rowId: product.teamId,
+        queries: [Query.select(["$id", "name", "avatar"])]
+      });
 
       revalidateTag("products");
 
@@ -291,11 +291,11 @@ export async function updateProduct({
     const { database } = await createSessionClient();
 
     try {
-      const existingProduct = await database.getDocument<Product>(
-        DATABASE_ID,
-        SAMPLE_COLLECTION_ID,
-        id
-      );
+      const existingProduct = await database.getRow<Product>({
+        databaseId: DATABASE_ID,
+        tableId: SAMPLE_COLLECTION_ID,
+        rowId: id
+      });
 
       if (data.image instanceof File) {
         if (existingProduct.image) {
@@ -321,30 +321,30 @@ export async function updateProduct({
         data.image = null;
       }
 
-      const product = await database.updateDocument<Product>(
-        DATABASE_ID,
-        SAMPLE_COLLECTION_ID,
-        id,
-        {
+      const product = await database.updateRow<Product>({
+        databaseId: DATABASE_ID,
+        tableId: SAMPLE_COLLECTION_ID,
+        rowId: id,
+        data: {
           ...data,
           userId: user.$id,
         },
-        permissions
-      );
+        permissions: permissions
+      });
 
-      const userRes = await database.getDocument<UserData>(
-        DATABASE_ID,
-        USER_COLLECTION_ID,
-        product.userId,
-        [Query.select(["$id", "name", "avatar"])]
-      );
+      const userRes = await database.getRow<UserData>({
+        databaseId: DATABASE_ID,
+        tableId: USER_COLLECTION_ID,
+        rowId: product.userId,
+        queries: [Query.select(["$id", "name", "avatar"])]
+      });
 
-      const teamRes = await database.getDocument<TeamData>(
-        DATABASE_ID,
-        TEAM_COLLECTION_ID,
-        product.teamId,
-        [Query.select(["$id", "name", "avatar"])]
-      );
+      const teamRes = await database.getRow<TeamData>({
+        databaseId: DATABASE_ID,
+        tableId: TEAM_COLLECTION_ID,
+        rowId: product.teamId,
+        queries: [Query.select(["$id", "name", "avatar"])]
+      });
 
       revalidateTag("products");
       revalidateTag(`product:${id}`);
@@ -379,11 +379,11 @@ export async function deleteProduct(id: string): Promise<Result<Product>> {
     const { database } = await createSessionClient();
 
     try {
-      const product = await database.getDocument<Product>(
-        DATABASE_ID,
-        SAMPLE_COLLECTION_ID,
-        id
-      );
+      const product = await database.getRow<Product>({
+        databaseId: DATABASE_ID,
+        tableId: SAMPLE_COLLECTION_ID,
+        rowId: id
+      });
 
       if (product.image) {
         const image = await deleteProductImage(product.image);
@@ -393,7 +393,7 @@ export async function deleteProduct(id: string): Promise<Result<Product>> {
         }
       }
 
-      await database.deleteDocument(DATABASE_ID, SAMPLE_COLLECTION_ID, id);
+      await database.deleteRow({databaseId: DATABASE_ID, tableId: SAMPLE_COLLECTION_ID, rowId: id});
 
       revalidateTag("products");
 

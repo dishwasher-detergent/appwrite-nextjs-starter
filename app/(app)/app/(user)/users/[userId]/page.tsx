@@ -32,7 +32,7 @@ export default async function ProfilePage({
       <UserHeader user={data} canEdit={isOwnProfile} />
       <main className="px-4 space-y-6">
         <UserDescription user={data} />
-        <UserContent products={productData?.documents ?? []} userId={userId} />
+        <UserContent products={productData?.rows ?? []} userId={userId} />
       </main>
     </article>
   );

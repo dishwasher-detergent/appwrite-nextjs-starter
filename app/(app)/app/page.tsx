@@ -15,7 +15,7 @@ export default async function AppPage() {
         <h2 className="font-bold">Products</h2>
         <AddProduct teams={teams} />
       </header>
-      <Products initialProducts={data?.documents} />
+      <Products initialProducts={data?.rows} />
     </>
   ) : (
     <section className="grid place-items-center gap-4">

@@ -6,7 +6,7 @@ import { AVATAR_BUCKET_ID, ENDPOINT, PROJECT_ID } from "@/lib/constants";
 import { cn, getInitials } from "@/lib/utils";
 
 interface ProfileLinkProps {
-  avatar?: string;
+  avatar?: string | null;
   name?: string;
   href: string;
   className?: string;

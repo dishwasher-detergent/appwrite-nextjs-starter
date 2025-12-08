@@ -29,11 +29,11 @@ export const useProduct = ({ initialProduct }: Props) => {
 
     if (client) {
       unsubscribe = client.subscribe<Product>(
-        `databases.${DATABASE_ID}.collections.${SAMPLE_COLLECTION_ID}.documents.${product?.$id}`,
+        `databases.${DATABASE_ID}.tables.${SAMPLE_COLLECTION_ID}.rows.${product?.$id}`,
         async (response) => {
           if (
             response.events.includes(
-              "databases.*.collections.*.documents.*.update"
+              "databases.*.tables.*.rows.*.update"
             )
           ) {
             const { data } = await getUserById(response.payload.userId);
@@ -50,7 +50,7 @@ export const useProduct = ({ initialProduct }: Props) => {
 
           if (
             response.events.includes(
-              "databases.*.collections.*.documents.*.delete"
+              "databases.*.tables.*.rows.*.delete"
             )
           ) {
             router.push("/app");
